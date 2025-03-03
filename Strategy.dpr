@@ -4,7 +4,8 @@ uses
   System.StartUpCopy,
   FMX.Forms,
   Window in 'Window.pas' {Form2},
-  CellManager in 'CellManager.pas';
+  CellManager in 'CellManager.pas',
+  DiceManager in 'DiceManager.pas';
 
 {$R *.res}
 

@@ -1,14 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.fmx=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.fmx</Transaction>
     <Transaction>1899.12.30 00:00:00.000.685,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.776,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.pas=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.173,C:\Файлы\Учёба\ОАИП2\Strategy\CellManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.117,C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas=C:\Файлы\Учёба\ОАИП2\Strategy\DiceManager.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.186,C:\Файлы\Учёба\ОАИП2\Strategy\Strategy.dproj=C:\Users\user\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.707,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.135,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2025.02.21 23:55:44.776,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2025.02.21 23:56:00.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.pas=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>2025.02.21 23:56:00.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.fmx=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.fmx</Transaction>
-    <Transaction>2025.02.21 23:56:25.186,C:\Файлы\Учёба\ОАИП2\Strategy\Strategy.dproj=C:\Users\user\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
-    <Transaction>2025.02.21 23:56:39.481,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>2025.02.21 23:56:55.173,C:\Файлы\Учёба\ОАИП2\Strategy\CellManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.481,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.065,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>
