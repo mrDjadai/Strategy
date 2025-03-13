@@ -132,6 +132,8 @@
         </DCCReference>
         <DCCReference Include="CellManager.pas"/>
         <DCCReference Include="DiceManager.pas"/>
+        <DCCReference Include="CharacterManager.pas"/>
+        <DCCReference Include="DataTypes.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

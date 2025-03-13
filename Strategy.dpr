@@ -5,7 +5,9 @@ uses
   FMX.Forms,
   Window in 'Window.pas' {Form2},
   CellManager in 'CellManager.pas',
-  DiceManager in 'DiceManager.pas';
+  DiceManager in 'DiceManager.pas',
+  CharacterManager in 'CharacterManager.pas',
+  DataTypes in 'DataTypes.pas';
 
 {$R *.res}
 

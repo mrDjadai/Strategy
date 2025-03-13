@@ -4,27 +4,14 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, DataTypes;
 
-
-Type
-CellType = (cBlocked, cDefault, cDifficult);
-
-Vector2 = Record
-  x, y : integer;
-End;
-
-CellData = Record
-  sprite : string;
-  decardPos : Vector2;
-  cType : CellType;
-End;
 
 procedure Init(mapName : string);
 
 implementation
 
-uses Window;
+uses Window, WinApi.Windows;
 
 const
  cellSize = 150;
@@ -35,11 +22,13 @@ var
  x, y: integer;
  line : string;
  f : TextFile;
- map : Array of Array of CellData;
+ map : Array of Array of TCellData;
 
 
-function GetCellById(id : char) : CellData;
+function GetCellById(id : char) : TCellData;
 begin
+  Result := TCellData.Create;
+
   Case id of
   '0' : begin
           Result.sprite := 'meadow';
@@ -84,7 +73,9 @@ for var i := 0 to x do
       MyImage.Width := cellSize;
       MyImage.Height := cellSize;
 
-      MyImage.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + map[k][i].sprite + '.png');
+      map[k][i].Image := MyImage;
+      map[k][i].ReDraw();
+
       MyImage.RotationAngle := 90;
     end;
   end;
@@ -94,7 +85,6 @@ procedure Init(mapName : string);
 var i, len : integer;
 begin
   AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + mapName + '.txt');
-
   Reset(f);
   i := 0;
   while (not EOF(f)) do

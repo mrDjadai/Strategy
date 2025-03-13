@@ -20,14 +20,19 @@ var
 
 implementation
 
-uses CellManager, DiceManager;
+uses CellManager, DiceManager, Winapi.Windows;
 {$R *.fmx}
 
 const
   testDices : DicesCount = (1,1,1,1,1);
+  useConsole = true;
+
 procedure TForm2.OpenGame(Sender: TObject);
 begin
   Randomize();
+  if useConsole then
+      AllocConsole();
+
   CellManager.Init('test');
   DropDices(testDices);
 end;

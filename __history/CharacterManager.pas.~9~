@@ -1,0 +1,20 @@
+unit CharacterManager;
+
+interface
+
+uses CellManager;
+
+{type
+  TCharacter = class
+    public
+      var
+        sprite : string;
+        pos : vector2;
+        hp : integer;
+        speed : integer;
+        armor : integer;
+  end;                       }
+
+implementation
+
+end.

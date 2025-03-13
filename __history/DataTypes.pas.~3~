@@ -1,0 +1,48 @@
+unit DataTypes;
+
+interface
+
+uses CellManager;
+
+type
+  TCharacter = class
+    public
+      var
+        sprite : string;
+        pos : vector2;
+        hp : integer;
+        speed : integer;
+        armor : integer;
+  end;
+
+  TCellType = (cBlocked, cDefault, cDifficult);
+
+Vector2 = Record
+  x, y : integer;
+End;
+
+TCellData = class
+  private
+    procedure OnClick(sender : Tobject);
+    procedure SetImage(im : TImage);
+    function GetImage() : TImage;
+
+    var
+      img : TImage;
+
+  public
+    var
+      sprite : string;
+      decardPos : Vector2;
+      cType : TCellType;
+      character : TCharacter;
+
+  procedure ReDraw();
+
+  property Image: TImage read GetImage write SetImage;
+
+End;
+
+implementation
+
+end.
