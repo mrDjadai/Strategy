@@ -134,6 +134,8 @@
         <DCCReference Include="DiceManager.pas"/>
         <DCCReference Include="CharacterManager.pas"/>
         <DCCReference Include="DataTypes.pas"/>
+        <DCCReference Include="Drawer.pas"/>
+        <DCCReference Include="PlayerManager.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

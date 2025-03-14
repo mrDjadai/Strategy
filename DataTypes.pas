@@ -11,7 +11,14 @@ Vector2 = Record
   x, y : integer;
 End;
 
-  TCharacter = class
+TCharacter = class
+    private
+      var
+        img : TImage;
+
+    destructor OnDestroy();
+
+
     public
       var
         sprite : string;
@@ -19,6 +26,9 @@ End;
         hp : integer;
         speed : integer;
         armor : integer;
+        isSelected : boolean;
+
+        procedure ReDraw();
   end;
 
 TCellType = (cBlocked, cDefault, cDifficult);
@@ -29,6 +39,7 @@ TCellData = class
     procedure OnClick(sender : Tobject);
     procedure SetImage(im : TImage);
     function GetImage() : TImage;
+    destructor OnDestroy();
 
     var
       img : TImage;
@@ -50,42 +61,49 @@ End;
 
 implementation
 
+uses Drawer, CharacterManager;
+
 procedure TCellData.ReDraw();
 var cBitmap : TBitMap;
 begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + '.png');
 
   if character <> nil then
-  begin
-     img.Bitmap.Canvas.BeginScene();
-     cBitMap := TBitMap.Create;
-     cBitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + character.sprite + '.png');
-      img.Bitmap.Canvas.DrawBitmap(
-      cBitmap,
-      RectF(0, 0, img.Bitmap.Width, img.Bitmap.Height),
-      RectF(0, 0, cBitmap.Width, cBitmap.Height),
-      1,
-      True
-    );
-    img.Bitmap.Canvas.EndScene();
-    cBitmap.Free;
-  end;
-
+    character.ReDraw();
 end;
 
 procedure TCellData.OnClick(sender: TObject);
 begin
   WriteLn('clicked    ' + sprite);            //тест
 
-  if True then                                // если режим предварительной расстановки
+
+  if character = nil then       // если режим предварительной расстановки
   begin
     var c : TCharacter;
     c := TCharacter.Create;
     c.sprite := 'pers';
     c.pos := decardPos;
     character := c;
+
+    var myImage : TImage;
+    myImage := TImage.Create(TComponent(Sender).Owner);
+    myImage.Parent := TControl(Sender).Parent;
+
+    MyImage.Position := img.Position;
+    MyImage.Height := img.Height;
+    MyImage.BringToFront();
+
+    MyImage.HitTest := false;
+
+    c.img := myImage;
     ReDraw();
+  end
+  else
+  begin
+    if true then
+      SelectCharacter(decardPos);
   end;
+
 end;
 
 procedure TCellData.SetImage(im: TImage);
@@ -99,6 +117,29 @@ end;
 function TCellData.GetImage: TImage;
 begin
   Result := img;
+end;
+
+
+destructor TCharacter.OnDestroy();
+begin
+  img.Free;
+  inherited Destroy;
+end;
+
+
+destructor TCellData.OnDestroy();
+begin
+  img.Free;
+  character.Free;
+  inherited Destroy;
+end;
+
+
+procedure TCharacter.ReDraw();
+begin
+  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + '.png');
+  if isSelected then
+    DrawOutline(img, TAlphaColors.Yellow, 50);
 end;
 
 end.

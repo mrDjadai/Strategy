@@ -1,20 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>1899.12.30 00:00:00.000.490,C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Window.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.117,C:\Файлы\Учёба\ОАИП2\Strategy\DiceManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.776,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.490,C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.fmx=C:\Файлы\Учёба\ОАИП2\Strategy\Window.fmx</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.173,C:\Файлы\Учёба\ОАИП2\Strategy\CellManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.pas=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.112,C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas=C:\Файлы\Учёба\ОАИП2\Strategy\DataTypes.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.450,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
     <Transaction>1899.12.30 00:00:00.000.685,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.065,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.707,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.135,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.186,C:\Users\user\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Файлы\Учёба\ОАИП2\Strategy\Strategy.dproj</Transaction>
-    <Transaction>1899.12.30 00:00:00.000.173,C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas=C:\Файлы\Учёба\ОАИП2\Strategy\CellManager.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.776,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.490,C:\Файлы\Учёба\ОАИП2\Strategy\Window.fmx=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit2.fmx</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.186,C:\Файлы\Учёба\ОАИП2\Strategy\Strategy.dproj=C:\Users\user\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
     <Transaction>1899.12.30 00:00:00.000.481,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>2025.03.13 22:45:08.085,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>2025.03.13 22:45:19.076,C:\Файлы\Учёба\ОАИП2\Strategy\CharacterManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>2025.03.13 23:05:53.450,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
-    <Transaction>2025.03.13 23:06:04.112,C:\Файлы\Учёба\ОАИП2\Strategy\DataTypes.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.065,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.117,C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas=C:\Файлы\Учёба\ОАИП2\Strategy\DiceManager.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.135,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.707,=C:\Users\user\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.076,C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas=C:\Файлы\Учёба\ОАИП2\Strategy\CharacterManager.pas</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.085,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>2025.03.14 18:58:00.640,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>2025.03.14 18:58:06.247,C:\Файлы\Учёба\ОАИП2\Strategy\Drawer.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>2025.03.14 19:00:45.772,=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
+    <Transaction>2025.03.14 19:00:51.819,C:\Файлы\Учёба\ОАИП2\Strategy\PlayerManager.pas=C:\Файлы\Учёба\ОАИП2\Strategy\Unit1.pas</Transaction>
   </Transactions>
 </BorlandProject>

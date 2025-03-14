@@ -7,7 +7,9 @@ uses
   CellManager in 'CellManager.pas',
   DiceManager in 'DiceManager.pas',
   CharacterManager in 'CharacterManager.pas',
-  DataTypes in 'DataTypes.pas';
+  DataTypes in 'DataTypes.pas',
+  Drawer in 'Drawer.pas',
+  PlayerManager in 'PlayerManager.pas';
 
 {$R *.res}
 

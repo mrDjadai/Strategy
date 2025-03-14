@@ -1,0 +1,122 @@
+unit CellManager;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, DataTypes;
+
+
+procedure Init(mapName : string);
+
+function GetCell(pos : vector2) : TCellData;
+
+implementation
+
+uses Window, WinApi.Windows;
+
+const
+ cellSize = 150;
+ cellSpaceX = 130;
+ cellSpaceY = 110;
+
+var
+ x, y: integer;
+ line : string;
+ f : TextFile;
+ map : Array of Array of TCellData;
+
+function GetCell(pos : vector2) : TCellData;
+begin
+  result := map[pos.x, pos.y];
+end;
+
+function GetCellById(id : char) : TCellData;
+begin
+  Result := TCellData.Create;
+
+  Case id of
+  '0' : begin
+          Result.sprite := 'meadow';
+          Result.cType := cDefault;
+        end;
+  '1' : begin
+          Result.sprite := 'desert';
+          Result.cType := cDefault;
+        end;
+  '2' : begin
+          Result.sprite := 'forest';
+          Result.cType := cDifficult;
+        end;
+  '3' : begin
+          Result.sprite := 'hills';
+          Result.cType := cBlocked;
+        end;
+  '4' : begin
+          Result.sprite := 'sea';
+          Result.cType := cBlocked;
+        end;
+  End;
+end;
+
+procedure DrawMap(form : TForm2);
+begin
+var MyImage : TImage;
+for var i := 0 to x do
+  begin
+    for var k := 0 to y do
+    begin
+      MyImage := TImage.Create(form);
+
+      MyImage.Parent := form;
+
+      MyImage.Position.X := cellSpaceX * i;
+      MyImage.Position.Y := cellSpaceY * k;
+
+      if k mod 2 = 0 then
+        MyImage.Position.X := cellSpaceX / 2 + MyImage.Position.X;
+
+      MyImage.Width := cellSize;
+      MyImage.Height := cellSize;
+
+      map[k][i].Image := MyImage;
+      map[k][i].ReDraw();
+
+      MyImage.RotationAngle := 90;
+    end;
+  end;
+end;
+
+procedure Init(mapName : string);
+var i, len : integer;
+begin
+  AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + mapName + '.txt');
+  Reset(f);
+  i := 0;
+  while (not EOF(f)) do
+  begin
+    readln(f, line);
+
+    SetLength(map, i + 1);
+    SetLength(map[i], Length(line));
+    y := i;
+    x := Length(line) - 1;
+
+    for var k := 0 to Length(line) - 1 do
+    begin
+      map[i][k] := GetCellById(line[k+1]);
+      map[i][k].decardPos.x := k;
+      map[i][k].decardPos.y := i;
+    end;
+
+    inc(i);
+
+  end;
+
+
+  DrawMap(Form2);
+
+end;
+
+
+end.

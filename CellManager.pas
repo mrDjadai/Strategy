@@ -9,6 +9,8 @@ uses
 
 procedure Init(mapName : string);
 
+function GetCell(pos : vector2) : TCellData;
+
 implementation
 
 uses Window, WinApi.Windows;
@@ -24,6 +26,10 @@ var
  f : TextFile;
  map : Array of Array of TCellData;
 
+function GetCell(pos : vector2) : TCellData;
+begin
+  result := map[pos.y, pos.x];
+end;
 
 function GetCellById(id : char) : TCellData;
 begin

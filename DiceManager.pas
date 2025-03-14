@@ -26,7 +26,7 @@ function DropDices(dices: DicesCount) : integer;
 
 implementation
 
-uses CellManager, Window;
+uses CellManager, Window, Drawer;
 
 const
   DiceSize = 60;
@@ -59,47 +59,6 @@ begin
   SetLength(spawnedCubes, 0);;
 end;
 
-procedure ColorizeImage(Image: TImage);
-var
-  Bitmap: TBitmap;
-  BitmapData: TBitmapData;
-  X, Y: Integer;
-  PixelColor: TAlphaColor;
-  TintColor: TAlphaColor;
-  TintRec: TAlphaColorRec;
-  PixelRec: TAlphaColorRec;
-begin
-  Bitmap := Image.Bitmap;
-
-  TintRec.A := 255;
-  TintRec.R := Random(256);
-  TintRec.G := Random(256);
-  TintRec.B := Random(256);
-
-  TintColor := TAlphaColor(TintRec);
-
-  if Bitmap.Map(TMapAccess.ReadWrite, BitmapData) then
-  try
-    for Y := 0 to Bitmap.Height - 1 do
-      for X := 0 to Bitmap.Width - 1 do
-      begin
-        PixelColor := BitmapData.GetPixel(X, Y);
-        PixelRec := TAlphaColorRec(PixelColor);
-        if TAlphaColorRec(PixelColor).A > 0 then
-        begin
-          PixelRec.R := (PixelRec.R + TintRec.R) div 2;
-          PixelRec.G := (PixelRec.G + TintRec.G) div 2;
-          PixelRec.B := (PixelRec.B + TintRec.B) div 2;
-
-          BitmapData.SetPixel(X, Y, TAlphaColor(PixelRec));
-        end;
-      end;
-  finally
-    Bitmap.Unmap(BitmapData);
-  end;
-
-  Image.InvalidateRect(Image.BoundsRect);
-end;
 
 function DrawDice(sprite : string; val : integer; pos : Vector2) : DiceVisualisator;
 var MyImage : TImage;

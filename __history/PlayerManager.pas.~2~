@@ -1,0 +1,11 @@
+unit PlayerManager;
+
+interface
+
+uses DataTypes;
+
+var selected : vector2;
+
+implementation
+
+end.

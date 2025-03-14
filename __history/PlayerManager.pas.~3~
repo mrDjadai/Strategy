@@ -1,0 +1,17 @@
+unit PlayerManager;
+
+interface
+
+uses DataTypes;
+
+var selected : vector2;
+
+implementation
+
+initialization
+begin
+  selected.x := -1;
+  selected.y := -1;
+end;
+
+end.
