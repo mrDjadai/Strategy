@@ -28,7 +28,10 @@ var
 
 function GetCell(pos : vector2) : TCellData;
 begin
-  result := map[pos.y, pos.x];
+  if (pos.x < 0) or (pos.y < 0) or (pos.x > x) or (pos.y > y) then
+    result := nil
+  else
+    result := map[pos.y, pos.x];
 end;
 
 function GetCellById(id : char) : TCellData;
@@ -107,6 +110,7 @@ begin
       map[i][k] := GetCellById(line[k+1]);
       map[i][k].decardPos.x := k;
       map[i][k].decardPos.y := i;
+      map[i][k].cubePos := decardToCube(map[i][k].decardPos);
     end;
 
     inc(i);

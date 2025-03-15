@@ -1,0 +1,101 @@
+unit CharacterDataVisualisator;
+
+interface
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, DataTypes;
+
+procedure Init(_opText : TLabel; pan : TImage);
+
+procedure SetCaharcter(c : TCharacter);
+
+procedure ReDraw();
+
+implementation
+
+uses CellManager, CharacterManager;
+
+var
+  panel : TImage;
+  opText : TLabel;
+  curCharacter : TCharacter;
+  moveIndicators : array[0..7] of TImage;
+
+const
+  neignourPositions : array[0..7] of Vector2 =(
+  (x : 1; y : 0),
+  (x : 1; y : 1),
+  (x : 0; y : 1),
+  (x : -1; y : 1),
+  (x : -1; y : 0),
+  (x : -1; y : -1),
+  (x : 0; y : -1),
+  (x : 1; y : -1));
+
+  moveIndicator = 'd1.png';
+  moveIndicatorSize = 50;
+
+
+procedure Init(_opText : TLabel; pan : TImage);
+var MyImage : TImage;
+begin
+  panel := pan;
+  opText := _opText;
+  panel.Visible := false;
+
+  for var i := 0 to 7 do
+  begin
+    MyImage := TImage.Create(pan.Parent);
+
+    MyImage.Width := moveIndicatorSize;
+    MyImage.Height := moveIndicatorSize;
+    MyImage.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + moveIndicator);
+    moveIndicators[i] := MyImage;
+    MyImage.Visible := false;
+  end;
+end;
+
+procedure DrawMoveIndicators();
+var current : vector2;
+begin
+  for var i := 0 to 7 do
+  begin
+
+    if GetCell(current) = nil then
+       moveIndicators[i].Visible := false
+    else
+       moveIndicators[i].Visible := CorrectDest(current);
+  end;
+end;
+
+procedure HideMoveIndicators();
+begin
+  for var i := 0 to 7 do
+    moveIndicators[i].Visible := false;
+end;
+
+
+procedure SetCaharcter(c : TCharacter);
+begin
+  curCharacter := c;
+  ReDraw();
+end;
+
+
+procedure ReDraw();
+begin
+  if curCharacter = nil then
+  begin
+    panel.Visible := false;
+    HideMoveIndicators();
+  end
+  else
+  begin
+    opText.Text := IntToStr(curCharacter.movePoints);
+    panel.Visible := true;
+    DrawMoveIndicators();
+  end;
+end;
+end.

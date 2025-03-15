@@ -11,10 +11,13 @@ Vector2 = Record
   x, y : integer;
 End;
 
+Vector3 = Record
+  x, y, z : integer;
+End;
+
+
 TCharacter = class
     private
-      var
-        img : TImage;
 
     destructor OnDestroy();
 
@@ -27,7 +30,8 @@ TCharacter = class
         speed : integer;
         armor : integer;
         isSelected : boolean;
-
+        img : TImage;
+        movePoints : integer;
         procedure ReDraw();
   end;
 
@@ -48,6 +52,7 @@ TCellData = class
     var
       sprite : string;
       decardPos : Vector2;
+      cubePos : Vector3;
       cType : TCellType;
       character : TCharacter;
 
@@ -57,11 +62,13 @@ TCellData = class
 
 End;
 
+function decardToCube(pos : vector2) : Vector3;
 
+function GetDistance(a, b : vector3) : integer;
 
 implementation
 
-uses Drawer, CharacterManager;
+uses Drawer, CharacterManager, PlayerManager, CellManager;
 
 procedure TCellData.ReDraw();
 var cBitmap : TBitMap;
@@ -73,35 +80,23 @@ begin
 end;
 
 procedure TCellData.OnClick(sender: TObject);
-begin
-  WriteLn('clicked    ' + sprite);            //тест
+begin                          //тест
+  WriteLn('clicked    ' + sprite + '  at decard  x=', decardPos.x, '  y=', decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,'   has character  ', character <> nil);
 
 
   if character = nil then       // если режим предварительной расстановки
   begin
-    var c : TCharacter;
-    c := TCharacter.Create;
-    c.sprite := 'pers';
-    c.pos := decardPos;
-    character := c;
-
-    var myImage : TImage;
-    myImage := TImage.Create(TComponent(Sender).Owner);
-    myImage.Parent := TControl(Sender).Parent;
-
-    MyImage.Position := img.Position;
-    MyImage.Height := img.Height;
-    MyImage.BringToFront();
-
-    MyImage.HitTest := false;
-
-    c.img := myImage;
-    ReDraw();
+    if selectedCharacter.x = -1 then
+      TryCreateCharacter(Self)
+    else
+      TryMoveCharacter(GetCell(selectedCharacter), Self);
   end
   else
   begin
-    if true then
-      SelectCharacter(decardPos);
+  if (selectedCharacter.x = decardPos.x) and (selectedCharacter.y = decardPos.y) then
+      UnselectCharacter()
+  else
+    SelectCharacter(decardPos);
   end;
 
 end;
@@ -140,6 +135,19 @@ begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + '.png');
   if isSelected then
     DrawOutline(img, TAlphaColors.Yellow, 50);
+end;
+
+
+function decardToCube(pos : vector2) : Vector3;
+begin
+  result.x := pos.x - (pos.y + (pos.y and 1)) div 2;
+  result.y := pos.y;
+  result.z := -result.x - result.y;
+end;
+
+function GetDistance(a, b : vector3) : integer;
+begin
+  result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
 end;
 
 end.

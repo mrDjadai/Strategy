@@ -1,0 +1,149 @@
+unit CharacterManager;
+
+interface
+
+uses DataTypes, FMX.Objects, System.Classes, FMX.Controls, FMX.Ani;
+
+procedure SelectCharacter(pos : Vector2);
+
+procedure UnselectCharacter();
+
+procedure TryMoveCharacter(source, dest : TCellData);
+
+function TryCreateCharacter(cell : TCellData) : boolean;
+
+function IsCorrectDest(src, dest : TCellData) : boolean;
+
+implementation
+
+uses PlayerManager, CellManager, System.SysUtils, Window, CharacterDataVisualisator;
+
+
+const
+  movingDuration = 0.5;
+
+
+
+procedure SelectCharacter(pos : Vector2);
+begin
+  if selectedCharacter.x <> -1 then
+  begin
+    GetCell(selectedCharacter).character.isSelected := false;
+    GetCell(selectedCharacter).character.ReDraw();
+  end;
+
+  selectedCharacter := pos;
+  GetCell(pos).character.isSelected := true;
+  GetCell(pos).character.ReDraw();
+end;
+
+procedure UnselectCharacter();
+var last : vector2;
+begin
+  last := selectedCharacter;
+  selectedCharacter.x := -1;
+  selectedCharacter.y := -1;
+  GetCell(last).character.isSelected := false;
+  GetCell(last).character.ReDraw();
+end;
+
+procedure AnimationFinished(Sender: TObject);
+begin
+  if Sender is TFloatAnimation then
+    TFloatAnimation(Sender).Free;
+end;
+
+procedure MoveCharacter(source, dest : TCellData);
+var
+  AnimX, AnimY: TFloatAnimation;
+  Image : TImage;
+begin
+  Image := source.character.img;
+  selectedCharacter := dest.decardPos;
+
+
+  dest.character := source.character;
+  source.character := nil;
+
+                                                   //Анимация
+
+  AnimX := TFloatAnimation.Create(Image);
+  AnimX.Parent := Image;
+  AnimX.PropertyName := 'Position.X';
+  AnimX.StartValue := source.Image.Position.X;
+  AnimX.StopValue := dest.Image.Position.X;
+  AnimX.Duration := movingDuration;
+  AnimX.Start;
+
+  AnimY := TFloatAnimation.Create(Image);
+  AnimY.Parent := Image;
+  AnimY.PropertyName := 'Position.Y';
+  AnimY.StartValue := source.Image.Position.Y;
+  AnimY.StopValue := dest.Image.Position.Y;
+  AnimY.Duration := movingDuration;
+  AnimY.Start;
+
+  AnimX.OnFinish := Form2.DeleteAnimation;
+  AnimY.OnFinish := Form2.DeleteAnimation;
+end;
+
+procedure TryMoveCharacter(source, dest : TCellData);
+begin
+  if IsCorrectDest(source, dest) then
+  begin
+    MoveCharacter(source, dest);
+    if dest.cType = cDifficult then
+      dest.character.movePoints := dest.character.movePoints - 2
+    else
+      dest.character.movePoints := dest.character.movePoints - 1;
+  end;
+end;
+
+procedure CreateCharacter(cell : TCellData);
+begin
+var c : TCharacter;
+    c := TCharacter.Create;
+    c.sprite := 'pers';
+    c.pos := cell.decardPos;
+    cell.character := c;
+
+    var myImage : TImage;
+    myImage := TImage.Create(TComponent(cell.Image).Owner);
+    myImage.Parent := TControl(cell.Image).Parent;
+
+    MyImage.Position := cell.Image.Position;
+    MyImage.Height := cell.Image.Height;
+    MyImage.BringToFront();
+
+    MyImage.HitTest := false;
+
+    c.img := myImage;
+    cell.ReDraw();
+
+    c.movePoints := 10;
+end;
+
+function TryCreateCharacter(cell : TCellData) : boolean;
+begin
+  result := false;
+
+  if cell.cType <> cBlocked then
+  begin
+    CreateCharacter(cell);
+    result := true;
+  end;
+end;
+
+function IsCorrectDest(src, dest : TCellData) : boolean;
+begin
+  if (GetDistance(src.cubePos, dest.cubePos) = 1)  then
+    case dest.cType of
+    cBlocked: result := false;
+    cDefault: result := src.character.movePoints > 0;
+    cDifficult: result := src.character.movePoints > 1;
+    end
+  else
+    result := false;
+end;
+
+end.

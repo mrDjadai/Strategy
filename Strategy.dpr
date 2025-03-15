@@ -9,7 +9,8 @@ uses
   CharacterManager in 'CharacterManager.pas',
   DataTypes in 'DataTypes.pas',
   Drawer in 'Drawer.pas',
-  PlayerManager in 'PlayerManager.pas';
+  PlayerManager in 'PlayerManager.pas',
+  CharacterDataVisualisator in 'CharacterDataVisualisator.pas';
 
 {$R *.res}
 
