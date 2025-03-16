@@ -15,7 +15,7 @@ procedure ReDraw();
 
 implementation
 
-uses CellManager, CharacterManager;
+uses CellManager, CharacterManager, Window;
 
 var
   panel : TImage;
@@ -48,7 +48,7 @@ begin
   for var i := 0 to 7 do
   begin
     MyImage := TImage.Create(pan.Parent);
-    MyImage.Parent := pan.Parent;
+    MyImage.Parent := form2.Map;
 
     MyImage.Width := moveIndicatorSize;
     MyImage.Height := moveIndicatorSize;

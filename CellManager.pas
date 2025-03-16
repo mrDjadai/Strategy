@@ -22,8 +22,6 @@ const
 
 var
  x, y: integer;
- line : string;
- f : TextFile;
  map : Array of Array of TCellData;
 
 function GetCell(pos : vector2) : TCellData;
@@ -71,7 +69,7 @@ for var i := 0 to x do
     begin
       MyImage := TImage.Create(form);
 
-      MyImage.Parent := form;
+      MyImage.Parent := form.Map;
 
       MyImage.Position.X := cellSpaceX * i;
       MyImage.Position.Y := cellSpaceY * k;
@@ -92,6 +90,8 @@ end;
 
 procedure Init(mapName : string);
 var i, len : integer;
+ f : TextFile;
+ line : string;
 begin
   AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + mapName + '.txt');
   Reset(f);
@@ -117,7 +117,7 @@ begin
 
   end;
 
-
+  CloseFile(f);
   DrawMap(Form2);
 
 end;

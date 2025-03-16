@@ -5,14 +5,21 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
-  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects;
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts;
 
 type
   TForm2 = class(TForm)
     OPLabel: TLabel;
     OP: TLabel;
     CharacterPanel: TImage;
+    Map: TLayout;
+    KeyPressTimer: TTimer;
     procedure OpenGame(Sender: TObject);
+    procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
+      Shift: TShiftState);
+    procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar;
+      Shift: TShiftState);
+    procedure KeyPressTimerTimer(Sender: TObject);
   private
     { Private declarations }
   public
@@ -24,7 +31,7 @@ var
 
 implementation
 
-uses CellManager, DiceManager, Winapi.Windows, CharacterDataVisualisator;
+uses CellManager, DiceManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, CharacterManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -32,12 +39,49 @@ const
   testDices : DicesCount = (1,1,1,1,1);
   useConsole = true;
 
+  mapMovingSpeed = 2;
+
+var MapMoveDirection : vector2;
+
+
+procedure TForm2.FormKeyDown(Sender: TObject; var Key: Word;
+  var KeyChar: WideChar; Shift: TShiftState);
+begin
+  case KeyChar of
+    'W', 'w', 'Ö', 'ö': MapMoveDirection.y := -mapMovingSpeed;
+    'A', 'a', 'Ô', 'ô': MapMoveDirection.x := -mapMovingSpeed;
+    'S', 's', 'Û', 'û': MapMoveDirection.y := mapMovingSpeed;
+    'D', 'd', 'Â', 'â': MapMoveDirection.x := mapMovingSpeed;
+  end;
+end;
+
+procedure TForm2.FormKeyUp(Sender: TObject; var Key: Word;
+  var KeyChar: WideChar; Shift: TShiftState);
+begin
+  case KeyChar of
+    'W', 'w', 'Ö', 'ö': MapMoveDirection.y := 0;
+    'A', 'a', 'Ô', 'ô': MapMoveDirection.x := 0;
+    'S', 's', 'Û', 'û': MapMoveDirection.y := 0;
+    'D', 'd', 'Â', 'â': MapMoveDirection.x := 0;
+  end;
+end;
+
+procedure TForm2.KeyPressTimerTimer(Sender: TObject);
+begin
+  Map.Position.X := Map.Position.X + MapMoveDirection.x;
+  Map.Position.Y := Map.Position.Y + MapMoveDirection.y;
+end;
+
 procedure TForm2.OpenGame(Sender: TObject);
 begin
   Randomize();
+  MapMoveDirection.x := 0;
+  MapMoveDirection.y := 0;
+
   if useConsole then
       AllocConsole();
 
+  CharacterManager.Init();
   CharacterDataVisualisator.Init(op, CharacterPanel);
   CellManager.Init('test');
   DropDices(testDices);

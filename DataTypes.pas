@@ -19,20 +19,29 @@ End;
 TCharacter = class
     private
 
-    destructor OnDestroy();
+    var healsBar : TImage;
 
+    destructor OnDestroy();
+    procedure SetHP(h : integer);
+    function GetHP() : integer;
 
     public
       var
+        name : string;
         sprite : string;
         pos : vector2;
-        hp : integer;
+        heals : integer;
+        maxHp : integer;
         speed : integer;
         armor : integer;
         isSelected : boolean;
         img : TImage;
         movePoints : integer;
+
+        procedure Init(form : TForm);
+
         procedure ReDraw();
+        property HP: integer read GetHP write SetHP;
   end;
 
 TCellType = (cBlocked, cDefault, cDifficult);
@@ -70,6 +79,9 @@ implementation
 
 uses Drawer, CharacterManager, PlayerManager, CellManager;
 
+const
+  healsBarScale : vector2 = (x: 50; y : 4);
+  healsBarPos : vector2 = (x: 0; y : 100);
 procedure TCellData.ReDraw();
 var cBitmap : TBitMap;
 begin
@@ -118,6 +130,7 @@ end;
 destructor TCharacter.OnDestroy();
 begin
   img.Free;
+  healsBar.Free;
   inherited Destroy;
 end;
 
@@ -148,6 +161,46 @@ end;
 function GetDistance(a, b : vector3) : integer;
 begin
   result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
+end;
+
+procedure TCharacter.Init(form : TForm);
+begin
+  healsBar := TImage.Create(form);
+  healsBar.Parent := img;
+  healsBar.Position.X := healsBarPos.X;
+  healsBar.Position.Y := healsBarPos.Y;
+
+  healsBar.Width := healsBarScale.x;
+  healsBar.Height := healsBarScale.y;
+
+  healsBar.Bitmap.Width := healsBarScale.x;
+  healsBar.Bitmap.Height := healsBarScale.y;
+  healsBar.Bitmap.Canvas.BeginScene();
+  healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x, healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.EndScene();
+end;
+
+
+function TCharacter.GetHP() : integer;
+begin
+  result := heals;
+end;
+
+procedure TCharacter.SetHP(h : integer);
+begin
+  heals := h;
+
+  healsBar.Bitmap.Width := healsBarScale.x;
+  healsBar.Bitmap.Height := healsBarScale.y;
+  healsBar.Bitmap.Canvas.BeginScene();
+  healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Brown;
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x, healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, Round(healsBarScale.x * heals / maxHP), healsBarScale.y), 0, 0, [], 1);
+
+  healsBar.Bitmap.Canvas.EndScene();
+
 end;
 
 end.

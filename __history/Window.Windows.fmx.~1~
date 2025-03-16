@@ -1,0 +1,9 @@
+inherited Form2_Windows: TForm2_Windows
+  DesignerMasterStyle = 0
+  inherited CharacterPanel: TImage
+    MultiResBitmap.Height = 167
+    MultiResBitmap.Width = 167
+    MultiResBitmap.TransparentColor = 2763429
+    Position.Y = 40.000000000000000000
+  end
+end

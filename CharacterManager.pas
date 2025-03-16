@@ -16,15 +16,62 @@ function IsCorrectDest(character : TCharacter; dest : TCellData) : boolean; over
 
 function IsCorrectDest(src, dest : TCellData) : boolean; overload;
 
+procedure Init();
+
 implementation
 
-uses PlayerManager, CellManager, System.SysUtils, Window, CharacterDataVisualisator;
+uses PlayerManager, CellManager, System.SysUtils, Window, CharacterDataVisualisator, System.IOUtils, System.Types;
 
 
 const
   movingDuration = 0.5;
 
 
+var
+  charTypes : Array of TCharacter;
+
+procedure LoadCharacter(FileName : string);
+var line : string;
+  cur : TCharacter;
+  f : TextFile;
+begin
+  SetLength(charTypes, Length(charTypes) + 1);
+  cur := TCharacter.Create;
+  charTypes[Length(charTypes) - 1] := cur;
+
+  AssignFile(f, FileName);
+  Reset(f);
+  readln(f, line);
+  cur.name := line;
+
+  readln(f, line);
+  cur.sprite := line;
+
+  readln(f, line);
+  cur.maxHp := StrToInt(line);
+
+  readln(f, line);
+  cur.speed := StrToInt(line);
+
+  readln(f, line);
+  cur.armor := StrToInt(line);
+
+  CloseFile(f);
+end;
+
+procedure Init();
+var Files: TStringDynArray;
+begin
+  SetLength(charTypes, 0);
+  Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) + 'Resourses\Characters\');
+  for var FileName in Files do
+  begin
+    if True then      //Добавить валидацию
+    begin
+      LoadCharacter(FileName);
+    end;
+  end;
+end;
 
 procedure SelectCharacter(pos : Vector2);
 begin
@@ -105,15 +152,17 @@ begin
   ReDraw();
 end;
 
-procedure CreateCharacter(cell : TCellData);
+procedure CreateCharacter(cell : TCellData; charID : integer);
 begin
 var c : TCharacter;
     c := TCharacter.Create;
-    c.sprite := 'pers';
+    c.sprite := charTypes[charId].sprite;       //Загрузка визуала перса
+    c.name := charTypes[charId].name;
+
     c.pos := cell.decardPos;
     cell.character := c;
 
-    var myImage : TImage;
+    var myImage : TImage;                                       //Настройка картинки
     myImage := TImage.Create(TComponent(cell.Image).Owner);
     myImage.Parent := TControl(cell.Image).Parent;
 
@@ -122,11 +171,16 @@ var c : TCharacter;
     MyImage.BringToFront();
 
     MyImage.HitTest := false;
-
     c.img := myImage;
+    c.Init(form2);
     cell.ReDraw();
 
-    c.movePoints := 10;
+    c.maxHp := charTypes[charId].maxHp;           //Загрузка параметров перса
+    c.hp := c.maxHp;
+    c.speed := charTypes[charId].speed;
+    c.armor := charTypes[charId].armor;
+
+    c.movePoints := 10;                             //Для теста
 end;
 
 function TryCreateCharacter(cell : TCellData) : boolean;
@@ -135,7 +189,7 @@ begin
 
   if cell.cType <> cBlocked then
   begin
-    CreateCharacter(cell);
+    CreateCharacter(cell, 0);
     result := true;
   end;
 end;
