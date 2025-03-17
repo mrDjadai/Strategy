@@ -90,12 +90,15 @@ end;
 procedure UnselectCharacter();
 var last : vector2;
 begin
-  last := selectedCharacter;
-  selectedCharacter.x := -1;
-  selectedCharacter.y := -1;
-  GetCell(last).character.isSelected := false;
-  GetCell(last).character.ReDraw();
-  SetCaharcter(nil);
+  if selectedCharacter.x <> -1 then
+  begin
+    last := selectedCharacter;
+    selectedCharacter.x := -1;
+    selectedCharacter.y := -1;
+    GetCell(last).character.isSelected := false;
+    GetCell(last).character.ReDraw();
+    SetCaharcter(nil);
+  end;
 end;
 
 procedure AnimationFinished(Sender: TObject);
@@ -152,12 +155,14 @@ begin
   ReDraw();
 end;
 
+const characterOffset : vector2 = (x : -14; y : 0);
 procedure CreateCharacter(cell : TCellData; charID : integer);
 begin
 var c : TCharacter;
     c := TCharacter.Create;
     c.sprite := charTypes[charId].sprite;       //Загрузка визуала перса
     c.name := charTypes[charId].name;
+    c.owner := curPlayer;
 
     c.pos := cell.decardPos;
     cell.character := c;
@@ -166,8 +171,10 @@ var c : TCharacter;
     myImage := TImage.Create(TComponent(cell.Image).Owner);
     myImage.Parent := TControl(cell.Image).Parent;
 
-    MyImage.Position := cell.Image.Position;
+    MyImage.Position.x := cell.Image.Position.x + characterOffset.x;
+    MyImage.Position.y := cell.Image.Position.y + characterOffset.y;
     MyImage.Height := cell.Image.Height;
+    MyImage.Width := cell.Image.Width;
     MyImage.BringToFront();
 
     MyImage.HitTest := false;
@@ -180,7 +187,7 @@ var c : TCharacter;
     c.speed := charTypes[charId].speed;
     c.armor := charTypes[charId].armor;
 
-    c.movePoints := 10;                             //Для теста
+    c.movePoints := 0;                             //Для теста
 end;
 
 function TryCreateCharacter(cell : TCellData) : boolean;
@@ -196,7 +203,7 @@ end;
 
 function IsCorrectDest(character : TCharacter; dest : TCellData) : boolean; overload;
 begin
-  if (GetDistance(decardToCube(character.pos), dest.cubePos) = 1)  then
+  if (GetDistance(decardToCube(character.pos), dest.cubePos) = 1) and (dest.character = nil) then
     case dest.cType of
     cBlocked: result := false;
     cDefault: result := character.movePoints > 0;

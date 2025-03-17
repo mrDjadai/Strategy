@@ -6,30 +6,31 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.StdCtrls;
 
-procedure ColorizeImage(Image: TImage);
+procedure ColorizeImage(Image: TImage; color : TAlphaColor);
+
+procedure DrawColoredImage(Image: TImage; sprite : string; color : TAlphaColor);
+
+procedure RandomColorizeImage(Image: TImage);
 
 procedure DrawOutline(Image: TImage; BorderColor: TAlphaColor; BorderWidth: Integer);
 
 implementation
 
-procedure ColorizeImage(Image: TImage);
+procedure ColorizeImage(Image: TImage; color : TAlphaColor);
 var
   Bitmap: TBitmap;
   BitmapData: TBitmapData;
   X, Y: Integer;
   PixelColor: TAlphaColor;
-  TintColor: TAlphaColor;
   TintRec: TAlphaColorRec;
   PixelRec: TAlphaColorRec;
 begin
   Bitmap := Image.Bitmap;
 
   TintRec.A := 255;
-  TintRec.R := Random(256);
-  TintRec.G := Random(256);
-  TintRec.B := Random(256);
-
-  TintColor := TAlphaColor(TintRec);
+  TintRec.R := TAlphaColorRec(color).R;
+  TintRec.G := TAlphaColorRec(color).G;
+  TintRec.B := TAlphaColorRec(color).B;
 
   if Bitmap.Map(TMapAccess.ReadWrite, BitmapData) then
     for Y := 0 to Bitmap.Height - 1 do
@@ -49,6 +50,22 @@ begin
     Bitmap.Unmap(BitmapData);
 
   Image.InvalidateRect(Image.BoundsRect);
+end;
+
+procedure RandomColorizeImage(Image: TImage);
+var c : TAlphaColorRec;
+begin
+  c.A := 255;
+  c.R := Random(256);
+  c.G := Random(256);
+  c.B := Random(256);
+  ColorizeImage(Image, TAlphaColor(c));
+end;
+
+procedure DrawColoredImage(Image: TImage; sprite : string; color : TAlphaColor);
+begin
+  Image.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite);
+  ColorizeImage(Image, color);
 end;
 
 procedure DrawOutline(Image: TImage; BorderColor: TAlphaColor; BorderWidth: Integer);

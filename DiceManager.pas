@@ -78,7 +78,7 @@ begin
   MyText.Parent := Form2;
 
   MyImage.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite);
-  ColorizeImage(MyImage);
+  RandomColorizeImage(MyImage);
 
   MyText.Position.X := pos.x;
   MyText.Position.Y := pos.y;

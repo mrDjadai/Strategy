@@ -27,6 +27,7 @@ TCharacter = class
 
     public
       var
+        owner : byte;
         name : string;
         sprite : string;
         pos : vector2;
@@ -39,7 +40,8 @@ TCharacter = class
         movePoints : integer;
 
         procedure Init(form : TForm);
-
+        procedure ResetMP();
+        procedure BuyMP();
         procedure ReDraw();
         property HP: integer read GetHP write SetHP;
   end;
@@ -71,17 +73,18 @@ TCellData = class
 
 End;
 
+  TPlayer = class
+
+  end;
+
 function decardToCube(pos : vector2) : Vector3;
 
 function GetDistance(a, b : vector3) : integer;
 
 implementation
 
-uses Drawer, CharacterManager, PlayerManager, CellManager;
+uses Drawer, CharacterManager, PlayerManager, CellManager, CharacterDataVisualisator;
 
-const
-  healsBarScale : vector2 = (x: 50; y : 4);
-  healsBarPos : vector2 = (x: 0; y : 100);
 procedure TCellData.ReDraw();
 var cBitmap : TBitMap;
 begin
@@ -105,10 +108,13 @@ begin                          //тест
   end
   else
   begin
-  if (selectedCharacter.x = decardPos.x) and (selectedCharacter.y = decardPos.y) then
-      UnselectCharacter()
-  else
-    SelectCharacter(decardPos);
+    if character.owner = curPlayer then
+    begin
+      if (selectedCharacter.x = decardPos.x) and (selectedCharacter.y = decardPos.y) then
+        UnselectCharacter()
+      else
+        SelectCharacter(decardPos);
+    end;
   end;
 
 end;
@@ -145,7 +151,7 @@ end;
 
 procedure TCharacter.ReDraw();
 begin
-  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + '.png');
+  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + IntToStr(owner) + '.png');
   if isSelected then
     DrawOutline(img, TAlphaColors.Yellow, 50);
 end;
@@ -162,6 +168,12 @@ function GetDistance(a, b : vector3) : integer;
 begin
   result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
 end;
+
+
+const
+  healsBarScale : vector2 = (x: 50; y : 4);
+  healsBarPos : vector2 = (x: 53; y : 110);
+
 
 procedure TCharacter.Init(form : TForm);
 begin
@@ -201,6 +213,21 @@ begin
 
   healsBar.Bitmap.Canvas.EndScene();
 
+end;
+
+procedure TCharacter.ResetMP();
+begin
+  movePoints := 0;
+end;
+
+procedure TCharacter.BuyMP();
+begin
+  if GetActionCount() > 0 then
+  begin
+    Inc(movePoints, speed);
+    SetActionCount(GetActionCount() - 1);
+    CharacterDataVisualisator.ReDraw();
+  end;
 end;
 
 end.

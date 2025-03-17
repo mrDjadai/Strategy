@@ -17,35 +17,97 @@ object Form2: TForm2
     Size.PlatformDefault = False
     TabOrder = 1
   end
-  object CharacterPanel: TImage
-    MultiResBitmap.Height = 167
-    MultiResBitmap.Width = 167
-    MultiResBitmap.TransparentColor = 2763429
-    MultiResBitmap = <
-      item
-      end>
-    Anchors = [akTop, akRight]
-    Position.X = 664.000000000000000000
-    Size.Width = 226.000000000000000000
-    Size.Height = 129.000000000000000000
-    Size.PlatformDefault = False
-    object OP: TLabel
-      Position.X = 136.000000000000000000
-      Position.Y = 112.000000000000000000
-      Text = '00'
-      TabOrder = 1
-    end
-    object OPLabel: TLabel
-      Position.X = 8.000000000000000000
-      Position.Y = 112.000000000000000000
-      Text = #1054#1095#1082#1080' '#1087#1077#1088#1077#1076#1074#1080#1078#1077#1085#1080#1103
-      TabOrder = 2
-    end
-  end
   object KeyPressTimer: TTimer
     Interval = 10
     OnTimer = KeyPressTimerTimer
     Left = 528
     Top = 344
+  end
+  object RightMenu: TLayout
+    Anchors = [akTop, akRight]
+    Position.X = 1030.000000000000000000
+    TabOrder = 3
+    object BG: TPanel
+      Position.X = -176.000000000000000000
+      Size.Width = 232.000000000000000000
+      Size.Height = 721.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+    end
+    object CharacterPanel: TImage
+      MultiResBitmap.Height = 167
+      MultiResBitmap.Width = 167
+      MultiResBitmap.TransparentColor = 2763429
+      MultiResBitmap = <
+        item
+        end>
+      Anchors = [akTop, akRight]
+      Position.X = -176.000000000000000000
+      Size.Width = 226.000000000000000000
+      Size.Height = 129.000000000000000000
+      Size.PlatformDefault = False
+      object OP: TLabel
+        Position.X = 136.000000000000000000
+        Position.Y = 112.000000000000000000
+        Text = '00'
+        TabOrder = 1
+      end
+      object OPLabel: TLabel
+        Position.X = 8.000000000000000000
+        Position.Y = 112.000000000000000000
+        Text = #1054#1095#1082#1080' '#1087#1077#1088#1077#1076#1074#1080#1078#1077#1085#1080#1103
+        TabOrder = 2
+      end
+      object OPButton: TButton
+        Position.X = 10.000000000000000000
+        Position.Y = 137.000000000000000000
+        TabOrder = 3
+        Text = #1050#1091#1087#1080#1090#1100' '#1054#1055
+        TextSettings.Trimming = None
+        OnClick = OPButtonClick
+      end
+    end
+  end
+  object DownMenu: TLayout
+    Position.X = 320.000000000000000000
+    Position.Y = 671.000000000000000000
+    TabOrder = 4
+    object SkipRound: TButton
+      Position.X = -16.000000000000000000
+      Position.Y = 20.000000000000000000
+      TabOrder = 0
+      Text = 'SkipRound'
+      TextSettings.Trimming = None
+      OnClick = SkipRoundClick
+    end
+    object PlayerIndicator: TImage
+      MultiResBitmap = <
+        item
+        end>
+      Position.X = -74.000000000000000000
+    end
+    object RoundPrefix: TLabel
+      Position.X = -144.000000000000000000
+      Position.Y = 9.000000000000000000
+      Text = 'Round:'
+      TabOrder = 5
+    end
+    object RoundText: TLabel
+      Position.X = -144.000000000000000000
+      Position.Y = 34.000000000000000000
+      Text = '0'
+      TabOrder = 2
+    end
+    object ActionsPrefix: TLabel
+      Position.X = 104.000000000000000000
+      Text = 'Actions:'
+      TabOrder = 4
+    end
+    object ActionsText: TLabel
+      Position.X = 104.000000000000000000
+      Position.Y = 25.000000000000000000
+      Text = '0/0'
+      TabOrder = 3
+    end
   end
 end
