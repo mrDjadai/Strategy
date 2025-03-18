@@ -112,6 +112,7 @@ begin
 
       Inc(curPos);
     end;
+    result := sum;
 end;
 
 end.

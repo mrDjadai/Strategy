@@ -15,6 +15,18 @@ Vector3 = Record
   x, y, z : integer;
 End;
 
+TCellData = class;
+
+TSkill = class
+  protected
+    function IsCorrectTarget(caster, target: TCellData) : boolean; virtual; abstract;
+  public
+    reloadTime : integer;
+    timeAfterUse : integer;
+    hasTarget : boolean;
+    procedure Select(caster: TCellData);
+    procedure Use(caster, target: TCellData); virtual; abstract;
+end;
 
 TCharacter = class
     private
@@ -35,14 +47,16 @@ TCharacter = class
         maxHp : integer;
         speed : integer;
         armor : integer;
-        isSelected : boolean;
         img : TImage;
         movePoints : integer;
+
+        atack, skill1, skill2 : TSkill;
 
         procedure Init(form : TForm);
         procedure ResetMP();
         procedure BuyMP();
         procedure ReDraw();
+        function IsSelected() : boolean;
         property HP: integer read GetHP write SetHP;
   end;
 
@@ -73,8 +87,22 @@ TCellData = class
 
 End;
 
-  TPlayer = class
 
+charList = ^charElem;
+charElem = Record
+      data : TCharacter;
+      next : charList;
+End;
+
+  TPlayer = class
+    private
+      destructor Destroy();
+      var
+        characters : charList;
+    public
+      procedure AddCharacter(c : TCharacter);
+      procedure Init();
+      procedure OnRoundStart();
   end;
 
 function decardToCube(pos : vector2) : Vector3;
@@ -227,6 +255,62 @@ begin
     Inc(movePoints, speed);
     SetActionCount(GetActionCount() - 1);
     CharacterDataVisualisator.ReDraw();
+  end;
+end;
+
+procedure TPlayer.Init();
+begin
+  New(characters);
+  characters^.data := nil;
+  characters^.next := nil;
+end;
+
+procedure TPlayer.AddCharacter(c: TCharacter);
+var cur : charList;
+begin
+  cur := characters;
+  while cur.next <> nil do
+    cur := cur^.next;
+  New(cur^.next);
+  cur := cur^.next;
+  cur^.next := nil;
+  cur^.data := c;
+end;
+
+procedure TPlayer.OnRoundStart();
+var curChar : charList;
+begin
+  curChar := characters^.next;
+  while curChar <> nil do
+  begin
+    curChar^.data.movePoints := 0;
+    curChar := curChar^.next;
+  end;
+end;
+
+function TCharacter.IsSelected() : boolean;
+begin
+  result := (selectedCharacter.x = pos.x) and (selectedCharacter.y = pos.y);
+end;
+
+destructor TPlayer.Destroy();
+begin
+  Dispose(characters);
+end;
+
+procedure TSkill.Select(caster: TCellData);
+begin
+  if GetActionCount() > 0 then
+  begin
+    if hasTarget then
+    begin
+
+    end
+    else
+    begin
+      Use(caster, caster);
+      SetActionCount(GetActionCount() - 1);
+    end;
   end;
 end;
 

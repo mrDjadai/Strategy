@@ -23,7 +23,10 @@ type
     RoundText: TLabel;
     ActionsPrefix: TLabel;
     ActionsText: TLabel;
-    OPButton: TButton;
+    Skill1Buton: TButton;
+    Skill2Button: TButton;
+    AttackButton: TButton;
+    MPButton: TButton;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -31,7 +34,8 @@ type
       Shift: TShiftState);
     procedure KeyPressTimerTimer(Sender: TObject);
     procedure SkipRoundClick(Sender: TObject);
-    procedure OPButtonClick(Sender: TObject);
+    procedure MPButonClick(Sender: TObject);
+    procedure AttackButtonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -43,12 +47,11 @@ var
 
 implementation
 
-uses CellManager, DiceManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, CharacterManager, PlayerManager;
+uses CellManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, CharacterManager, PlayerManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
 const
-  testDices : DicesCount = (1,1,1,1,1);
   useConsole = true;
 
   mapMovingSpeed = 2;
@@ -89,7 +92,7 @@ begin
     Map.Position.X := Map.Position.X - mapMovingSpeed;
 end;
 
-procedure TForm2.OPButtonClick(Sender: TObject);
+procedure TForm2.MPButonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.BuyMP();
 end;
@@ -110,12 +113,16 @@ begin
   CharacterManager.Init();
   CharacterDataVisualisator.Init(op, CharacterPanel);
   CellManager.Init('test');
-  DropDices(testDices);
 end;
 
 procedure TForm2.SkipRoundClick(Sender: TObject);
 begin
   NextMove();
+end;
+
+procedure TForm2.AttackButtonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.atack.Select(GetCell(selectedCharacter));
 end;
 
 procedure TForm2.DeleteAnimation(Sender: TObject);

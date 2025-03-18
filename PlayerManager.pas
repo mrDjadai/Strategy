@@ -51,13 +51,22 @@ begin
 
   SetActionCount(actionsPerRound);
   ShowMoveData();
+  players[0].Init();
+  players[1].Init();
+end;
+
+procedure StartNewRound();
+begin
+  Inc(round);
+  players[0].OnRoundStart();
+  players[1].OnRoundStart();
 end;
 
 procedure NextMove();
 begin
   curPlayer := 1 - curPlayer;
   if curPlayer = 0 then
-    Inc(round);
+    StartNewRound();
 
   currentPlayer := players[curPlayer];
   UnselectCharacter();

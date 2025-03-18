@@ -20,7 +20,7 @@ procedure Init();
 
 implementation
 
-uses PlayerManager, CellManager, System.SysUtils, Window, CharacterDataVisualisator, System.IOUtils, System.Types;
+uses PlayerManager, CellManager, System.SysUtils, Window, CharacterDataVisualisator, System.IOUtils, System.Types, SkillManager, DiceManager;
 
 
 const
@@ -77,12 +77,10 @@ procedure SelectCharacter(pos : Vector2);
 begin
   if selectedCharacter.x <> -1 then
   begin
-    GetCell(selectedCharacter).character.isSelected := false;
     GetCell(selectedCharacter).character.ReDraw();
   end;
 
   selectedCharacter := pos;
-  GetCell(pos).character.isSelected := true;
   SetCaharcter(GetCell(pos).character);
   GetCell(pos).character.ReDraw();
 end;
@@ -95,7 +93,6 @@ begin
     last := selectedCharacter;
     selectedCharacter.x := -1;
     selectedCharacter.y := -1;
-    GetCell(last).character.isSelected := false;
     GetCell(last).character.ReDraw();
     SetCaharcter(nil);
   end;
@@ -155,6 +152,8 @@ begin
   ReDraw();
 end;
 
+
+const testDamage : DicesCount = (0,2,1,0,0); //тест
 const characterOffset : vector2 = (x : -14; y : 0);
 procedure CreateCharacter(cell : TCellData; charID : integer);
 begin
@@ -187,7 +186,16 @@ var c : TCharacter;
     c.speed := charTypes[charId].speed;
     c.armor := charTypes[charId].armor;
 
-    c.movePoints := 0;                             //Для теста
+    c.movePoints := 0;
+
+    currentPlayer.AddCharacter(c);
+                                 //Для теста
+    var a : SplashAttack;
+    a := SplashAttack.Create;
+    a.friendlyFire := false;
+    a.damage := testDamage;
+    a.radius := 2;
+    c.atack := a;
 end;
 
 function TryCreateCharacter(cell : TCellData) : boolean;

@@ -10,7 +10,8 @@ uses
   DataTypes in 'DataTypes.pas',
   Drawer in 'Drawer.pas',
   PlayerManager in 'PlayerManager.pas',
-  CharacterDataVisualisator in 'CharacterDataVisualisator.pas';
+  CharacterDataVisualisator in 'CharacterDataVisualisator.pas',
+  SkillManager in 'SkillManager.pas';
 
 {$R *.res}
 

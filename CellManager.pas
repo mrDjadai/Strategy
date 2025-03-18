@@ -11,6 +11,8 @@ procedure Init(mapName : string);
 
 function GetCell(pos : vector2) : TCellData;
 
+function GetMapScale() : vector2;
+
 implementation
 
 uses Window, WinApi.Windows;
@@ -122,5 +124,10 @@ begin
 
 end;
 
+function GetMapScale() : vector2;
+begin
+  result.x := x;
+  result.y := y;
+end;
 
 end.
