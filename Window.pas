@@ -36,6 +36,7 @@ type
     procedure SkipRoundClick(Sender: TObject);
     procedure MPButonClick(Sender: TObject);
     procedure AttackButtonClick(Sender: TObject);
+    procedure Skill1ButonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -113,6 +114,11 @@ begin
   CharacterManager.Init();
   CharacterDataVisualisator.Init(op, CharacterPanel);
   CellManager.Init('test');
+end;
+
+procedure TForm2.Skill1ButonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.skill1.Select(GetCell(selectedCharacter));
 end;
 
 procedure TForm2.SkipRoundClick(Sender: TObject);

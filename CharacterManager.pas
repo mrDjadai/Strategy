@@ -191,11 +191,18 @@ var c : TCharacter;
     currentPlayer.AddCharacter(c);
                                  //Для теста
     var a : SplashAttack;
-    a := SplashAttack.Create;
+    a := SplashAttack.Create(false);
     a.friendlyFire := false;
     a.damage := testDamage;
     a.radius := 2;
-    c.atack := a;
+    c.skill1 := a;
+
+    var b: TargetAttack;
+    b := TargetAttack.Create(true);
+    b.damage := testDamage;
+    b.radius := 1;
+    c.atack := b;
+
 end;
 
 function TryCreateCharacter(cell : TCellData) : boolean;

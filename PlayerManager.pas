@@ -7,6 +7,11 @@ uses DataTypes;
 var selectedCharacter : vector2;
 currentPlayer : TPlayer;
 curPlayer : integer;
+players : Array[0..1] of TPlayer;
+
+targetSelectionMode : boolean;
+selectedSkill : TSkill;
+selectedCaster : TCellData;
 
 procedure Init();
 
@@ -23,7 +28,6 @@ uses Window, System.SysUtils, Drawer, System.UITypes, CharacterManager;
 const actionsPerRound = 3;
 
 var
-  players : Array[0..1] of TPlayer;
   round : integer;
   actions : integer;
 
@@ -39,6 +43,8 @@ end;
 
 procedure Init();
 begin
+  targetSelectionMode := false;
+
   selectedCharacter.x := -1;
   selectedCharacter.y := -1;
 

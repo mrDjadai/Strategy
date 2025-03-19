@@ -94,24 +94,28 @@ begin
 end;
 
 function DropDices(dices: DicesCount) : integer;
-var curPos, cur, sum : integer;
+var curPos, cur, sum, i : integer;
 begin
   curPos := 0;
   sum := 0;
 
   ClearVisualisation();
 
-  for var i := Low(dices) to High(dices) do
-    for var j := 0 to dices[i] - 1 do
+  while (dices[0] > 0) or (dices[1] > 0) or (dices[2] > 0) or (dices[3] > 0) or (dices[4] > 0)  do
+  begin
+    i := random(4);
+   if dices[i] > 0 then
     begin
       cur := DiceTypes[i].minValue +  random(DiceTypes[i].maxValue - DiceTypes[i].minValue);
       Inc(sum, cur);
 
         SetLength(spawnedCubes, curPos + 1);
         spawnedCubes[curPos] := DrawDice(DiceTypes[i].sprite, cur, places[curPos]);
-
+        dec(dices[i]);
       Inc(curPos);
     end;
+  end;
+
     result := sum;
 end;
 

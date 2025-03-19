@@ -8,7 +8,6 @@ Type
 
 SplashAttack = class(TSkill)
   private
-    constructor OnCreate();
     function IsCorrectTarget(caster, target: TCellData) : boolean; override;
   public
     var
@@ -18,14 +17,19 @@ SplashAttack = class(TSkill)
     procedure Use(caster, target: TCellData); override;
 end;
 
+TargetAttack = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData) : boolean; override;
+  public
+    var
+      radius : integer;
+      damage : DicesCount;
+    procedure Use(caster, target: TCellData); override;
+end;
+
 implementation
 
-uses CellManager, PlayerManager;
-
-constructor SplashAttack.OnCreate;
-begin
-  hasTarget := false;
-end;
+uses CellManager, PlayerManager, CharacterManager;
 
 function SplashAttack.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
 var dist : integer;
@@ -57,5 +61,19 @@ begin
         end;
       end;
     end;
+  end;
+
+function TargetAttack.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
+var dist : integer;
+begin
+  dist := GetDistance(caster.cubePos, target.cubePos);
+  result := (dist > 0) and (dist <= radius) and (target.character <> nil) and (target.character.owner <> curPlayer);
+end;
+
+procedure TargetAttack.Use(caster, target: TCellData);
+var  curDamage : integer;
+begin
+  curDamage:= DropDices(damage);
+  target.Character.HP := target.Character.HP - curDamage;
   end;
 end.

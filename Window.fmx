@@ -67,6 +67,7 @@ object Form2: TForm2
         TabOrder = 6
         Text = #1057#1082#1080#1083'1'
         TextSettings.Trimming = None
+        OnClick = Skill1ButonClick
       end
       object Skill2Button: TButton
         Position.X = 120.000000000000000000

@@ -1,147 +1,205 @@
 unit DataTypes;
 
 interface
- uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+
+uses
+  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
 
 Type
 
-Vector2 = Record
-  x, y : integer;
-End;
+  Vector2 = Record
+    x, y: integer;
+  End;
 
-Vector3 = Record
-  x, y, z : integer;
-End;
+  Vector3 = Record
+    x, y, z: integer;
+  End;
 
-TCellData = class;
+  TCellData = class;
 
-TSkill = class
+  TSkill = class
   protected
-    function IsCorrectTarget(caster, target: TCellData) : boolean; virtual; abstract;
+    function IsCorrectTarget(caster, target: TCellData): boolean;
+      virtual; abstract;
   public
-    reloadTime : integer;
-    timeAfterUse : integer;
-    hasTarget : boolean;
+    reloadTime: integer;
+    timeAfterUse: integer;
+    hasTarget: boolean;
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
-end;
-
-TCharacter = class
-    private
-
-    var healsBar : TImage;
-
-    destructor OnDestroy();
-    procedure SetHP(h : integer);
-    function GetHP() : integer;
-
-    public
-      var
-        owner : byte;
-        name : string;
-        sprite : string;
-        pos : vector2;
-        heals : integer;
-        maxHp : integer;
-        speed : integer;
-        armor : integer;
-        img : TImage;
-        movePoints : integer;
-
-        atack, skill1, skill2 : TSkill;
-
-        procedure Init(form : TForm);
-        procedure ResetMP();
-        procedure BuyMP();
-        procedure ReDraw();
-        function IsSelected() : boolean;
-        property HP: integer read GetHP write SetHP;
+    Constructor Create(targetable : boolean); overload;
   end;
 
-TCellType = (cBlocked, cDefault, cDifficult);
-
-
-TCellData = class
+  TCharacter = class
   private
-    procedure OnClick(sender : Tobject);
-    procedure SetImage(im : TImage);
-    function GetImage() : TImage;
-    destructor OnDestroy();
 
-    var
-      img : TImage;
+  var
+    healsBar: TImage;
+    procedure SetHP(h: integer);
+    function GetHP(): integer;
+  public
+  var
+    owner: byte;
+    name: string;
+    sprite: string;
+    pos: Vector2;
+    heals: integer;
+    maxHp: integer;
+    speed: integer;
+    armor: integer;
+    img: TImage;
+    movePoints: integer;
+
+    atack, skill1, skill2: TSkill;
+    destructor Destroy(); override;
+
+    property HP: integer read GetHP write SetHP;
+    procedure Init(form: TForm);
+    procedure ResetMP();
+    procedure BuyMP();
+    procedure ReDraw();
+    function IsSelected(): boolean;
+  end;
+
+  TCellType = (cBlocked, cDefault, cDifficult);
+
+  TCellData = class
+  private
+    procedure OnClick(sender: Tobject);
+    procedure SetImage(im: TImage);
+    function GetImage(): TImage;
+    destructor Destroy(); override;
+
+  var
+    img : TImage;
+    selector : TImage;
 
   public
-    var
-      sprite : string;
-      decardPos : Vector2;
-      cubePos : Vector3;
-      cType : TCellType;
-      character : TCharacter;
+  var
+    isSelected : boolean;
+    sprite: string;
+    decardPos: Vector2;
+    cubePos: Vector3;
+    cType: TCellType;
+    character: TCharacter;
 
-  procedure ReDraw();
+    procedure ReDraw();
 
-  property Image: TImage read GetImage write SetImage;
+    property Image: TImage read GetImage write SetImage;
 
-End;
+    Constructor Create(x, y : extended; size : integer);
 
+  End;
 
-charList = ^charElem;
-charElem = Record
-      data : TCharacter;
-      next : charList;
-End;
+  charList = ^charElem;
+
+  charElem = Record
+    data: TCharacter;
+    next: charList;
+  End;
 
   TPlayer = class
-    private
-      destructor Destroy();
-      var
-        characters : charList;
-    public
-      procedure AddCharacter(c : TCharacter);
-      procedure Init();
-      procedure OnRoundStart();
+  private
+    destructor Destroy();
+
+  var
+    characters: charList;
+  public
+    procedure AddCharacter(c: TCharacter);
+    procedure RemoveCharacter(c: TCharacter);
+    procedure Init();
+    procedure OnRoundStart();
   end;
 
-function decardToCube(pos : vector2) : Vector3;
+function decardToCube(pos: Vector2): Vector3;
 
-function GetDistance(a, b : vector3) : integer;
+function GetDistance(a, b: Vector3): integer;
 
 implementation
 
-uses Drawer, CharacterManager, PlayerManager, CellManager, CharacterDataVisualisator;
+uses Drawer, CharacterManager, PlayerManager, CellManager,
+  CharacterDataVisualisator, Window;
+
+
+Constructor TCellData.Create(x, y : extended; size : integer);
+begin
+    inherited Create;
+    Image := TImage.Create(form2);
+
+    Image.Parent := form2.Map;
+
+    Image.Position.X := x;
+    Image.Position.Y := y;
+
+    Image.Width := size;
+    Image.Height := size;
+    Image.RotationAngle := 90;
+    isSelected := false;
+
+    selector := TImage.Create(form2);
+
+    selector.Parent := image;
+
+    selector.Position.X := 0;
+    selector.Position.Y := 0;
+
+    selector.Width := size;
+    selector.Height := size;
+    selector.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\cellSelector.png');
+    selector.HitTest := false;
+    selector.Visible := false;
+end;
 
 procedure TCellData.ReDraw();
-var cBitmap : TBitMap;
+var
+  cBitmap: TBitMap;
 begin
-  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + '.png');
-
+  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+    sprite + '.png');
+  selector.Visible := isSelected;
   if character <> nil then
     character.ReDraw();
 end;
 
-procedure TCellData.OnClick(sender: TObject);
-begin                          //тест
-  WriteLn('clicked    ' + sprite + '  at decard  x=', decardPos.x, '  y=', decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,'   has character  ', character <> nil);
+procedure TCellData.OnClick(sender: Tobject);
+begin
+  WriteLn('clicked    ' + sprite + '  at decard  x=', decardPos.x, '  y=',
+    decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,
+    '   has character  ', character <> nil);
 
-
-  if character = nil then       // если режим предварительной расстановки
+  if targetSelectionMode then
   begin
-    if selectedCharacter.x = -1 then
-      TryCreateCharacter(Self)
-    else
-      TryMoveCharacter(GetCell(selectedCharacter), Self);
+    if selectedSkill.IsCorrectTarget(SelectedCaster, self) then
+    begin
+      targetSelectionMode := false;
+      selectedSkill.Use(SelectedCaster, self);
+      selectedSkill := nil;
+      Form2.SkipRound.Enabled := true;
+      UnselectMap();
+    end;
   end
   else
+  if selectedSkill = nil then
   begin
-    if character.owner = curPlayer then
+    if character = nil then // если режим предварительной расстановки
     begin
-      if (selectedCharacter.x = decardPos.x) and (selectedCharacter.y = decardPos.y) then
-        UnselectCharacter()
+      if selectedCharacter.x = -1 then
+        TryCreateCharacter(Self)
       else
-        SelectCharacter(decardPos);
+        TryMoveCharacter(GetCell(selectedCharacter), Self);
+    end
+    else
+    begin
+      if character.owner = curPlayer then
+      begin
+        if (selectedCharacter.x = decardPos.x) and
+          (selectedCharacter.y = decardPos.y) then
+          UnselectCharacter()
+        else
+          SelectCharacter(decardPos);
+      end;
     end;
   end;
 
@@ -160,55 +218,49 @@ begin
   Result := img;
 end;
 
-
-destructor TCharacter.OnDestroy();
+destructor TCharacter.Destroy();
 begin
+  WriteLn('Kill ' + name);
   img.Free;
-  healsBar.Free;
   inherited Destroy;
 end;
 
-
-destructor TCellData.OnDestroy();
+destructor TCellData.Destroy();
 begin
   img.Free;
-  character.Free;
   inherited Destroy;
 end;
-
 
 procedure TCharacter.ReDraw();
 begin
-  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + sprite + IntToStr(owner) + '.png');
-  if isSelected then
+  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+    sprite + IntToStr(owner) + '.png');
+  if IsSelected then
     DrawOutline(img, TAlphaColors.Yellow, 50);
 end;
 
-
-function decardToCube(pos : vector2) : Vector3;
+function decardToCube(pos: Vector2): Vector3;
 begin
-  result.x := pos.x - (pos.y + (pos.y and 1)) div 2;
-  result.y := pos.y;
-  result.z := -result.x - result.y;
+  Result.x := pos.x - (pos.y + (pos.y and 1)) div 2;
+  Result.y := pos.y;
+  Result.z := -Result.x - Result.y;
 end;
 
-function GetDistance(a, b : vector3) : integer;
+function GetDistance(a, b: Vector3): integer;
 begin
-  result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
+  Result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
 end;
-
 
 const
-  healsBarScale : vector2 = (x: 50; y : 4);
-  healsBarPos : vector2 = (x: 53; y : 110);
+  healsBarScale: Vector2 = (x: 50; y: 4);
+  healsBarPos: Vector2 = (x: 53; y: 110);
 
-
-procedure TCharacter.Init(form : TForm);
+procedure TCharacter.Init(form: TForm);
 begin
   healsBar := TImage.Create(form);
   healsBar.Parent := img;
-  healsBar.Position.X := healsBarPos.X;
-  healsBar.Position.Y := healsBarPos.Y;
+  healsBar.Position.x := healsBarPos.x;
+  healsBar.Position.y := healsBarPos.y;
 
   healsBar.Width := healsBarScale.x;
   healsBar.Height := healsBarScale.y;
@@ -217,30 +269,41 @@ begin
   healsBar.Bitmap.Height := healsBarScale.y;
   healsBar.Bitmap.Canvas.BeginScene();
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x, healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x,
+  healsBarScale.y), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.EndScene();
 end;
 
-
-function TCharacter.GetHP() : integer;
+function TCharacter.GetHP(): integer;
 begin
-  result := heals;
+  Result := heals;
 end;
 
-procedure TCharacter.SetHP(h : integer);
+procedure TCharacter.SetHP(h: integer);
 begin
-  heals := h;
+  if h > maxHp then
+    heals := maxHp
+  else
+    heals := h;
 
   healsBar.Bitmap.Width := healsBarScale.x;
   healsBar.Bitmap.Height := healsBarScale.y;
   healsBar.Bitmap.Canvas.BeginScene();
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Brown;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x, healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x,
+    healsBarScale.y), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, Round(healsBarScale.x * heals / maxHP), healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0,
+    Round(healsBarScale.x * heals / maxHp), healsBarScale.y), 0, 0, [], 1);
 
   healsBar.Bitmap.Canvas.EndScene();
 
+  if heals <= 0 then
+  begin
+    players[owner].RemoveCharacter(Self);
+    GetCell(pos).character := nil;
+    Self.Free;
+  end;
 end;
 
 procedure TCharacter.ResetMP();
@@ -266,7 +329,8 @@ begin
 end;
 
 procedure TPlayer.AddCharacter(c: TCharacter);
-var cur : charList;
+var
+  cur: charList;
 begin
   cur := characters;
   while cur.next <> nil do
@@ -277,8 +341,21 @@ begin
   cur^.data := c;
 end;
 
+procedure TPlayer.RemoveCharacter(c: TCharacter);
+var
+  cur, temp: charList;
+begin
+  cur := characters;
+  while cur.next^.data <> c do
+    cur := cur^.next;
+  temp := cur^.next;
+  cur^.next := cur^.next^.next;
+  Dispose(temp);
+end;
+
 procedure TPlayer.OnRoundStart();
-var curChar : charList;
+var
+  curChar: charList;
 begin
   curChar := characters^.next;
   while curChar <> nil do
@@ -288,9 +365,9 @@ begin
   end;
 end;
 
-function TCharacter.IsSelected() : boolean;
+function TCharacter.IsSelected(): boolean;
 begin
-  result := (selectedCharacter.x = pos.x) and (selectedCharacter.y = pos.y);
+  Result := (selectedCharacter.x = pos.x) and (selectedCharacter.y = pos.y);
 end;
 
 destructor TPlayer.Destroy();
@@ -302,16 +379,24 @@ procedure TSkill.Select(caster: TCellData);
 begin
   if GetActionCount() > 0 then
   begin
+    SetActionCount(GetActionCount() - 1);
     if hasTarget then
     begin
-
+      targetSelectionMode := True;
+      selectedSkill :=self;
+      selectedCaster := caster;
+      Form2.SkipRound.Enabled := false;
+      SelectMap(self.IsCorrectTarget, caster);
     end
     else
     begin
       Use(caster, caster);
-      SetActionCount(GetActionCount() - 1);
     end;
   end;
 end;
 
+Constructor TSkill.Create(targetable : boolean);
+begin
+  hasTarget := targetable;
+end;
 end.

@@ -6,12 +6,16 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, DataTypes;
 
-
+type
+  SelectionCondition = function(caster, target: TCellData): boolean of object;
 procedure Init(mapName : string);
 
 function GetCell(pos : vector2) : TCellData;
 
 function GetMapScale() : vector2;
+
+procedure UnselectMap();
+procedure SelectMap(cond : SelectionCondition; caster : TCellData);
 
 implementation
 
@@ -34,9 +38,21 @@ begin
     result := map[pos.y, pos.x];
 end;
 
-function GetCellById(id : char) : TCellData;
+function GetCellById(xpos, ypos : integer; id : char) : TCellData;
+var x, y : extended;
 begin
-  Result := TCellData.Create;
+{  X := cellSpacey * xpos;
+  Y := cellSpacex * ypos;
+
+    if xpos mod 2 = 0 then
+        y := cellSpacex / 2 + y;
+          Result := TCellData.Create(y, x, cellSize);}
+  Y := cellSpacey * ypos;
+  X := cellSpacex * xpos;
+
+  if ypos mod 2 = 0 then
+    X := cellSpacex / 2 + x;
+  Result := TCellData.Create(x, y, cellSize);
 
   Case id of
   '0' : begin
@@ -60,34 +76,7 @@ begin
           Result.cType := cBlocked;
         end;
   End;
-end;
-
-procedure DrawMap(form : TForm2);
-begin
-var MyImage : TImage;
-for var i := 0 to x do
-  begin
-    for var k := 0 to y do
-    begin
-      MyImage := TImage.Create(form);
-
-      MyImage.Parent := form.Map;
-
-      MyImage.Position.X := cellSpaceX * i;
-      MyImage.Position.Y := cellSpaceY * k;
-
-      if k mod 2 = 0 then
-        MyImage.Position.X := cellSpaceX / 2 + MyImage.Position.X;
-
-      MyImage.Width := cellSize;
-      MyImage.Height := cellSize;
-
-      map[k][i].Image := MyImage;
-      map[k][i].ReDraw();
-
-      MyImage.RotationAngle := 90;
-    end;
-  end;
+  result.ReDraw();
 end;
 
 procedure Init(mapName : string);
@@ -109,7 +98,7 @@ begin
 
     for var k := 0 to Length(line) - 1 do
     begin
-      map[i][k] := GetCellById(line[k+1]);
+      map[i][k] := GetCellById(k,i,line[k+1]);
       map[i][k].decardPos.x := k;
       map[i][k].decardPos.y := i;
       map[i][k].cubePos := decardToCube(map[i][k].decardPos);
@@ -120,14 +109,36 @@ begin
   end;
 
   CloseFile(f);
-  DrawMap(Form2);
-
 end;
 
 function GetMapScale() : vector2;
 begin
   result.x := x;
   result.y := y;
+end;
+
+procedure UnselectMap();
+begin
+for var i := 0 to x do
+  begin
+    for var k := 0 to y do
+    begin
+      map[k][i].IsSelected := false;
+      map[k][i].ReDraw();
+    end;
+  end;
+end;
+
+procedure SelectMap(cond : SelectionCondition; caster : TCellData);
+begin
+for var i := 0 to x do
+  begin
+    for var k := 0 to y do
+    begin
+      map[k][i].IsSelected := cond(caster, map[k][i]);
+      map[k][i].ReDraw();
+    end;
+  end;
 end;
 
 end.
