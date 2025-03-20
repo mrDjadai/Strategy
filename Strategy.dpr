@@ -11,7 +11,8 @@ uses
   Drawer in 'Drawer.pas',
   PlayerManager in 'PlayerManager.pas',
   CharacterDataVisualisator in 'CharacterDataVisualisator.pas',
-  SkillManager in 'SkillManager.pas';
+  SkillManager in 'SkillManager.pas',
+  buildingManager in 'buildingManager.pas';
 
 {$R *.res}
 

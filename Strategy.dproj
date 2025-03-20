@@ -138,6 +138,7 @@
         <DCCReference Include="PlayerManager.pas"/>
         <DCCReference Include="CharacterDataVisualisator.pas"/>
         <DCCReference Include="SkillManager.pas"/>
+        <DCCReference Include="buildingManager.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

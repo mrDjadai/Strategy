@@ -110,6 +110,10 @@ begin
       attackButton.Enabled := atack.timeAfterUse >= atack.reloadTime;
       skill1Button.Enabled := skill1.timeAfterUse >= skill1.reloadTime;
       skill2Button.Enabled := skill2.timeAfterUse >= skill2.reloadTime;
+
+      attackButton.Text := atack.name;
+      skill1Button.Text := skill1.name;
+      skill2Button.Text := skill2.name;
     end;
   end;
 end;

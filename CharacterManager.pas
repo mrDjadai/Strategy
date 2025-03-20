@@ -28,55 +28,96 @@ const
 
 
 var
-  charTypes : Array of TCharacter;
+  charTypes : Array of string;
 
-const testDamage : DicesCount = (0,2,1,0,0); //тест
+type
+  skillData = array[0..5] of string;
 
-procedure LoadCharacter(FileName : string);
+function LoadSkill(data : skillData) : TSkill;
 var line : string;
-  cur : TCharacter;
-  f : TextFile;
+    id : integer;
 begin
-  SetLength(charTypes, Length(charTypes) + 1);
-  cur := TCharacter.Create;
-  charTypes[Length(charTypes) - 1] := cur;
+  case StrToInt(data[0]) of
+    0 :begin
+      var splash : SplashAttack;
+      splash := SplashAttack.Create;
+      splash.radius := StrToInt(data[3]);
+      var damage : dicesCount;
+      for var i := 0 to Length(damage)-1 do
+        damage[i] := 0;
+      for var i := 1 to Length(data[4]) do
+        damage[i-1] := Ord(data[4][i]) - Ord('0');
+      splash.damage := damage;
+      splash.friendlyFire := data[5] = '+';
+      result := splash;
+      result.hasTarget := false;
+    end;
+    1 :begin
+      var target : TargetAttack;
+      target := TargetAttack.Create;
+      target.radius := StrToInt(data[3]);
+      var damage : dicesCount;
+      for var i := 0 to Length(damage)-1 do
+        damage[i] := 0;
+      for var i := 1 to Length(data[4]) do
+        damage[i-1] := Ord(data[4][i]) - Ord('0');
+      target.damage := damage;
+      result := target;
+      result.hasTarget := true;
+    end;
+    2 :begin
+      var heal : SplashHeal;
+      heal := SplashHeal.Create;
+      heal.radius := StrToInt(data[3]);
+      var damage : dicesCount;
+      for var i := 0 to Length(damage)-1 do
+        damage[i] := 0;
+      for var i := 1 to Length(data[4]) do
+        damage[i-1] := Ord(data[4][i]) - Ord('0');
+      heal.heals := damage;
+      result := heal;
+      result.hasTarget := false;
+    end;
+  end;
+
+  result.name := data[1];
+  result.reloadTime := StrToInt(data[2]);
+end;
+
+function LoadCharacter(FileName : string) : TCharacter;
+var line : string;
+  f : TextFile;
+  data : skillData;
+begin
+  result := TCharacter.Create;
 
   AssignFile(f, FileName);
   Reset(f);
   readln(f, line);
-  cur.name := line;
+  result.name := line;
 
   readln(f, line);
-  cur.sprite := line;
+  result.sprite := line;
 
   readln(f, line);
-  cur.maxHp := StrToInt(line);
+  result.maxHp := StrToInt(line);
 
   readln(f, line);
-  cur.speed := StrToInt(line);
+  result.speed := StrToInt(line);
 
   readln(f, line);
-  cur.armor := StrToInt(line);
+  result.armor := StrToInt(line);
 
-  var a : SplashAttack;
-  a := SplashAttack.Create(false);
-  a.friendlyFire := false;
-  a.damage := testDamage;
-  a.radius := 2;
-  cur.skill1 := a;
+  for var i := 0 to High(skillData) do
+    readln(f, data[i]);
+  result.atack := LoadSkill(data);
+  for var i := 0 to High(skillData) do
+    readln(f, data[i]);
+  result.skill1 := LoadSkill(data);
+  for var i := 0 to High(skillData) do
+    readln(f, data[i]);
+  result.skill2 := LoadSkill(data);
 
-  var b: TargetAttack;
-  b := TargetAttack.Create(true);
-  b.damage := testDamage;
-  b.radius := 1;
-  cur.atack := b;
-
-  var h : SplashHeal;
-  h := SplashHeal.Create(false);
-  h.heals := testDamage;
-  h.radius := 2;
-  h.reloadTime := 2;
-  cur.skill2 := h;
 
   CloseFile(f);
 end;
@@ -90,7 +131,8 @@ begin
   begin
     if True then      //Добавить валидацию
     begin
-      LoadCharacter(FileName);
+      SetLength(charTypes, Length(charTypes) + 1);
+      charTypes[Length(charTypes) - 1] := FileName;
     end;
   end;
 end;
@@ -140,6 +182,9 @@ begin
 
   dest.character := source.character;
   dest.character.pos := dest.decardPos;
+
+  source.OnExit();
+  dest.OnEnter();
   source.character := nil;
 
                                                    //Анимация
@@ -182,7 +227,7 @@ const characterOffset : vector2 = (x : -14; y : 0);
 procedure CreateCharacter(cell : TCellData; charID : integer);
 begin
 var c : TCharacter;
-    c := TCharacter.Create(charTypes[charId]);
+    c := LoadCharacter(charTypes[charId]);
     c.owner := curPlayer;
 
     c.pos := cell.decardPos;

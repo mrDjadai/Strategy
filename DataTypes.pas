@@ -24,14 +24,28 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean;
       virtual; abstract;
   public
-    name : string;
+    name: string;
     reloadTime: integer;
     timeAfterUse: integer;
     hasTarget: boolean;
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
-    procedure Clone(other : TSkill); overload; virtual;
-    Constructor Create(targetable : boolean); overload;
+    Constructor Create(targetable: boolean); overload;
+  end;
+
+  TBuilding = class
+  public
+    cell: TCellData;
+    owner: integer;
+    pos: Vector2;
+    img: TImage;
+    sprite: string;
+    procedure OnBuild(c: TCellData; ow: integer); virtual;
+    procedure OnDemolish(); virtual;
+    procedure OnEnter(); virtual;
+    procedure OnStay(); virtual;
+    procedure OnExit(); virtual;
+    procedure ReDraw();
   end;
 
   TCharacter = class
@@ -41,7 +55,7 @@ Type
 
     procedure SetHP(h: integer);
     function GetHP(): integer;
-    function RecalculateDamage(h : integer) : integer;
+    function RecalculateDamage(h: integer): integer;
 
   public
   var
@@ -66,7 +80,7 @@ Type
     procedure BuyMP();
     procedure ReDraw();
     function IsSelected(): boolean;
-    Constructor Create(other : TCharacter); overload;
+
     constructor Create; overload;
   end;
 
@@ -80,23 +94,27 @@ Type
     destructor Destroy(); override;
 
   var
-    img : TImage;
-    selector : TImage;
+    img: TImage;
+    selector: TImage;
 
   public
   var
-    isSelected : boolean;
+    IsSelected: boolean;
     sprite: string;
     decardPos: Vector2;
     cubePos: Vector3;
     cType: TCellType;
     character: TCharacter;
+    building: TBuilding;
 
     procedure ReDraw();
+    procedure OnEnter();
+    procedure OnStay();
+    procedure OnExit();
 
     property Image: TImage read GetImage write SetImage;
 
-    Constructor Create(x, y : extended; size : integer);
+    Constructor Create(x, y: extended; size: integer);
 
   End;
 
@@ -127,36 +145,36 @@ function GetDistance(a, b: Vector3): integer;
 implementation
 
 uses Drawer, CharacterManager, PlayerManager, CellManager,
-  CharacterDataVisualisator, Window;
+  CharacterDataVisualisator, Window, BuildingManager;
 
-
-Constructor TCellData.Create(x, y : extended; size : integer);
+Constructor TCellData.Create(x, y: extended; size: integer);
 begin
-    inherited Create;
-    Image := TImage.Create(form2);
+  inherited Create;
+  Image := TImage.Create(form2);
 
-    Image.Parent := form2.Map;
+  Image.Parent := form2.Map;
 
-    Image.Position.X := x;
-    Image.Position.Y := y;
+  Image.Position.x := x;
+  Image.Position.y := y;
 
-    Image.Width := size;
-    Image.Height := size;
-    Image.RotationAngle := 90;
-    isSelected := false;
+  Image.Width := size;
+  Image.Height := size;
+  Image.RotationAngle := 90;
+  IsSelected := false;
 
-    selector := TImage.Create(form2);
+  selector := TImage.Create(form2);
 
-    selector.Parent := image;
+  selector.Parent := Image;
 
-    selector.Position.X := 0;
-    selector.Position.Y := 0;
+  selector.Position.x := 0;
+  selector.Position.y := 0;
 
-    selector.Width := size;
-    selector.Height := size;
-    selector.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\cellSelector.png');
-    selector.HitTest := false;
-    selector.Visible := false;
+  selector.Width := size;
+  selector.Height := size;
+  selector.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) +
+    'Resourses\Sprites\cellSelector.png');
+  selector.HitTest := false;
+  selector.Visible := false;
 end;
 
 procedure TCellData.ReDraw();
@@ -165,9 +183,12 @@ var
 begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
     sprite + '.png');
-  selector.Visible := isSelected;
+  selector.Visible := IsSelected;
   if character <> nil then
     character.ReDraw();
+
+  if building <> nil then
+    building.ReDraw();
 end;
 
 procedure TCellData.OnClick(sender: Tobject);
@@ -183,19 +204,21 @@ begin
       targetSelectionMode := false;
       selectedSkill.Use(SelectedCaster, self);
       selectedSkill := nil;
-      Form2.SkipRound.Enabled := true;
+      form2.SkipRound.Enabled := true;
       UnselectMap();
     end;
   end
-  else
-  if selectedSkill = nil then
+  else if selectedSkill = nil then
   begin
     if character = nil then // если режим предварительной расстановки
     begin
       if selectedCharacter.x = -1 then
+      begin
+        TryBuild(Self);
         TryCreateCharacter(Self)
+      end
       else
-        TryMoveCharacter(GetCell(selectedCharacter), Self);
+        TryMoveCharacter(GetCell(selectedCharacter), self);
     end
     else
     begin
@@ -277,7 +300,7 @@ begin
   healsBar.Bitmap.Canvas.BeginScene();
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
   healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x,
-  healsBarScale.y), 0, 0, [], 1);
+    healsBarScale.y), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.EndScene();
 end;
 
@@ -286,21 +309,21 @@ begin
   Result := heals;
 end;
 
-function TCharacter.RecalculateDamage(h: Integer): Integer;
+function TCharacter.RecalculateDamage(h: integer): integer;
 begin
-  result := h - armor;
-  if result < 0 then
-    result := 0;
+  Result := h - armor;
+  if Result < 0 then
+    Result := 0;
 end;
 
 procedure TCharacter.SetHP(h: integer);
 begin
-  if h < heals then          //урон
+  if h < heals then // урон
   begin
     heals := heals - RecalculateDamage(heals - h);
   end
   else
-  begin                   //лечение
+  begin // лечение
     if h > maxHp then
       heals := maxHp
     else
@@ -321,9 +344,9 @@ begin
 
   if heals <= 0 then
   begin
-    players[owner].RemoveCharacter(Self);
+    players[owner].RemoveCharacter(self);
     GetCell(pos).character := nil;
-    Self.Free;
+    self.Free;
   end;
 end;
 
@@ -387,6 +410,7 @@ begin
       Inc(atack.timeAfterUse);
       Inc(skill1.timeAfterUse);
       Inc(skill2.timeAfterUse);
+      GetCell(pos).OnStay();
     end;
     curChar := curChar^.next;
   end;
@@ -411,10 +435,10 @@ begin
     SetActionCount(GetActionCount() - 1);
     if hasTarget then
     begin
-      targetSelectionMode := True;
-      selectedSkill :=self;
-      selectedCaster := caster;
-      Form2.SkipRound.Enabled := false;
+      targetSelectionMode := true;
+      selectedSkill := self;
+      SelectedCaster := caster;
+      form2.SkipRound.Enabled := false;
       SelectMap(self.IsCorrectTarget, caster);
     end
     else
@@ -424,40 +448,61 @@ begin
   end;
 end;
 
-Constructor TSkill.Create(targetable : boolean);
+Constructor TSkill.Create(targetable: boolean);
 begin
   hasTarget := targetable;
 end;
 
-Procedure TSkill.Clone(other : TSkill);
-begin
-    inherited Create;
-    name := other.name;
-    reloadTime:= other.reloadTime;
-    hasTarget := other.hasTarget;
-end;
-
-Constructor TCharacter.Create(other : TCharacter);
-begin
-    inherited Create;
-    sprite := other.sprite;
-    name := other.name;
-    maxHp := other.maxHp;
-    speed := other.speed;
-    armor := other.armor;
-
-    movePoints := 0;
-
-    atack := TSkill.Create();
-    skill1 := TSkill.Create();
-    skill2 := TSkill.Create();
-    atack.Clone(other.atack);
-    skill1.Clone(other.skill1);
-    skill2.Clone(other.skill2);
-end;
-
 Constructor TCharacter.Create();
 begin
-    inherited Create;
+  inherited Create;
 end;
+
+procedure TBuilding.OnBuild(c: TCellData; ow: integer);
+begin
+  cell := c;
+  cell.building := self;
+  owner := ow;
+end;
+
+procedure TBuilding.OnDemolish();
+begin
+end;
+
+procedure TBuilding.OnEnter();
+begin
+end;
+
+procedure TBuilding.OnExit();
+begin
+end;
+
+procedure TBuilding.OnStay();
+begin
+end;
+
+procedure TCellData.OnEnter();
+begin
+  if building <> nil then
+    building.OnEnter();
+end;
+
+procedure TCellData.OnExit();
+begin
+  if building <> nil then
+    building.OnExit();
+end;
+
+procedure TCellData.OnStay();
+begin
+  if building <> nil then
+    building.OnStay();
+end;
+
+procedure TBuilding.ReDraw();
+begin
+  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+    sprite + IntToStr(owner) + '.png');
+end;
+
 end.

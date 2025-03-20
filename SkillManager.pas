@@ -15,7 +15,6 @@ SplashAttack = class(TSkill)
       friendlyFire : boolean;
       damage : DicesCount;
     procedure Use(caster, target: TCellData); override;
-    procedure Clone(other : TSKill); override;
 end;
 
 TargetAttack = class(TSkill)
@@ -26,7 +25,6 @@ TargetAttack = class(TSkill)
       radius : integer;
       damage : DicesCount;
     procedure Use(caster, target: TCellData); override;
-    procedure Clone(other : TSKill); override;
 end;
 
 SplashHeal = class(TSkill)
@@ -37,7 +35,6 @@ SplashHeal = class(TSkill)
       radius : integer;
       heals : DicesCount;
     procedure Use(caster, target: TCellData); override;
-    procedure Clone(other : TSKill); override;
 end;
 
 
@@ -77,18 +74,6 @@ begin
     end;
 end;
 
-procedure SplashAttack.Clone(other : TSkill);
-begin
-  inherited Clone(other);
-  if other is SplashAttack then
-  begin
-    radius := SplashAttack(other).radius;
-    damage := SplashAttack(other).damage;
-    friendlyFire := SplashAttack(other).friendlyFire;
-  end;
-end;
-
-
 function TargetAttack.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
 var dist : integer;
 begin
@@ -101,16 +86,6 @@ var  curDamage : integer;
 begin
   curDamage:= DropDices(damage);
   target.Character.HP := target.Character.HP - curDamage;
-end;
-
-Procedure TargetAttack.Clone(other : TSkill);
-begin
-  inherited Clone(other);
-  if other is TargetAttack then
-  begin
-    radius := TargetAttack(other).radius;
-    damage := TargetAttack(other).damage;
-  end;
 end;
 
 
@@ -143,16 +118,6 @@ begin
         end;
       end;
     end;
-end;
-
-procedure SplashHeal.Clone(other : TSkill);
-begin
-  inherited Clone(other);
-  if other is SplashHeal then
-  begin
-    radius := SplashHeal(other).radius;
-    heals := SplashHeal(other).heals;
-  end;
 end;
 
 end.
