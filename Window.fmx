@@ -58,7 +58,7 @@ object Form2: TForm2
         Text = #1054#1095#1082#1080' '#1087#1077#1088#1077#1076#1074#1080#1078#1077#1085#1080#1103
         TabOrder = 2
       end
-      object Skill1Buton: TButton
+      object Skill1Button: TButton
         Position.X = 8.000000000000000000
         Position.Y = 8.000000000000000000
         Size.Width = 80.000000000000000000
@@ -67,7 +67,7 @@ object Form2: TForm2
         TabOrder = 6
         Text = #1057#1082#1080#1083'1'
         TextSettings.Trimming = None
-        OnClick = Skill1ButonClick
+        OnClick = Skill1ButtonClick
       end
       object Skill2Button: TButton
         Position.X = 120.000000000000000000
@@ -78,6 +78,7 @@ object Form2: TForm2
         TabOrder = 5
         Text = #1057#1082#1080#1083'2'
         TextSettings.Trimming = None
+        OnClick = Skill2ButtonClick
       end
       object AttackButton: TButton
         Position.X = 64.000000000000000000

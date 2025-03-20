@@ -30,6 +30,8 @@ const
 var
   charTypes : Array of TCharacter;
 
+const testDamage : DicesCount = (0,2,1,0,0); //тест
+
 procedure LoadCharacter(FileName : string);
 var line : string;
   cur : TCharacter;
@@ -56,6 +58,26 @@ begin
   readln(f, line);
   cur.armor := StrToInt(line);
 
+  var a : SplashAttack;
+  a := SplashAttack.Create(false);
+  a.friendlyFire := false;
+  a.damage := testDamage;
+  a.radius := 2;
+  cur.skill1 := a;
+
+  var b: TargetAttack;
+  b := TargetAttack.Create(true);
+  b.damage := testDamage;
+  b.radius := 1;
+  cur.atack := b;
+
+  var h : SplashHeal;
+  h := SplashHeal.Create(false);
+  h.heals := testDamage;
+  h.radius := 2;
+  h.reloadTime := 2;
+  cur.skill2 := h;
+
   CloseFile(f);
 end;
 
@@ -74,15 +96,18 @@ begin
 end;
 
 procedure SelectCharacter(pos : Vector2);
+var last : vector2;
 begin
-  if selectedCharacter.x <> -1 then
-  begin
-    GetCell(selectedCharacter).character.ReDraw();
-  end;
+  last := selectedCharacter;
 
   selectedCharacter := pos;
   SetCaharcter(GetCell(pos).character);
   GetCell(pos).character.ReDraw();
+
+  if last.x <> -1 then
+  begin
+    GetCell(last).character.ReDraw();
+  end;
 end;
 
 procedure UnselectCharacter();
@@ -153,20 +178,17 @@ begin
 end;
 
 
-const testDamage : DicesCount = (0,2,1,0,0); //тест
 const characterOffset : vector2 = (x : -14; y : 0);
 procedure CreateCharacter(cell : TCellData; charID : integer);
 begin
 var c : TCharacter;
-    c := TCharacter.Create;
-    c.sprite := charTypes[charId].sprite;       //Загрузка визуала перса
-    c.name := charTypes[charId].name;
+    c := TCharacter.Create(charTypes[charId]);
     c.owner := curPlayer;
 
     c.pos := cell.decardPos;
     cell.character := c;
 
-    var myImage : TImage;                                       //Настройка картинки
+    var myImage : TImage;
     myImage := TImage.Create(TComponent(cell.Image).Owner);
     myImage.Parent := TControl(cell.Image).Parent;
 
@@ -178,31 +200,14 @@ var c : TCharacter;
 
     MyImage.HitTest := false;
     c.img := myImage;
+
     c.Init(form2);
     cell.ReDraw();
 
-    c.maxHp := charTypes[charId].maxHp;           //Загрузка параметров перса
-    c.hp := c.maxHp;
-    c.speed := charTypes[charId].speed;
-    c.armor := charTypes[charId].armor;
 
-    c.movePoints := 0;
+    c.hp := c.maxHp;
 
     currentPlayer.AddCharacter(c);
-                                 //Для теста
-    var a : SplashAttack;
-    a := SplashAttack.Create(false);
-    a.friendlyFire := false;
-    a.damage := testDamage;
-    a.radius := 2;
-    c.skill1 := a;
-
-    var b: TargetAttack;
-    b := TargetAttack.Create(true);
-    b.damage := testDamage;
-    b.radius := 1;
-    c.atack := b;
-
 end;
 
 function TryCreateCharacter(cell : TCellData) : boolean;

@@ -24,21 +24,25 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean;
       virtual; abstract;
   public
+    name : string;
     reloadTime: integer;
     timeAfterUse: integer;
     hasTarget: boolean;
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
+    procedure Clone(other : TSkill); overload; virtual;
     Constructor Create(targetable : boolean); overload;
   end;
 
   TCharacter = class
   private
-
   var
     healsBar: TImage;
+
     procedure SetHP(h: integer);
     function GetHP(): integer;
+    function RecalculateDamage(h : integer) : integer;
+
   public
   var
     owner: byte;
@@ -53,6 +57,7 @@ Type
     movePoints: integer;
 
     atack, skill1, skill2: TSkill;
+
     destructor Destroy(); override;
 
     property HP: integer read GetHP write SetHP;
@@ -61,6 +66,8 @@ Type
     procedure BuyMP();
     procedure ReDraw();
     function IsSelected(): boolean;
+    Constructor Create(other : TCharacter); overload;
+    constructor Create; overload;
   end;
 
   TCellType = (cBlocked, cDefault, cDifficult);
@@ -279,12 +286,26 @@ begin
   Result := heals;
 end;
 
+function TCharacter.RecalculateDamage(h: Integer): Integer;
+begin
+  result := h - armor;
+  if result < 0 then
+    result := 0;
+end;
+
 procedure TCharacter.SetHP(h: integer);
 begin
-  if h > maxHp then
-    heals := maxHp
+  if h < heals then          //урон
+  begin
+    heals := heals - RecalculateDamage(heals - h);
+  end
   else
-    heals := h;
+  begin                   //лечение
+    if h > maxHp then
+      heals := maxHp
+    else
+      heals := h;
+  end;
 
   healsBar.Bitmap.Width := healsBarScale.x;
   healsBar.Bitmap.Height := healsBarScale.y;
@@ -360,7 +381,13 @@ begin
   curChar := characters^.next;
   while curChar <> nil do
   begin
-    curChar^.data.movePoints := 0;
+    with curChar^.data do
+    begin
+      movePoints := 0;
+      Inc(atack.timeAfterUse);
+      Inc(skill1.timeAfterUse);
+      Inc(skill2.timeAfterUse);
+    end;
     curChar := curChar^.next;
   end;
 end;
@@ -377,6 +404,8 @@ end;
 
 procedure TSkill.Select(caster: TCellData);
 begin
+  timeAfterUse := 0;
+  CharacterDataVisualisator.ReDraw();
   if GetActionCount() > 0 then
   begin
     SetActionCount(GetActionCount() - 1);
@@ -398,5 +427,37 @@ end;
 Constructor TSkill.Create(targetable : boolean);
 begin
   hasTarget := targetable;
+end;
+
+Procedure TSkill.Clone(other : TSkill);
+begin
+    inherited Create;
+    name := other.name;
+    reloadTime:= other.reloadTime;
+    hasTarget := other.hasTarget;
+end;
+
+Constructor TCharacter.Create(other : TCharacter);
+begin
+    inherited Create;
+    sprite := other.sprite;
+    name := other.name;
+    maxHp := other.maxHp;
+    speed := other.speed;
+    armor := other.armor;
+
+    movePoints := 0;
+
+    atack := TSkill.Create();
+    skill1 := TSkill.Create();
+    skill2 := TSkill.Create();
+    atack.Clone(other.atack);
+    skill1.Clone(other.skill1);
+    skill2.Clone(other.skill2);
+end;
+
+Constructor TCharacter.Create();
+begin
+    inherited Create;
 end;
 end.

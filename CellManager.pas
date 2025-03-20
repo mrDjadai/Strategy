@@ -41,12 +41,6 @@ end;
 function GetCellById(xpos, ypos : integer; id : char) : TCellData;
 var x, y : extended;
 begin
-{  X := cellSpacey * xpos;
-  Y := cellSpacex * ypos;
-
-    if xpos mod 2 = 0 then
-        y := cellSpacex / 2 + y;
-          Result := TCellData.Create(y, x, cellSize);}
   Y := cellSpacey * ypos;
   X := cellSpacex * xpos;
 
@@ -95,7 +89,8 @@ begin
     SetLength(map[i], Length(line));
     y := i;
     x := Length(line) - 1;
-
+    minMapY := -X * cellSpaceY div 2;
+    minMapX := -y * cellSpaceY div 4;
     for var k := 0 to Length(line) - 1 do
     begin
       map[i][k] := GetCellById(k,i,line[k+1]);

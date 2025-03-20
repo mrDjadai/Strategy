@@ -105,6 +105,12 @@ begin
     opText.Text := IntToStr(curCharacter.movePoints);
     panel.Visible := true;
     DrawMoveIndicators();
+    with form2, curCharacter do
+    begin
+      attackButton.Enabled := atack.timeAfterUse >= atack.reloadTime;
+      skill1Button.Enabled := skill1.timeAfterUse >= skill1.reloadTime;
+      skill2Button.Enabled := skill2.timeAfterUse >= skill2.reloadTime;
+    end;
   end;
 end;
 end.

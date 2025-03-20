@@ -23,7 +23,7 @@ type
     RoundText: TLabel;
     ActionsPrefix: TLabel;
     ActionsText: TLabel;
-    Skill1Buton: TButton;
+    Skill1Button: TButton;
     Skill2Button: TButton;
     AttackButton: TButton;
     MPButton: TButton;
@@ -36,7 +36,8 @@ type
     procedure SkipRoundClick(Sender: TObject);
     procedure MPButonClick(Sender: TObject);
     procedure AttackButtonClick(Sender: TObject);
-    procedure Skill1ButonClick(Sender: TObject);
+    procedure Skill1ButtonClick(Sender: TObject);
+    procedure Skill2ButtonClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -45,6 +46,7 @@ type
 
 var
   Form2: TForm2;
+  minMapX, minMapY : integer;
 
 implementation
 
@@ -55,13 +57,27 @@ uses CellManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, Characte
 const
   useConsole = true;
 
-  mapMovingSpeed = 2;
+  mapMovingSpeed = 2;     //движение карты
 
 var pressedA, pressedW, pressedD,pressedS : boolean;
 
 procedure TForm2.FormKeyDown(Sender: TObject; var Key: Word;
   var KeyChar: WideChar; Shift: TShiftState);
 begin
+  if Key = vkEscape then
+  begin
+    if TargetSelectionMode then
+    begin
+      targetSelectionMode := false;
+      selectedSkill.timeAfterUse := selectedSkill.reloadTime;
+      selectedSkill := nil;
+      Form2.SkipRound.Enabled := true;
+      UnselectMap();
+      SetActionCount(GetActionCount() + 1);
+      CharacterDataVisualisator.ReDraw();
+    end;
+    Key := 0;
+  end;
   case KeyChar of
     'W', 'w', 'Ц', 'ц': pressedW := true;
     'A', 'a', 'Ф', 'ф': pressedA := true;
@@ -91,6 +107,16 @@ begin
     Map.Position.X := Map.Position.X + mapMovingSpeed;
   if pressedD then
     Map.Position.X := Map.Position.X - mapMovingSpeed;
+
+  if Map.Position.X  > 0 then
+    Map.Position.X := 0;
+  if Map.Position.Y  > 0 then
+    Map.Position.Y := 0;
+
+  if Map.Position.X  < minMapX then
+    Map.Position.X := minMapX;
+  if Map.Position.Y  < minMapY then
+    Map.Position.Y := minMapY;
 end;
 
 procedure TForm2.MPButonClick(Sender: TObject);
@@ -116,9 +142,14 @@ begin
   CellManager.Init('test');
 end;
 
-procedure TForm2.Skill1ButonClick(Sender: TObject);
+procedure TForm2.Skill1ButtonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.skill1.Select(GetCell(selectedCharacter));
+end;
+
+procedure TForm2.Skill2ButtonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.skill2.Select(GetCell(selectedCharacter));
 end;
 
 procedure TForm2.SkipRoundClick(Sender: TObject);
