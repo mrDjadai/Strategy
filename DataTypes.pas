@@ -17,6 +17,20 @@ Type
     x, y, z: integer;
   End;
 
+  Action = procedure of object;
+
+  THealsContainer = class
+  public
+    healsBar: TImage;
+    heals: integer;
+    maxHp: integer;
+    onDie : action;
+    imageScale : vector2;
+    procedure SetHP(h: integer);
+    function GetHP(): integer;
+    procedure Init(img : TImage; mHp : integer; scale, position : vector2; dieAction : Action);
+  end;
+
   TCellData = class;
 
   TSkill = class
@@ -34,7 +48,13 @@ Type
   end;
 
   TBuilding = class
+  private
+      destructor Destroy(); override;
   public
+    cost : integer;
+    name : string;
+    maxHp : integer;
+    healsBar : THealsContainer;
     cell: TCellData;
     owner: integer;
     pos: Vector2;
@@ -51,20 +71,20 @@ Type
   TCharacter = class
   private
   var
-    healsBar: TImage;
+    healsBar : THealsContainer;
 
+    procedure Die();
     procedure SetHP(h: integer);
     function GetHP(): integer;
     function RecalculateDamage(h: integer): integer;
 
   public
   var
+    maxHp: integer;
     owner: byte;
     name: string;
     sprite: string;
     pos: Vector2;
-    heals: integer;
-    maxHp: integer;
     speed: integer;
     armor: integer;
     img: TImage;
@@ -75,7 +95,7 @@ Type
     destructor Destroy(); override;
 
     property HP: integer read GetHP write SetHP;
-    procedure Init(form: TForm);
+    procedure Init(form: TForm; maxHP : Integer);
     procedure ResetMP();
     procedure BuyMP();
     procedure ReDraw();
@@ -111,6 +131,7 @@ Type
     procedure OnEnter();
     procedure OnStay();
     procedure OnExit();
+    procedure AtackCell(damage : integer);
 
     property Image: TImage read GetImage write SetImage;
 
@@ -127,11 +148,17 @@ Type
 
   TPlayer = class
   private
+  var
+    playerMoney : integer;
+    procedure SetMoney(m : integer);
+    function GetMoney() : integer;
     destructor Destroy();
 
   var
     characters: charList;
   public
+  var
+    property Money: integer read GetMoney write SetMoney;
     procedure AddCharacter(c: TCharacter);
     procedure RemoveCharacter(c: TCharacter);
     procedure Init();
@@ -255,6 +282,13 @@ begin
   inherited Destroy;
 end;
 
+destructor TBuilding.Destroy();
+begin
+  WriteLn('Destroy ' + name);
+  img.Free;
+  inherited Destroy;
+end;
+
 destructor TCellData.Destroy();
 begin
   img.Free;
@@ -282,29 +316,45 @@ begin
 end;
 
 const
-  healsBarScale: Vector2 = (x: 50; y: 4);
-  healsBarPos: Vector2 = (x: 53; y: 110);
+  charHealsBarScale: Vector2 = (x: 50; y: 4);
+  charHealsBarPos: Vector2 = (x: 53; y: 110);
 
-procedure TCharacter.Init(form: TForm);
+procedure THealsContainer.Init(img : TImage; mHp : integer; scale, position : vector2; dieAction : Action);
 begin
-  healsBar := TImage.Create(form);
+  healsBar := TImage.Create(form2);
   healsBar.Parent := img;
-  healsBar.Position.x := healsBarPos.x;
-  healsBar.Position.y := healsBarPos.y;
+  healsBar.Position.x := position.x;
+  healsBar.Position.y := position.y;
 
-  healsBar.Width := healsBarScale.x;
-  healsBar.Height := healsBarScale.y;
+  healsBar.Width := scale.x;
+  healsBar.Height := scale.y;
 
-  healsBar.Bitmap.Width := healsBarScale.x;
-  healsBar.Bitmap.Height := healsBarScale.y;
+  healsBar.Bitmap.Width := scale.x;
+  healsBar.Bitmap.Height := scale.y;
   healsBar.Bitmap.Canvas.BeginScene();
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x,
-    healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, scale.x,
+    scale.y), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.EndScene();
+  healsBar.BringToFront;
+  maxHp := mHP;
+  heals := mHP;
+  imageScale := scale;
+  onDie := dieAction;
+end;
+
+procedure TCharacter.Init(form: TForm; maxHP : Integer);
+begin
+  healsBar := THealsContainer.Create;
+  healsBar.Init(img, maxHP, charHealsBarScale, charHealsBarPos, self.Die);
 end;
 
 function TCharacter.GetHP(): integer;
+begin
+  Result := healsBar.GetHP();
+end;
+
+function THealsContainer.GetHP(): integer;
 begin
   Result := heals;
 end;
@@ -318,35 +368,38 @@ end;
 
 procedure TCharacter.SetHP(h: integer);
 begin
-  if h < heals then // урон
+  if h < healsBar.GetHP() then // урон
   begin
-    heals := heals - RecalculateDamage(heals - h);
-  end
-  else
-  begin // лечение
-    if h > maxHp then
-      heals := maxHp
-    else
-      heals := h;
+    h := healsBar.GetHP() - RecalculateDamage(healsBar.GetHP() - h);
   end;
+  healsBar.SetHP(h);
+end;
 
-  healsBar.Bitmap.Width := healsBarScale.x;
-  healsBar.Bitmap.Height := healsBarScale.y;
+procedure THealsContainer.SetHP(h: integer);
+begin
+  if h > maxHp then
+    heals := maxHp
+  else
+    heals := h;
+
+  healsBar.Bitmap.Width := imageScale.x;
+  healsBar.Bitmap.Height := imageScale.y;
+
   healsBar.Bitmap.Canvas.BeginScene();
+
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Brown;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBarScale.x,
-    healsBarScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, imageScale.x,
+    imageScale.y), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
   healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0,
-    Round(healsBarScale.x * heals / maxHp), healsBarScale.y), 0, 0, [], 1);
+    Round(imageScale.x * (heals / maxHp)), imageScale.y), 0, 0, [], 1);
 
   healsBar.Bitmap.Canvas.EndScene();
 
   if heals <= 0 then
   begin
-    players[owner].RemoveCharacter(self);
-    GetCell(pos).character := nil;
-    self.Free;
+    OnDie();
+    Self.Free;
   end;
 end;
 
@@ -458,15 +511,27 @@ begin
   inherited Create;
 end;
 
+const
+  buildingHealsBarScale: Vector2 = (x: 60; y: 10);
+  buildingHealsBarPos: Vector2 = (x: 45; y: 40);
+
 procedure TBuilding.OnBuild(c: TCellData; ow: integer);
 begin
   cell := c;
   cell.building := self;
   owner := ow;
+
+  healsBar := THealsContainer.Create;
+  healsBar.Init(img, maxHP, buildingHealsBarScale, buildingHealsBarPos, OnDemolish);
+  healsBar.SetHP(maxHp);
 end;
 
 procedure TBuilding.OnDemolish();
 begin
+  if curPlayer <> owner then
+    currentPlayer.Money := currentPlayer.Money + cost;
+  GetCell(pos).building := nil;
+  self.Free;
 end;
 
 procedure TBuilding.OnEnter();
@@ -503,6 +568,36 @@ procedure TBuilding.ReDraw();
 begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
     sprite + IntToStr(owner) + '.png');
+end;
+
+procedure TCharacter.Die();
+begin
+  players[owner].RemoveCharacter(self);
+  GetCell(pos).character := nil;
+  self.Free;
+end;
+
+procedure TCellData.AtackCell(damage : integer);
+begin
+  if character <> nil then
+  begin
+    character.HP := character.HP - damage;
+  end
+  else
+  begin
+    building.HealsBar.SetHP(building.HealsBar.GetHP() - damage);
+  end;
+end;
+
+procedure TPlayer.SetMoney(m : integer);
+begin
+  playerMoney := m;
+  form2.MoneyText.Text := IntToStr(m);
+end;
+
+function TPlayer.GetMoney() : integer;
+begin
+  result := playerMoney;
 end;
 
 end.

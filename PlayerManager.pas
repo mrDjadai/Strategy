@@ -13,7 +13,7 @@ targetSelectionMode : boolean;
 selectedSkill : TSkill;
 selectedCaster : TCellData;
 
-procedure Init();
+procedure Init(baseMoney : integer; roundMoney : integer);
 
 procedure NextMove();
 
@@ -30,7 +30,7 @@ const actionsPerRound = 3;
 var
   round : integer;
   actions : integer;
-
+  moneyPerRound : integer;
 procedure ShowMoveData();
 begin
   Form2.RoundText.Text := IntToStr(round);
@@ -41,9 +41,11 @@ begin
     DrawColoredImage(Form2.PlayerIndicator, 'd6.png', TAlphaColors.red);
 end;
 
-procedure Init();
+procedure Init(baseMoney : integer; roundMoney : integer);
 begin
   targetSelectionMode := false;
+
+  moneyPerRound := roundMoney;
 
   selectedCharacter.x := -1;
   selectedCharacter.y := -1;
@@ -57,13 +59,19 @@ begin
 
   SetActionCount(actionsPerRound);
   ShowMoveData();
+
   players[0].Init();
   players[1].Init();
+
+  players[0].Money := baseMoney;
+  players[1].Money := baseMoney;
 end;
 
 procedure StartNewRound();
 begin
   Inc(round);
+  players[0].Money := players[0].Money + moneyPerRound;
+  players[1].Money := players[1].Money + moneyPerRound;
   players[0].OnRoundStart();
   players[1].OnRoundStart();
 end;
@@ -78,6 +86,7 @@ begin
   UnselectCharacter();
   SetActionCount(actionsPerRound);
   ShowMoveData();
+  form2.MoneyText.Text := IntToStr(currentPlayer.Money);
 end;
 
 function GetActionCount() : integer;

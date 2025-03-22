@@ -27,6 +27,8 @@ type
     Skill2Button: TButton;
     AttackButton: TButton;
     MPButton: TButton;
+    MoneyPrefix: TLabel;
+    MoneyText: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -38,6 +40,7 @@ type
     procedure AttackButtonClick(Sender: TObject);
     procedure Skill1ButtonClick(Sender: TObject);
     procedure Skill2ButtonClick(Sender: TObject);
+    procedure FormResize(Sender: TObject);
   private
     { Private declarations }
   public
@@ -50,7 +53,7 @@ var
 
 implementation
 
-uses CellManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, CharacterManager, PlayerManager;
+uses CellManager, Winapi.Windows, CharacterDataVisualisator, DataTypes, CharacterManager, PlayerManager, buildingManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -97,6 +100,12 @@ begin
   end;
 end;
 
+procedure TForm2.FormResize(Sender: TObject);
+begin
+  RightMenu.Height := form2.Height;
+  BG.Height := form2.Height;
+end;
+
 procedure TForm2.KeyPressTimerTimer(Sender: TObject);
 begin
   if pressedW then
@@ -125,6 +134,9 @@ begin
 end;
 
 procedure TForm2.OpenGame(Sender: TObject);
+var f : textFile;
+money, roundMoney : integer;
+line : string;
 begin
   pressedW := false;
   pressedA := false;
@@ -135,9 +147,21 @@ begin
 
   if useConsole then
       AllocConsole();
+  AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Configs\Parametrs.txt');
+  Reset(f);
 
-  PlayerManager.Init();
+  Readln(f, line);
+  Readln(f, line);
+  money := StrToInt(line);
+
+  Readln(f, line);
+  Readln(f, line);
+  roundMoney := StrToInt(line);
+
+  CloseFile(f);
+  PlayerManager.Init(money, roundMoney);
   CharacterManager.Init();
+  buildingManager.Init();
   CharacterDataVisualisator.Init(op, CharacterPanel);
   CellManager.Init('test');
 end;

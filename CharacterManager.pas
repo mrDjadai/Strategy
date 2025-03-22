@@ -246,7 +246,7 @@ var c : TCharacter;
     MyImage.HitTest := false;
     c.img := myImage;
 
-    c.Init(form2);
+    c.Init(form2, c.maxHp);
     cell.ReDraw();
 
 

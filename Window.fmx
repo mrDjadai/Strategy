@@ -10,6 +10,7 @@ object Form2: TForm2
   OnCreate = OpenGame
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
+  OnResize = FormResize
   DesignerMasterStyle = 0
   object Map: TLayout
     Size.Width = 50.000000000000000000
@@ -26,10 +27,14 @@ object Form2: TForm2
   object RightMenu: TLayout
     Anchors = [akTop, akRight]
     Position.X = 1030.000000000000000000
+    Position.Y = 1.000000000000000000
+    Size.Width = 50.000000000000000000
+    Size.Height = 50.000000000000000000
+    Size.PlatformDefault = False
     TabOrder = 3
     object BG: TPanel
-      Position.X = -176.000000000000000000
-      Size.Width = 232.000000000000000000
+      Position.X = -192.000000000000000000
+      Size.Width = 242.000000000000000000
       Size.Height = 721.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
@@ -126,7 +131,7 @@ object Form2: TForm2
       Position.X = -144.000000000000000000
       Position.Y = 9.000000000000000000
       Text = 'Round:'
-      TabOrder = 5
+      TabOrder = 7
     end
     object RoundText: TLabel
       Position.X = -144.000000000000000000
@@ -137,13 +142,24 @@ object Form2: TForm2
     object ActionsPrefix: TLabel
       Position.X = 104.000000000000000000
       Text = 'Actions:'
-      TabOrder = 4
+      TabOrder = 6
     end
     object ActionsText: TLabel
       Position.X = 104.000000000000000000
       Position.Y = 25.000000000000000000
       Text = '0/0'
       TabOrder = 3
+    end
+    object MoneyPrefix: TLabel
+      Position.X = 168.000000000000000000
+      Text = 'Money:'
+      TabOrder = 5
+    end
+    object MoneyText: TLabel
+      Position.X = 168.000000000000000000
+      Position.Y = 25.000000000000000000
+      Text = '0'
+      TabOrder = 4
     end
   end
 end

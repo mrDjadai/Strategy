@@ -1,0 +1,4 @@
+DefaultMoney
+100
+MoneyPerRound
+10

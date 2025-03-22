@@ -14,6 +14,10 @@ function GetCell(pos : vector2) : TCellData;
 
 function GetMapScale() : vector2;
 
+function GetCellTypeByName(name : string) : TCellType;
+
+function GetCellTypeById(id : char) : TCellType;
+
 procedure UnselectMap();
 procedure SelectMap(cond : SelectionCondition; caster : TCellData);
 
@@ -38,6 +42,38 @@ begin
     result := map[pos.y, pos.x];
 end;
 
+const nameList : array[0..4] of string = ('meadow', 'desert', 'forest', 'hills', 'begin');
+
+function GetCellTypeByName(name : string) : TCellType;
+var id : integer;
+begin
+  for var I := 0 to Length(nameList) - 1 do
+    if nameList[i] = name then
+      id := i;
+  result := GetCellTypeById(char(Ord(0) + id));
+end;
+
+function GetCellTypeById(id : char) : TCellType;
+begin
+  Case id of
+  '0' : begin
+          Result := cDefault;
+        end;
+  '1' : begin
+          Result := cDefault;
+        end;
+  '2' : begin
+          Result := cDifficult;
+        end;
+  '3' : begin
+          Result := cBlocked;
+        end;
+  '4' : begin
+          Result := cBlocked;
+        end;
+  End;
+end;
+
 function GetCellById(xpos, ypos : integer; id : char) : TCellData;
 var x, y : extended;
 begin
@@ -51,25 +87,23 @@ begin
   Case id of
   '0' : begin
           Result.sprite := 'meadow';
-          Result.cType := cDefault;
         end;
   '1' : begin
           Result.sprite := 'desert';
-          Result.cType := cDefault;
         end;
   '2' : begin
           Result.sprite := 'forest';
-          Result.cType := cDifficult;
         end;
   '3' : begin
           Result.sprite := 'hills';
-          Result.cType := cBlocked;
         end;
   '4' : begin
           Result.sprite := 'sea';
-          Result.cType := cBlocked;
         end;
   End;
+
+  result.cType := GetCellTypeById(id);
+
   result.ReDraw();
 end;
 

@@ -6,118 +6,129 @@ uses DataTypes, DiceManager;
 
 Type
 
-SplashAttack = class(TSkill)
+  SplashAttack = class(TSkill)
   private
-    function IsCorrectTarget(caster, target: TCellData) : boolean; override;
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
-    var
-      radius : integer;
-      friendlyFire : boolean;
-      damage : DicesCount;
+  var
+    radius: integer;
+    friendlyFire: boolean;
+    damage: DicesCount;
     procedure Use(caster, target: TCellData); override;
-end;
+  end;
 
-TargetAttack = class(TSkill)
+  TargetAttack = class(TSkill)
   private
-    function IsCorrectTarget(caster, target: TCellData) : boolean; override;
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
-    var
-      radius : integer;
-      damage : DicesCount;
+  var
+    radius: integer;
+    damage: DicesCount;
     procedure Use(caster, target: TCellData); override;
-end;
+  end;
 
-SplashHeal = class(TSkill)
+  SplashHeal = class(TSkill)
   private
-    function IsCorrectTarget(caster, target: TCellData) : boolean; override;
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
-    var
-      radius : integer;
-      heals : DicesCount;
+  var
+    radius: integer;
+    heals: DicesCount;
     procedure Use(caster, target: TCellData); override;
-end;
-
+  end;
 
 implementation
 
 uses CellManager, PlayerManager, CharacterManager;
 
-function SplashAttack.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
-var dist : integer;
+function SplashAttack.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
   result := (dist > 0) and (dist <= radius);
 end;
 
 procedure SplashAttack.Use(caster, target: TCellData);
-var cur : vector2;
-  curDamage : integer;
-  curChar : TCharacter;
+var
+  cur: vector2;
+  curDamage: integer;
+  curChar: TCharacter;
 begin
-  curDamage:= DropDices(damage);
+  curDamage := DropDices(damage);
   for var i := 0 to GetMapScale().x do
+  begin
+    for var k := 0 to GetMapScale().y do
     begin
-      for var k := 0 to GetMapScale().y do
+      cur.x := i;
+      cur.y := k;
+      if GetCell(cur) <> nil then
       begin
-        cur.x := i;
-        cur.y := k;
-        if GetCell(cur) <> nil then
+        curChar := GetCell(cur).character;
+        if IsCorrectTarget(caster, GetCell(cur)) and
+          (((curChar <> nil) and (friendlyFire or (GetCell(cur).character.owner
+          <> curPlayer))) or ((curChar = nil) and (GetCell(cur).building <>
+          nil))) then
         begin
-          curChar := GetCell(cur).character;
-          if (curChar <> nil) and  IsCorrectTarget(caster, GetCell(cur))
-          and (friendlyFire or (GetCell(cur).character.owner <> curPlayer)) then
-          begin
-            curChar.HP := curChar.HP - curDamage;
-          end;
+          GetCell(cur).AtackCell(curDamage);
         end;
       end;
     end;
+  end;
 end;
 
-function TargetAttack.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
-var dist : integer;
+function TargetAttack.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
-  result := (dist > 0) and (dist <= radius) and (target.character <> nil) and (target.character.owner <> curPlayer);
+  result := (dist > 0) and (dist <= radius) and (((target.character <> nil) and
+    (target.character.owner <> curPlayer) or ((target.character = nil) and
+    (target.building <> nil))));
 end;
 
 procedure TargetAttack.Use(caster, target: TCellData);
-var  curDamage : integer;
+var
+  curDamage: integer;
 begin
-  curDamage:= DropDices(damage);
-  target.Character.HP := target.Character.HP - curDamage;
+  curDamage := DropDices(damage);
+  target.AtackCell(curDamage);
 end;
 
-
-function SplashHeal.IsCorrectTarget(caster: TCellData; target: TCellData): Boolean;
-var dist : integer;
+function SplashHeal.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
   result := (dist <= radius) and (target.character.owner = curPlayer);
 end;
 
 procedure SplashHeal.Use(caster, target: TCellData);
-var cur : vector2;
-curHeal : integer;
-  curChar : TCharacter;
+var
+  cur: vector2;
+  curHeal: integer;
+  curChar: TCharacter;
 begin
-  curHeal:= DropDices(heals);
+  curHeal := DropDices(heals);
   for var i := 0 to GetMapScale().x do
+  begin
+    for var k := 0 to GetMapScale().y do
     begin
-      for var k := 0 to GetMapScale().y do
+      cur.x := i;
+      cur.y := k;
+      if GetCell(cur) <> nil then
       begin
-        cur.x := i;
-        cur.y := k;
-        if GetCell(cur) <> nil then
+        curChar := GetCell(cur).character;
+        if (curChar <> nil) and IsCorrectTarget(caster, GetCell(cur)) then
         begin
-          curChar := GetCell(cur).character;
-          if (curChar <> nil) and  IsCorrectTarget(caster, GetCell(cur)) then
-          begin
-            curChar.HP := curChar.HP + curHeal;
-          end;
+          curChar.HP := curChar.HP + curHeal;
         end;
       end;
     end;
+  end;
 end;
 
 end.

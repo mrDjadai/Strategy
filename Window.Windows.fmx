@@ -5,10 +5,6 @@ inherited Form2_Windows: TForm2_Windows
     Position.Y = -40.000000000000000000
   end
   inherited RightMenu: TLayout
-    Position.Y = 24.000000000000000000
-    inherited BG: TPanel
-      Position.Y = 280.000000000000000000
-    end
     inherited CharacterPanel: TImage
       MultiResBitmap.Height = 167
       MultiResBitmap.Width = 167
