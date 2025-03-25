@@ -8,9 +8,6 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
   FMX.StdCtrls, DataTypes;
 
-const
-  DicesTypesCount = 5;
-
 type
   DiceData = Record
     sprite: string;
@@ -22,7 +19,7 @@ type
     text: TLabel;
   End;
 
-  DicesCount = array [0 .. (DicesTypesCount - 1)] of integer;
+
 
 procedure ClearVisualisation();
 function DropDices(dices: DicesCount): integer;

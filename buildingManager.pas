@@ -37,6 +37,15 @@ type
     healAmount: integer;
   end;
 
+  Fort = class(TBuilding)
+  public
+  var
+    damage: dicesCount;
+    armor: integer;
+    procedure OnEnter(); override;
+    procedure OnExit(); override;
+  end;
+
 var
   buildingCount: integer;
 
@@ -50,6 +59,8 @@ begin
       result := Wall.Create;
     1:
       result := Hospital.Create;
+    2:
+      result := Fort.Create;
   end;
 
   AssignFile(f, ExtractFilePath(ParamStr(0)) +
@@ -81,6 +92,11 @@ begin
       ;
     1:
       Hospital(result).healAmount := StrToInt(data1);
+    2:
+      begin
+        Fort(result).armor := StrToInt(data1);
+        Fort(result).damage := LoadDices(data2);
+      end;
   end;
   CloseFile(f);
 end;
@@ -187,6 +203,18 @@ procedure Hospital.OnStay();
 begin
   if cell.character <> nil then
     cell.character.HP := cell.character.HP + healAmount;
+end;
+
+procedure Fort.OnEnter();
+begin
+  cell.character.armor := cell.character.armor + armor;
+  cell.character.bonusDices := SumDices(cell.character.bonusDices, damage)
+end;
+
+procedure Fort.OnExit();
+begin
+  cell.character.armor := cell.character.armor - armor;
+  cell.character.bonusDices := SubDices(cell.character.bonusDices, damage)
 end;
 
 end.

@@ -50,10 +50,7 @@ begin
         splash.radius := StrToInt(data[3]);
         var
           damage: dicesCount;
-        for var i := 0 to Length(damage) - 1 do
-          damage[i] := 0;
-        for var i := 1 to Length(data[4]) do
-          damage[i - 1] := Ord(data[4][i]) - Ord('0');
+        damage := LoadDices(data[4]);
         splash.damage := damage;
         splash.friendlyFire := data[5] = '+';
         result := splash;
@@ -67,10 +64,7 @@ begin
         target.radius := StrToInt(data[3]);
         var
           damage: dicesCount;
-        for var i := 0 to Length(damage) - 1 do
-          damage[i] := 0;
-        for var i := 1 to Length(data[4]) do
-          damage[i - 1] := Ord(data[4][i]) - Ord('0');
+        damage := LoadDices(data[4]);
         target.damage := damage;
         result := target;
         result.hasTarget := true;
@@ -81,15 +75,28 @@ begin
           heal: SplashHeal;
         heal := SplashHeal.Create;
         heal.radius := StrToInt(data[3]);
-        var
-          damage: dicesCount;
-        for var i := 0 to Length(damage) - 1 do
-          damage[i] := 0;
-        for var i := 1 to Length(data[4]) do
-          damage[i - 1] := Ord(data[4][i]) - Ord('0');
+                var
+        damage := LoadDices(data[4]);
         heal.heals := damage;
         result := heal;
         result.hasTarget := false;
+      end;
+    3:
+      begin
+        var
+          ex: HonorExecution;
+        ex := HonorExecution.Create;
+        ex.radius := StrToInt(data[3]);
+        var
+          damage: dicesCount;
+        damage := LoadDices(data[4]);
+        ex.bonus := damage;
+
+        damage := LoadDices(data[5]);
+        ex.damage := damage;
+
+        result := ex;
+        result.hasTarget := true;
       end;
   end;
 

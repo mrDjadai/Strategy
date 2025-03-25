@@ -275,8 +275,8 @@ end;
 const
   cButtonScaleX = 80;
   cButtonScaleY = 15;
-  cButtonOffsetX = 140;
-  cButtonOffsetY = 25;
+  cButtonOffsetX = 40;
+  cButtonOffsetY = 15;
   cButtonColumns = 2;
 
 procedure TForm2.OnChooseMap(Sender: TObject);
@@ -401,8 +401,8 @@ begin
     b.Name := 'charPlacer' + IntToStr(b.id);
     b.OnClick := Form2.SelectToPlace;
 
-    b.Position.Y := (cNum div cButtonColumns) * cButtonOffsetY;
-    b.Position.X := (cNum mod cButtonColumns) * cButtonOffsetX;
+    b.Position.Y := cNum * buyButtonOffset;
+    b.Position.X := 0;
 
     lb.Position.Y := b.Position.Y;
     lb.Position.X := b.Position.X + buyLabelOffset;

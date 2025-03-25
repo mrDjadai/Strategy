@@ -7,8 +7,13 @@ uses
   System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
 
+const
+  DicesTypesCount = 5;
+
 Type
   TCount = Array of integer;
+
+  DicesCount = array [0 .. (DicesTypesCount - 1)] of integer;
 
   Vector2 = Record
     x, y: integer;
@@ -92,6 +97,7 @@ Type
     armor: integer;
     img: TImage;
     movePoints: integer;
+    bonusDices: DicesCount;
 
     atack, skill1, skill2: TSkill;
 
@@ -157,10 +163,9 @@ Type
     function GetMoney(): integer;
     destructor Destroy();
 
-  var
-    characters: charList;
   public
   var
+    characters: charList;
     boughtCharacters: TCount;
     BuildingsCount: TCount;
     property Money: integer read GetMoney write SetMoney;
@@ -174,6 +179,9 @@ Type
 function decardToCube(pos: Vector2): Vector3;
 
 function GetDistance(a, b: Vector3): integer;
+function SumDices(a, b: DicesCount): DicesCount;
+function SubDices(a, b: DicesCount): DicesCount;
+function LoadDices(s: string): DicesCount;
 
 implementation
 
@@ -363,6 +371,8 @@ procedure TCharacter.Init(form: TForm; maxHp: integer);
 begin
   healsBar := THealsContainer.Create;
   healsBar.Init(img, maxHp, charHealsBarScale, charHealsBarPos, Self.Die);
+  for var i := 0 to Length(bonusDices)-1 do
+    bonusDices[i] := 0;
 end;
 
 function TCharacter.GetHP(): integer;
@@ -442,7 +452,7 @@ begin
   BuildingsCount := defaulBuildingsCount;
 
   SetLength(BuildingsCount, Length(defaulBuildingsCount));
-  for var i := 0 to Length(BuildingsCount)-1 do
+  for var i := 0 to Length(BuildingsCount) - 1 do
     BuildingsCount[i] := defaulBuildingsCount[i];
 end;
 
@@ -634,6 +644,27 @@ begin
     for var a in BuildingsCount do
       if a > 0 then
         Result := true;
+end;
+
+function SumDices(a, b: DicesCount): DicesCount;
+begin
+  for var i := 0 to Length(a) - 1 do
+    Result[i] := a[i] + b[i];
+end;
+
+function SubDices(a, b: DicesCount): DicesCount;
+begin
+  for var i := 0 to Length(a) - 1 do
+    Result[i] := a[i] - b[i];
+end;
+
+function LoadDices(s: string): DicesCount;
+begin
+
+  for var i := 0 to Length(Result) - 1 do
+    Result[i] := 0;
+  for var i := 1 to Length(s) do
+    Result[i - 1] := Ord(s[i]) - Ord('0');
 end;
 
 end.
