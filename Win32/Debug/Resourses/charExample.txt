@@ -1,5 +1,6 @@
 DsiplayName
 SpriteFileName
+Cost
 HP
 Speed
 Armor

@@ -4,33 +4,42 @@ interface
 
 uses DataTypes;
 
-var selectedCharacter : vector2;
-currentPlayer : TPlayer;
-curPlayer : integer;
-players : Array[0..1] of TPlayer;
+var
+  selectedCharacter: vector2;
+  currentPlayer: TPlayer;
+  curPlayer: integer;
+  players: Array [0 .. 1] of TPlayer;
 
-targetSelectionMode : boolean;
-selectedSkill : TSkill;
-selectedCaster : TCellData;
+  targetSelectionMode: boolean;
+  prepareMode: boolean;
+  selectedSkill: TSkill;
+  selectedCaster: TCellData;
 
-procedure Init(baseMoney : integer; roundMoney : integer);
+  placableCharacterId: integer;
+  placableBuildingId: integer;
+
+procedure Init(baseMoney: integer; roundMoney: integer);
 
 procedure NextMove();
 
-function GetActionCount() : integer;
+function GetActionCount(): integer;
 
-procedure SetActionCount(c : integer);
+procedure SetActionCount(c: integer);
+
+procedure TryEndPrepare();
 
 implementation
 
 uses Window, System.SysUtils, Drawer, System.UITypes, CharacterManager;
 
-const actionsPerRound = 3;
+const
+  actionsPerRound = 3;
 
 var
-  round : integer;
-  actions : integer;
-  moneyPerRound : integer;
+  round: integer;
+  actions: integer;
+  moneyPerRound: integer;
+
 procedure ShowMoveData();
 begin
   Form2.RoundText.Text := IntToStr(round);
@@ -41,7 +50,7 @@ begin
     DrawColoredImage(Form2.PlayerIndicator, 'd6.png', TAlphaColors.red);
 end;
 
-procedure Init(baseMoney : integer; roundMoney : integer);
+procedure Init(baseMoney: integer; roundMoney: integer);
 begin
   targetSelectionMode := false;
 
@@ -65,6 +74,9 @@ begin
 
   players[0].Money := baseMoney;
   players[1].Money := baseMoney;
+
+  placableCharacterId := -1;
+  placableBuildingId := -1;
 end;
 
 procedure StartNewRound();
@@ -79,26 +91,43 @@ end;
 procedure NextMove();
 begin
   curPlayer := 1 - curPlayer;
-  if curPlayer = 0 then
-    StartNewRound();
+
+  if prepareMode = false then
+  begin
+    if curPlayer = 0 then
+      StartNewRound();
+  end;
 
   currentPlayer := players[curPlayer];
   UnselectCharacter();
   SetActionCount(actionsPerRound);
   ShowMoveData();
-  form2.MoneyText.Text := IntToStr(currentPlayer.Money);
+  Form2.MoneyText.Text := IntToStr(currentPlayer.Money);
 end;
 
-function GetActionCount() : integer;
+function GetActionCount(): integer;
 begin
   result := actions;
 end;
 
-procedure SetActionCount(c : integer);
+procedure SetActionCount(c: integer);
 begin
   actions := c;
 
   Form2.ActionsText.Text := IntToStr(actions) + '/' + IntToStr(actionsPerRound);
+end;
+
+procedure TryEndPrepare();
+begin
+  if players[1 - curPlayer].CanPlace then
+    NextMove()
+  else if currentPlayer.CanPlace = false then
+  begin
+    prepareMode := false;
+    NextMove();
+    form2.PlacerPanel.Visible := false;
+  end;
+  ShowPlacersCount(currentPlayer);
 end;
 
 end.

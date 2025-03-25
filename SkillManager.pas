@@ -86,7 +86,7 @@ begin
   dist := GetDistance(caster.cubePos, target.cubePos);
   result := (dist > 0) and (dist <= radius) and (((target.character <> nil) and
     (target.character.owner <> curPlayer) or ((target.character = nil) and
-    (target.building <> nil))));
+    (target.building <> nil) and (target.building.owner <> curPlayer))));
 end;
 
 procedure TargetAttack.Use(caster, target: TCellData);

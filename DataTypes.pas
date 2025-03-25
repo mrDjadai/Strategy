@@ -8,6 +8,7 @@ uses
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
 
 Type
+  TCount = Array of integer;
 
   Vector2 = Record
     x, y: integer;
@@ -24,11 +25,12 @@ Type
     healsBar: TImage;
     heals: integer;
     maxHp: integer;
-    onDie : action;
-    imageScale : vector2;
+    onDie: Action;
+    imageScale: Vector2;
     procedure SetHP(h: integer);
     function GetHP(): integer;
-    procedure Init(img : TImage; mHp : integer; scale, position : vector2; dieAction : Action);
+    procedure Init(img: TImage; mHp: integer; scale, position: Vector2;
+      dieAction: Action);
   end;
 
   TCellData = class;
@@ -49,12 +51,12 @@ Type
 
   TBuilding = class
   private
-      destructor Destroy(); override;
+    destructor Destroy(); override;
   public
-    cost : integer;
-    name : string;
-    maxHp : integer;
-    healsBar : THealsContainer;
+    cost: integer;
+    name: string;
+    maxHp: integer;
+    healsBar: THealsContainer;
     cell: TCellData;
     owner: integer;
     pos: Vector2;
@@ -71,7 +73,7 @@ Type
   TCharacter = class
   private
   var
-    healsBar : THealsContainer;
+    healsBar: THealsContainer;
 
     procedure Die();
     procedure SetHP(h: integer);
@@ -82,6 +84,7 @@ Type
   var
     maxHp: integer;
     owner: byte;
+    cost: integer;
     name: string;
     sprite: string;
     pos: Vector2;
@@ -95,7 +98,7 @@ Type
     destructor Destroy(); override;
 
     property HP: integer read GetHP write SetHP;
-    procedure Init(form: TForm; maxHP : Integer);
+    procedure Init(form: TForm; maxHp: integer);
     procedure ResetMP();
     procedure BuyMP();
     procedure ReDraw();
@@ -131,7 +134,7 @@ Type
     procedure OnEnter();
     procedure OnStay();
     procedure OnExit();
-    procedure AtackCell(damage : integer);
+    procedure AtackCell(damage: integer);
 
     property Image: TImage read GetImage write SetImage;
 
@@ -149,20 +152,23 @@ Type
   TPlayer = class
   private
   var
-    playerMoney : integer;
-    procedure SetMoney(m : integer);
-    function GetMoney() : integer;
+    playerMoney: integer;
+    procedure SetMoney(m: integer);
+    function GetMoney(): integer;
     destructor Destroy();
 
   var
     characters: charList;
   public
   var
+    boughtCharacters: TCount;
+    BuildingsCount: TCount;
     property Money: integer read GetMoney write SetMoney;
     procedure AddCharacter(c: TCharacter);
     procedure RemoveCharacter(c: TCharacter);
     procedure Init();
     procedure OnRoundStart();
+    function CanPlace(): boolean;
   end;
 
 function decardToCube(pos: Vector2): Vector3;
@@ -181,8 +187,8 @@ begin
 
   Image.Parent := form2.Map;
 
-  Image.Position.x := x;
-  Image.Position.y := y;
+  Image.position.x := x;
+  Image.position.y := y;
 
   Image.Width := size;
   Image.Height := size;
@@ -193,8 +199,8 @@ begin
 
   selector.Parent := Image;
 
-  selector.Position.x := 0;
-  selector.Position.y := 0;
+  selector.position.x := 0;
+  selector.position.y := 0;
 
   selector.Width := size;
   selector.Height := size;
@@ -224,42 +230,51 @@ begin
     decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,
     '   has character  ', character <> nil);
 
-  if targetSelectionMode then
+  if prepareMode then
   begin
-    if selectedSkill.IsCorrectTarget(SelectedCaster, self) then
+    if (curPlayer = 0) = (cubePos.x < x div 2) then
     begin
-      targetSelectionMode := false;
-      selectedSkill.Use(SelectedCaster, self);
-      selectedSkill := nil;
-      form2.SkipRound.Enabled := true;
-      UnselectMap();
+      if placableBuildingId > -1 then
+        TryBuild(Self);
+      if placableCharacterId > -1 then
+        TryCreateCharacter(Self)
     end;
   end
-  else if selectedSkill = nil then
+  else
   begin
-    if character = nil then // если режим предварительной расстановки
+    if targetSelectionMode then
     begin
-      if selectedCharacter.x = -1 then
+      if selectedSkill.IsCorrectTarget(SelectedCaster, Self) then
       begin
-        TryBuild(Self);
-        TryCreateCharacter(Self)
+        targetSelectionMode := false;
+        selectedSkill.Use(SelectedCaster, Self);
+        selectedSkill := nil;
+        form2.SkipRound.Enabled := true;
+        UnselectMap();
+      end;
+    end
+    else if selectedSkill = nil then
+    begin
+      if character = nil then // если режим предварительной расстановки
+      begin
+        if selectedCharacter.x <> -1 then
+        begin
+          TryMoveCharacter(GetCell(selectedCharacter), Self);
+        end
       end
       else
-        TryMoveCharacter(GetCell(selectedCharacter), self);
-    end
-    else
-    begin
-      if character.owner = curPlayer then
       begin
-        if (selectedCharacter.x = decardPos.x) and
-          (selectedCharacter.y = decardPos.y) then
-          UnselectCharacter()
-        else
-          SelectCharacter(decardPos);
+        if character.owner = curPlayer then
+        begin
+          if (selectedCharacter.x = decardPos.x) and
+            (selectedCharacter.y = decardPos.y) then
+            UnselectCharacter()
+          else
+            SelectCharacter(decardPos);
+        end;
       end;
     end;
   end;
-
 end;
 
 procedure TCellData.SetImage(im: TImage);
@@ -319,12 +334,13 @@ const
   charHealsBarScale: Vector2 = (x: 50; y: 4);
   charHealsBarPos: Vector2 = (x: 53; y: 110);
 
-procedure THealsContainer.Init(img : TImage; mHp : integer; scale, position : vector2; dieAction : Action);
+procedure THealsContainer.Init(img: TImage; mHp: integer;
+  scale, position: Vector2; dieAction: Action);
 begin
   healsBar := TImage.Create(form2);
   healsBar.Parent := img;
-  healsBar.Position.x := position.x;
-  healsBar.Position.y := position.y;
+  healsBar.position.x := position.x;
+  healsBar.position.y := position.y;
 
   healsBar.Width := scale.x;
   healsBar.Height := scale.y;
@@ -333,20 +349,20 @@ begin
   healsBar.Bitmap.Height := scale.y;
   healsBar.Bitmap.Canvas.BeginScene();
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, scale.x,
-    scale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, scale.x, scale.y), 0,
+    0, [], 1);
   healsBar.Bitmap.Canvas.EndScene();
   healsBar.BringToFront;
-  maxHp := mHP;
-  heals := mHP;
+  maxHp := mHp;
+  heals := mHp;
   imageScale := scale;
   onDie := dieAction;
 end;
 
-procedure TCharacter.Init(form: TForm; maxHP : Integer);
+procedure TCharacter.Init(form: TForm; maxHp: integer);
 begin
   healsBar := THealsContainer.Create;
-  healsBar.Init(img, maxHP, charHealsBarScale, charHealsBarPos, self.Die);
+  healsBar.Init(img, maxHp, charHealsBarScale, charHealsBarPos, Self.Die);
 end;
 
 function TCharacter.GetHP(): integer;
@@ -398,7 +414,7 @@ begin
 
   if heals <= 0 then
   begin
-    OnDie();
+    onDie();
     Self.Free;
   end;
 end;
@@ -423,6 +439,11 @@ begin
   New(characters);
   characters^.data := nil;
   characters^.next := nil;
+  BuildingsCount := defaulBuildingsCount;
+
+  SetLength(BuildingsCount, Length(defaulBuildingsCount));
+  for var i := 0 to Length(BuildingsCount)-1 do
+    BuildingsCount[i] := defaulBuildingsCount[i];
 end;
 
 procedure TPlayer.AddCharacter(c: TCharacter);
@@ -481,18 +502,18 @@ end;
 
 procedure TSkill.Select(caster: TCellData);
 begin
-  timeAfterUse := 0;
-  CharacterDataVisualisator.ReDraw();
   if GetActionCount() > 0 then
   begin
+    timeAfterUse := 0;
+    CharacterDataVisualisator.ReDraw();
     SetActionCount(GetActionCount() - 1);
     if hasTarget then
     begin
       targetSelectionMode := true;
-      selectedSkill := self;
+      selectedSkill := Self;
       SelectedCaster := caster;
       form2.SkipRound.Enabled := false;
-      SelectMap(self.IsCorrectTarget, caster);
+      SelectMap(Self.IsCorrectTarget, caster);
     end
     else
     begin
@@ -518,11 +539,12 @@ const
 procedure TBuilding.OnBuild(c: TCellData; ow: integer);
 begin
   cell := c;
-  cell.building := self;
+  cell.building := Self;
   owner := ow;
 
   healsBar := THealsContainer.Create;
-  healsBar.Init(img, maxHP, buildingHealsBarScale, buildingHealsBarPos, OnDemolish);
+  healsBar.Init(img, maxHp, buildingHealsBarScale, buildingHealsBarPos,
+    OnDemolish);
   healsBar.SetHP(maxHp);
 end;
 
@@ -531,7 +553,7 @@ begin
   if curPlayer <> owner then
     currentPlayer.Money := currentPlayer.Money + cost;
   GetCell(pos).building := nil;
-  self.Free;
+  Self.Free;
 end;
 
 procedure TBuilding.OnEnter();
@@ -572,12 +594,12 @@ end;
 
 procedure TCharacter.Die();
 begin
-  players[owner].RemoveCharacter(self);
+  players[owner].RemoveCharacter(Self);
   GetCell(pos).character := nil;
-  self.Free;
+  Self.Free;
 end;
 
-procedure TCellData.AtackCell(damage : integer);
+procedure TCellData.AtackCell(damage: integer);
 begin
   if character <> nil then
   begin
@@ -585,19 +607,33 @@ begin
   end
   else
   begin
-    building.HealsBar.SetHP(building.HealsBar.GetHP() - damage);
+    building.healsBar.SetHP(building.healsBar.GetHP() - damage);
   end;
 end;
 
-procedure TPlayer.SetMoney(m : integer);
+procedure TPlayer.SetMoney(m: integer);
 begin
   playerMoney := m;
   form2.MoneyText.Text := IntToStr(m);
 end;
 
-function TPlayer.GetMoney() : integer;
+function TPlayer.GetMoney(): integer;
 begin
-  result := playerMoney;
+  Result := playerMoney;
+end;
+
+function TPlayer.CanPlace(): boolean;
+begin
+  Result := false;
+
+  for var a in boughtCharacters do
+    if a > 0 then
+      Result := true;
+
+  if Result = false then
+    for var a in BuildingsCount do
+      if a > 0 then
+        Result := true;
 end;
 
 end.

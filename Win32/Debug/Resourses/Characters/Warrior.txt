@@ -1,5 +1,6 @@
 Warrior
 pers
+40
 20
 6
 2

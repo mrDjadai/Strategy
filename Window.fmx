@@ -51,6 +51,7 @@ object Form2: TForm2
       Size.Width = 226.000000000000000000
       Size.Height = 129.000000000000000000
       Size.PlatformDefault = False
+      Visible = False
       object OP: TLabel
         Position.X = 136.000000000000000000
         Position.Y = 122.000000000000000000
@@ -108,10 +109,19 @@ object Form2: TForm2
         OnClick = MPButonClick
       end
     end
+    object PlacerPanel: TLayout
+      Anchors = [akTop, akRight]
+      Position.X = -190.000000000000000000
+      Size.Width = 250.000000000000000000
+      Size.Height = 100.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 2
+    end
   end
   object DownMenu: TLayout
     Position.X = 320.000000000000000000
     Position.Y = 671.000000000000000000
+    Visible = False
     TabOrder = 4
     object SkipRound: TButton
       Position.X = -16.000000000000000000
@@ -160,6 +170,70 @@ object Form2: TForm2
       Position.Y = 25.000000000000000000
       Text = '0'
       TabOrder = 4
+    end
+  end
+  object MainMenu: TLayout
+    Align = Client
+    Size.Width = 1080.000000000000000000
+    Size.Height = 720.000000000000000000
+    Size.PlatformDefault = False
+    TabOrder = 6
+    object StartButton: TButton
+      Align = Center
+      TabOrder = 0
+      Text = #1048#1075#1088#1072#1090#1100
+      TextSettings.Trimming = None
+      OnClick = StartGame
+    end
+  end
+  object PrepairLayout: TLayout
+    Align = Client
+    Size.Width = 1080.000000000000000000
+    Size.Height = 720.000000000000000000
+    Size.PlatformDefault = False
+    Visible = False
+    TabOrder = 7
+    object MapPanel: TPanel
+      Align = Center
+      Scale.X = 5.000000000000000000
+      Scale.Y = 3.000000000000000000
+      TabOrder = 1
+    end
+    object BuyPanel: TPanel
+      Align = Center
+      Scale.X = 5.000000000000000000
+      Scale.Y = 3.000000000000000000
+      TabOrder = 0
+      object BuyMoneyPrefix: TLabel
+        Align = Bottom
+        Position.Y = 96.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 12.000000000000000000
+        Size.PlatformDefault = False
+        Text = #1044#1077#1085#1100#1075#1080
+        TabOrder = 1
+      end
+      object BuyMoneyText: TLabel
+        Align = Bottom
+        Position.Y = 108.000000000000000000
+        Size.Width = 120.000000000000000000
+        Size.Height = 12.000000000000000000
+        Size.PlatformDefault = False
+        Text = '0'
+        TabOrder = 0
+      end
+      object BuyRoundSkip: TButton
+        Anchors = [akRight, akBottom]
+        Position.X = 64.000000000000000000
+        Position.Y = 98.000000000000000000
+        Size.Width = 56.000000000000000000
+        Size.Height = 22.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #1047#1072#1082#1086#1085#1095#1080#1090#1100
+        TextSettings.Trimming = None
+        OnClick = BuyRoundSkipClick
+      end
     end
   end
 end
