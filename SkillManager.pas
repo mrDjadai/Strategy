@@ -48,9 +48,35 @@ Type
     procedure Use(caster, target: TCellData); override;
   end;
 
+  Teleport = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
+  public
+  var
+    radius: integer;
+    procedure Use(caster, target: TCellData); override;
+  end;
+
+  Shield = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
+  public
+  var
+    deltaSpeed : integer;
+    deltaArmor : integer;
+    deltaDamage : dicesCount;
+    armoredSprite : string;
+
+    baseSprite : string;
+    isActive : boolean;
+
+    procedure Use(caster, target: TCellData); override;
+  end;
+
+
 implementation
 
-uses CellManager, PlayerManager, CharacterManager;
+uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator;
 
 function SplashAttack.IsCorrectTarget(caster: TCellData;
   target: TCellData): boolean;
@@ -172,6 +198,54 @@ begin
       cur^.data.bonusDices := SumDices(cur^.data.bonusDices, bonus);
     end;
   end;
+end;
+
+function Teleport.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
+begin
+  dist := GetDistance(caster.cubePos, target.cubePos);
+  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and (target.character = nil)
+  and ((target.building = nil) or (target.building.owner = caster.character.owner));
+end;
+
+procedure Teleport.Use(caster, target: TCellData);
+begin
+  MoveCharacter(caster, target);
+end;
+
+function Shield.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+begin
+  result := true;
+end;
+
+procedure Shield.Use(caster, target: TCellData);
+begin
+  if not isActive then
+  begin
+    Inc(caster.character.armor, deltaArmor);
+    Inc(caster.character.speed, deltaSpeed);
+    caster.character.bonusDices := SumDices(caster.character.bonusDices, deltaDamage);
+    caster.character.movePoints := 0;
+
+    baseSprite := caster.character.sprite;
+    caster.character.sprite := armoredSprite;
+  end
+  else
+  begin
+    Dec(caster.character.armor, deltaArmor);
+    Dec(caster.character.speed, deltaSpeed);
+    caster.character.bonusDices := SubDices(caster.character.bonusDices, deltaDamage);
+
+    caster.character.sprite := baseSprite;
+  end;
+
+    isActive := not isActive;
+
+    caster.character.ReDraw();
+    CharacterDataVisualisator.ReDraw();
 end;
 
 end.

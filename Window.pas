@@ -39,6 +39,9 @@ type
     BuyMoneyText: TLabel;
     BuyRoundSkip: TButton;
     PlacerPanel: TLayout;
+    WinPanel: TPanel;
+    WinnerText: TLabel;
+    WinnerIndicator: TImage;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);

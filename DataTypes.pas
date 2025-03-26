@@ -479,6 +479,9 @@ begin
   temp := cur^.next;
   cur^.next := cur^.next^.next;
   Dispose(temp);
+
+  if characters^.next = nil then
+    Lose(self);
 end;
 
 procedure TPlayer.OnRoundStart();

@@ -22,6 +22,8 @@ procedure Init();
 
 function GetCharList(): TStringDynArray;
 
+procedure MoveCharacter(source, dest: TCellData);
+
 implementation
 
 uses PlayerManager, CellManager, System.SysUtils, Window,
@@ -34,7 +36,7 @@ var
   charTypes: TStringDynArray;
 
 type
-  skillData = array [0 .. 5] of string;
+  skillData = array [0 .. 6] of string;
 
 function LoadSkill(data: skillData): TSkill;
 var
@@ -75,7 +77,7 @@ begin
           heal: SplashHeal;
         heal := SplashHeal.Create;
         heal.radius := StrToInt(data[3]);
-                var
+        var
         damage := LoadDices(data[4]);
         heal.heals := damage;
         result := heal;
@@ -97,6 +99,29 @@ begin
 
         result := ex;
         result.hasTarget := true;
+      end;
+    4:
+      begin
+        var
+          tp: Teleport;
+        tp := Teleport.Create;
+        tp.radius := StrToInt(data[3]);
+        result := tp;
+        result.hasTarget := true;
+      end;
+    5:
+      begin
+        var
+          sh: Shield;
+        sh := Shield.Create;
+        sh.deltaArmor := StrToInt(data[3]);
+        sh.deltaSpeed := StrToInt(data[4]);
+        sh.deltaDamage := LoadDices(data[5]);
+        sh.armoredSprite := data[6];
+        sh.isActive := false;
+
+        result := sh;
+        result.hasTarget := false;
       end;
   end;
 

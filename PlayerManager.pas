@@ -18,6 +18,10 @@ var
   placableCharacterId: integer;
   placableBuildingId: integer;
 
+procedure Win(player : TPlayer);
+
+procedure Lose(player : TPlayer);
+
 procedure Init(baseMoney: integer; roundMoney: integer);
 
 procedure NextMove();
@@ -129,5 +133,29 @@ begin
   end;
   ShowPlacersCount(currentPlayer);
 end;
+
+procedure Win(player : TPlayer);
+begin
+  if currentPlayer <> player then
+    curPlayer := 1 - curPlayer;
+
+
+  if curPlayer = 0 then
+    DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.blue)
+  else
+    DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.red);
+
+  Form2.WinnerText.Text := form2.WinnerText.Text + IntToStr(1 + curPlayer);
+  Form2.WinPanel.Visible := true;
+end;
+
+procedure Lose(player : TPlayer);
+begin
+  if player = players[0] then
+    Win(players[1])
+  else
+    Win(players[0]);
+end;
+
 
 end.
