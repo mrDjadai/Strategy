@@ -9,7 +9,9 @@ var
 
 procedure Init();
 
-function TryBuild(cell: TCellData): boolean;
+function TryBuild(cell: TCellData): boolean; overload;
+
+function TryBuild(cell: TCellData; id: integer): boolean; overload;
 
 function GetBuildingName(id: integer): string;
 
@@ -18,7 +20,8 @@ implementation
 uses PlayerManager, cellManager, System.SysUtils, System.Types, System.UITypes,
   System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
-  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts;
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts,
+  DiceManager, WIndow;
 
 const
   buildingOffset: vector2 = (x: - 10; y: - 12);
@@ -46,6 +49,13 @@ type
     procedure OnExit(); override;
   end;
 
+  Kapkan = class(TBuilding)
+  public
+  var
+    damage: dicesCount;
+    procedure OnEnter(); override;
+  end;
+
 var
   buildingCount: integer;
 
@@ -61,6 +71,8 @@ begin
       result := Hospital.Create;
     2:
       result := Fort.Create;
+    3:
+      result := Kapkan.Create;
   end;
 
   AssignFile(f, ExtractFilePath(ParamStr(0)) +
@@ -97,6 +109,8 @@ begin
         Fort(result).armor := StrToInt(data1);
         Fort(result).damage := LoadDices(data2);
       end;
+    3:
+      Kapkan(result).damage := LoadDices(data1);
   end;
   CloseFile(f);
 end;
@@ -127,8 +141,8 @@ begin
 
   var
     myImage: TImage;
-  myImage := TImage.Create(TComponent(cell.Image).Owner);
-  myImage.Parent := TControl(cell.Image).Parent;
+  myImage := TImage.Create(form2);
+  myImage.Parent := form2.BuildingsOrigin;
 
   myImage.Position.x := cell.Image.Position.x + buildingOffset.x;
   myImage.Position.y := cell.Image.Position.y + buildingOffset.y;
@@ -143,19 +157,26 @@ begin
   b.OnBuild(cell, curPlayer);
 
   cell.ReDraw();
+  b.ReDraw();
 end;
 
 function TryBuild(cell: TCellData): boolean;
+begin
+  result := TryBuild(cell, placableBuildingId);
+end;
+
+function TryBuild(cell: TCellData; id: integer): boolean;
 begin
   result := false;
 
   if (cell.cType <> cBlocked) and (cell.building = nil) then
   begin
-    Build(cell, placableBuildingId);
+    Build(cell, id);
     placableBuildingId := -1;
     result := true;
 
-    TryEndPrepare();
+    if prepareMode then
+      TryEndPrepare();
   end;
 end;
 
@@ -215,6 +236,18 @@ procedure Fort.OnExit();
 begin
   cell.character.armor := cell.character.armor - armor;
   cell.character.bonusDices := SubDices(cell.character.bonusDices, damage)
+end;
+
+procedure Kapkan.OnEnter();
+var curDamage : integer;
+begin
+  if cell.building.owner <> cell.character.owner then
+  begin
+    curDamage := DropDices(damage);
+    cell.AtackCell(curDamage);
+    cell.building := nil;
+    self.Free;
+  end;
 end;
 
 end.

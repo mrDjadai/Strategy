@@ -123,6 +123,16 @@ begin
         result := sh;
         result.hasTarget := false;
       end;
+    6:
+      begin
+        var
+          bd: BuildingPlacer;
+        bd := BuildingPlacer.Create;
+        bd.radius := StrToInt(data[3]);
+        bd.buildingId := StrToInt(data[4]);
+        result := bd;
+        result.hasTarget := true;
+      end;
   end;
 
   result.name := data[1];
@@ -265,10 +275,11 @@ begin
   if IsCorrectDest(source, dest) then
   begin
     MoveCharacter(source, dest);
-    if dest.cType = cDifficult then
-      dest.character.movePoints := dest.character.movePoints - 2
-    else
-      dest.character.movePoints := dest.character.movePoints - 1;
+    if dest.character <> nil then
+      if dest.cType = cDifficult then
+        dest.character.movePoints := dest.character.movePoints - 2
+      else
+        dest.character.movePoints := dest.character.movePoints - 1;
   end;
   ReDraw();
 end;
@@ -288,8 +299,8 @@ begin
 
   var
     myImage: TImage;
-  myImage := TImage.Create(TComponent(cell.Image).owner);
-  myImage.Parent := TControl(cell.Image).Parent;
+  myImage := TImage.Create(form2);
+  myImage.Parent := form2.CharactersOrigin;
 
   myImage.Position.x := cell.Image.Position.x + characterOffset.x;
   myImage.Position.y := cell.Image.Position.y + characterOffset.y;
@@ -306,6 +317,7 @@ begin
   c.hp := c.maxHp;
 
   currentPlayer.AddCharacter(c);
+  c.ReDraw();
 end;
 
 function TryCreateCharacter(cell: TCellData): boolean;

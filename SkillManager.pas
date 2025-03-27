@@ -73,10 +73,20 @@ Type
     procedure Use(caster, target: TCellData); override;
   end;
 
+  BuildingPlacer = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
+  public
+  var
+    radius: integer;
+    buildingId : integer;
+    procedure Use(caster, target: TCellData); override;
+  end;
+
 
 implementation
 
-uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator;
+uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator, buildingManager;
 
 function SplashAttack.IsCorrectTarget(caster: TCellData;
   target: TCellData): boolean;
@@ -246,6 +256,21 @@ begin
 
     caster.character.ReDraw();
     CharacterDataVisualisator.ReDraw();
+end;
+
+function BuildingPlacer.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
+begin
+  dist := GetDistance(caster.cubePos, target.cubePos);
+  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and (target.building = nil)
+  and ((target.building = nil) or (target.building.owner = caster.character.owner));
+end;
+
+procedure BuildingPlacer.Use(caster, target: TCellData);
+begin
+  TryBuild(target, buildingId);
 end;
 
 end.

@@ -127,9 +127,13 @@ begin
     NextMove()
   else if currentPlayer.CanPlace = false then
   begin
-    prepareMode := false;
     NextMove();
+    prepareMode := false;
     form2.PlacerPanel.Visible := false;
+
+    form2.SkipRound.Enabled := true;
+  curPlayer := 0;
+  currentPlayer := players[0];
   end;
   ShowPlacersCount(currentPlayer);
 end;

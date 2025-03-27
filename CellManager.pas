@@ -154,6 +154,8 @@ begin
       map[I][k].decardPos.x := k;
       map[I][k].decardPos.y := I;
       map[I][k].cubePos := decardToCube(map[I][k].decardPos);
+        map[i][k].img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+    map[i][k].sprite + '.png');
     end;
 
     inc(I);
@@ -161,6 +163,9 @@ begin
   end;
 
   CloseFile(f);
+
+  form2.BuildingsOrigin.BringToFront();
+  form2.CharactersOrigin.BringToFront();
 end;
 
 function GetMapScale(): vector2;

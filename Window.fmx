@@ -17,6 +17,12 @@ object Form2: TForm2
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 1
+    object BuildingsOrigin: TLayout
+      TabOrder = 1
+    end
+    object CharactersOrigin: TLayout
+      TabOrder = 2
+    end
   end
   object KeyPressTimer: TTimer
     Interval = 10

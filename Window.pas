@@ -42,6 +42,8 @@ type
     WinPanel: TPanel;
     WinnerText: TLabel;
     WinnerIndicator: TImage;
+    CharactersOrigin: TLayout;
+    BuildingsOrigin: TLayout;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -87,10 +89,10 @@ type
 var
   Form2: TForm2;
   minMapX, minMapY: integer;
-  charPlacers : Array of PlacerButton;
-  buildPlacers : Array of PlacerButton;
+  charPlacers: Array of PlacerButton;
+  buildPlacers: Array of PlacerButton;
 
-procedure ShowPlacersCount(player : TPlayer);
+procedure ShowPlacersCount(player: TPlayer);
 
 implementation
 
@@ -242,7 +244,7 @@ begin
   roundMoney := StrToInt(line);
 
   CloseFile(f);
-  
+
   CharacterManager.Init();
   buildingManager.Init();
   PlayerManager.Init(money, roundMoney);
@@ -333,6 +335,7 @@ begin
     Inc(cNum);
   end;
   BuyMoneyText.Text := IntToStr(currentPlayer.money);
+  form2.BuyRoundSkip.Enabled := false;
 end;
 
 procedure TForm2.TryBuyCharacter(Sender: TObject);
@@ -351,6 +354,7 @@ begin
       currentPlayer.boughtCharacters[b.id] := 0;
     end;
     Inc(currentPlayer.boughtCharacters[b.id]);
+    form2.BuyRoundSkip.Enabled := true;
   end;
 end;
 
@@ -374,7 +378,7 @@ var
   lb: TLabel;
 begin
   var
-  chars: TStringDynArray;
+    chars: TStringDynArray;
   chars := GetCharList();
 
   SetLength(charPlacers, 0);
@@ -421,34 +425,40 @@ begin
 
   for var i := 0 to Length(defaulBuildingsCount) - 1 do
   begin
-    lb := TLabel.Create(Form2);
-    lb.Parent := Form2.PlacerPanel;
-
-    lb.Height := buyButtonScaleY;
-
-    b := PlacerButton.Create(Form2);
-    b.Parent := Form2.PlacerPanel;
-
-    b.Height := buyButtonScaleY;
-    b.Width := buyButtonScaleX;
-
-    b.Text := GetBuildingName(i);
-    b.isBuilding := true;
-    b.id := i;
-
-    b.Name := 'buildingPlacer' + IntToStr(b.id);
-    b.OnClick := Form2.SelectToPlace;
-
-    b.Position.Y := cNum * buyButtonOffset;
-    b.Position.X := 0;
-
-    lb.Position.Y := b.Position.Y;
-    lb.Position.X := b.Position.X + buyLabelOffset;
-    Inc(cNum);
-
-    b.txt := lb;
     SetLength(buildPlacers, Length(buildPlacers) + 1);
-    buildPlacers[Length(buildPlacers) - 1] := b;
+    buildPlacers[Length(buildPlacers) - 1] := nil;
+
+    if defaulBuildingsCount[i] > 0 then
+    begin
+      lb := TLabel.Create(Form2);
+      lb.Parent := Form2.PlacerPanel;
+
+      lb.Height := buyButtonScaleY;
+
+      b := PlacerButton.Create(Form2);
+      b.Parent := Form2.PlacerPanel;
+
+      b.Height := buyButtonScaleY;
+      b.Width := buyButtonScaleX;
+
+      b.Text := GetBuildingName(i);
+      b.isBuilding := true;
+      b.id := i;
+
+      b.Name := 'buildingPlacer' + IntToStr(b.id);
+      b.OnClick := Form2.SelectToPlace;
+
+      b.Position.Y := cNum * buyButtonOffset;
+      b.Position.X := 0;
+
+      lb.Position.Y := b.Position.Y;
+      lb.Position.X := b.Position.X + buyLabelOffset;
+      Inc(cNum);
+
+      b.txt := lb;
+
+      buildPlacers[Length(buildPlacers) - 1] := b;
+    end;
   end;
 
   ShowPlacersCount(players[0]);
@@ -471,7 +481,8 @@ begin
     end
     else
     begin
-      if (Length(currentPlayer.boughtCharacters) >= b.id+1) and (currentPlayer.boughtCharacters[b.id] > 0) then
+      if (Length(currentPlayer.boughtCharacters) >= b.id + 1) and
+        (currentPlayer.boughtCharacters[b.id] > 0) then
       begin
         placableCharacterId := b.id;
         Dec(currentPlayer.boughtCharacters[b.id]);
@@ -488,6 +499,7 @@ begin
   if curPlayer = 1 then
   begin
     BuyMoneyText.Text := IntToStr(currentPlayer.money);
+    form2.BuyRoundSkip.Enabled := false;
   end
   else
   begin
@@ -518,9 +530,9 @@ begin
   result := _count;
 end;
 
-procedure ShowPlacersCount(player : TPlayer);
+procedure ShowPlacersCount(player: TPlayer);
 begin
-  for var i  := 0 to Length(charPlacers) - 1 do
+  for var i := 0 to Length(charPlacers) - 1 do
   begin
     if i < Length(player.boughtCharacters) then
       charPlacers[i].SetCount(player.boughtCharacters[i])
@@ -528,9 +540,10 @@ begin
       charPlacers[i].SetCount(0);
   end;
 
-  for var i  := 0 to Length(buildPlacers) - 1 do
+  for var i := 0 to Length(buildPlacers) - 1 do
   begin
-    buildPlacers[i].SetCount(player.buildingsCount[i]);
+    if buildPlacers[i] <> nil then
+       buildPlacers[i].SetCount(player.BuildingsCount[i]);
   end;
 
 end;

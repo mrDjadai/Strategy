@@ -123,11 +123,12 @@ Type
     destructor Destroy(); override;
 
   var
-    img: TImage;
+
     selector: TImage;
 
   public
   var
+      img: TImage;
     IsSelected: boolean;
     sprite: string;
     decardPos: Vector2;
@@ -222,14 +223,14 @@ procedure TCellData.ReDraw();
 var
   cBitmap: TBitMap;
 begin
-  img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
-    sprite + '.png');
+ // img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+ //   sprite + '.png');
   selector.Visible := IsSelected;
-  if character <> nil then
-    character.ReDraw();
+ // if character <> nil then
+ //   character.ReDraw();
 
-  if building <> nil then
-    building.ReDraw();
+  //if building <> nil then
+  //  building.ReDraw();
 end;
 
 procedure TCellData.OnClick(sender: Tobject);
@@ -240,7 +241,7 @@ begin
 
   if prepareMode then
   begin
-    if (curPlayer = 0) = (cubePos.x < x div 2) then
+    if ((curPlayer = 0) and (decardPos.x <= (x-1) div 2)) or ((curPlayer = 1) and (decardPos.x > (x) div 2)) then
     begin
       if placableBuildingId > -1 then
         TryBuild(Self);
