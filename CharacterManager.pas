@@ -133,6 +133,17 @@ begin
         result := bd;
         result.hasTarget := true;
       end;
+    7:
+      begin
+        var
+          fb: FireBall;
+        fb := FireBall.Create;
+        fb.radius := StrToInt(data[3]);
+        fb.neigbourDamage := StrToInt(data[4]);
+        fb.damage := LoadDices(data[5]);
+        result := fb;
+        result.hasTarget := true;
+      end;
   end;
 
   result.name := data[1];
@@ -330,7 +341,8 @@ begin
     placableCharacterId := -1;
     result := true;
 
-    TryEndPrepare();
+    if prepareMode then
+      TryEndPrepare();
   end;
 end;
 

@@ -166,6 +166,7 @@ Type
 
   public
   var
+    portalCell : TCellData;
     characters: charList;
     boughtCharacters: TCount;
     BuildingsCount: TCount;
@@ -621,7 +622,8 @@ begin
   end
   else
   begin
-    building.healsBar.SetHP(building.healsBar.GetHP() - damage);
+    if building <> nil then
+      building.healsBar.SetHP(building.healsBar.GetHP() - damage);
   end;
 end;
 

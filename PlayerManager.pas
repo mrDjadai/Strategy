@@ -18,9 +18,9 @@ var
   placableCharacterId: integer;
   placableBuildingId: integer;
 
-procedure Win(player : TPlayer);
+procedure Win(player: TPlayer);
 
-procedure Lose(player : TPlayer);
+procedure Lose(player: TPlayer);
 
 procedure Init(baseMoney: integer; roundMoney: integer);
 
@@ -124,42 +124,52 @@ end;
 procedure TryEndPrepare();
 begin
   if players[1 - curPlayer].CanPlace then
-    NextMove()
+  begin
+    NextMove();
+    ShowPlacersCount(currentPlayer);
+  end
   else if currentPlayer.CanPlace = false then
   begin
     NextMove();
     prepareMode := false;
-    form2.PlacerPanel.Visible := false;
 
-    form2.SkipRound.Enabled := true;
-  curPlayer := 0;
-  currentPlayer := players[0];
-  end;
-  ShowPlacersCount(currentPlayer);
+    for var item in charPlacers do
+      item.txt.Text := IntToStr(item.price);
+    for var item1 in buildPlacers do
+      if item1 <> nil then
+      begin
+        item1.Visible := false;
+        item1.txt.Visible := false;
+      end;
+
+    Form2.SkipRound.Enabled := true;
+    curPlayer := 0;
+    currentPlayer := players[0];
+  end
+  else
+    ShowPlacersCount(currentPlayer);
 end;
 
-procedure Win(player : TPlayer);
+procedure Win(player: TPlayer);
 begin
   if currentPlayer <> player then
     curPlayer := 1 - curPlayer;
-
 
   if curPlayer = 0 then
     DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.blue)
   else
     DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.red);
 
-  Form2.WinnerText.Text := form2.WinnerText.Text + IntToStr(1 + curPlayer);
+  Form2.WinnerText.Text := Form2.WinnerText.Text + IntToStr(1 + curPlayer);
   Form2.WinPanel.Visible := true;
 end;
 
-procedure Lose(player : TPlayer);
+procedure Lose(player: TPlayer);
 begin
   if player = players[0] then
     Win(players[1])
   else
     Win(players[0]);
 end;
-
 
 end.

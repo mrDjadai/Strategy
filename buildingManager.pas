@@ -56,6 +56,10 @@ type
     procedure OnEnter(); override;
   end;
 
+  Portal = class(TBuilding)
+  public
+    procedure OnBuild(c: TCellData; ow: integer); override;
+  end;
 var
   buildingCount: integer;
 
@@ -73,6 +77,8 @@ begin
       result := Fort.Create;
     3:
       result := Kapkan.Create;
+    4:
+      result := Portal.Create;
   end;
 
   AssignFile(f, ExtractFilePath(ParamStr(0)) +
@@ -111,6 +117,8 @@ begin
       end;
     3:
       Kapkan(result).damage := LoadDices(data1);
+    4:
+      defaulBuildingsCount[3] := 1;
   end;
   CloseFile(f);
 end;
@@ -250,4 +258,9 @@ begin
   end;
 end;
 
+procedure Portal.OnBuild(c: TCellData; ow: integer);
+begin
+  inherited OnBuild(c, ow);
+  players[ow].portalCell := c;
+end;
 end.

@@ -83,6 +83,16 @@ Type
     procedure Use(caster, target: TCellData); override;
   end;
 
+  FireBall = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
+  public
+  var
+    radius : integer;
+    damage : DicesCount;
+    neigbourDamage : Integer;
+    procedure Use(caster, target: TCellData); override;
+  end;
 
 implementation
 
@@ -271,6 +281,49 @@ end;
 procedure BuildingPlacer.Use(caster, target: TCellData);
 begin
   TryBuild(target, buildingId);
+end;
+
+function FireBall.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
+begin
+  dist := GetDistance(caster.cubePos, target.cubePos);
+  result := (dist > 0) and (dist <= radius) and
+    (((target.character <> nil) and (target.character.owner <> curPlayer) or
+    ((target.character = nil) and (target.building <> nil) and
+    (target.building.owner <> curPlayer))));
+end;
+
+const  neignourPositions : array[0..7] of Vector2 =(
+  (x : 1; y : 0),
+  (x : 1; y : 1),
+  (x : 0; y : 1),
+  (x : -1; y : 1),
+  (x : -1; y : 0),
+  (x : -1; y : -1),
+  (x : 0; y : -1),
+  (x : 1; y : -1));
+
+procedure FireBall.Use(caster, target: TCellData);
+var
+  cell : TCellData;
+  curPos : vector2;
+  curDamage: integer;
+  nDamage : integer;
+begin
+  curDamage := DropDices(SumDices(damage, caster.character.bonusDices));
+  nDamage := curDamage div neigbourDamage;
+
+  target.AtackCell(curDamage);
+  for var pos in neignourPositions do
+  begin
+    curPos.x := target.decardPos.x + pos.x;
+    curPos.y := target.decardPos.y + pos.y;
+    cell := GetCell(curPos);
+    if cell <> nil then
+      cell.AtackCell(nDamage);
+  end;
 end;
 
 end.

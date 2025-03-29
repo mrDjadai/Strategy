@@ -6,7 +6,8 @@ uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
-  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts, DataTypes;
+  FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts, DataTypes,
+  FMX.Media;
 
 type
   TForm2 = class(TForm)
@@ -44,12 +45,14 @@ type
     WinnerIndicator: TImage;
     CharactersOrigin: TLayout;
     BuildingsOrigin: TLayout;
+    MusicPlayer: TMediaPlayer;
+    AudioLooper: TTimer;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
     procedure FormKeyUp(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
-    procedure KeyPressTimerTimer(Sender: TObject);
+    procedure CheckPressKey(Sender: TObject);
     procedure SkipRoundClick(Sender: TObject);
     procedure MPButonClick(Sender: TObject);
     procedure AttackButtonClick(Sender: TObject);
@@ -58,6 +61,7 @@ type
     procedure FormResize(Sender: TObject);
     procedure StartGame(Sender: TObject);
     procedure BuyRoundSkipClick(Sender: TObject);
+    procedure TryLoopAudio(Sender: TObject);
   private
     procedure OnChooseMap(Sender: TObject);
     procedure TryBuyCharacter(Sender: TObject);
@@ -83,6 +87,7 @@ type
     txt: TLabel;
     isBuilding: boolean;
     id: integer;
+    price: integer;
     property Count: integer read GetCount write SetCount;
   end;
 
@@ -97,7 +102,7 @@ procedure ShowPlacersCount(player: TPlayer);
 implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
-  CharacterManager, PlayerManager, buildingManager;
+  CharacterManager, PlayerManager, buildingManager, System.IOUtils;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -159,7 +164,7 @@ begin
   BG.Height := Form2.Height;
 end;
 
-procedure TForm2.KeyPressTimerTimer(Sender: TObject);
+procedure TForm2.CheckPressKey(Sender: TObject);
 begin
   if pressedW then
     Map.Position.Y := Map.Position.Y + mapMovingSpeed;
@@ -290,7 +295,6 @@ var
   line: string;
   cNum: integer;
 begin
-
   Form2.MapPanel.Visible := false;
   Form2.BuyPanel.Visible := true;
   Form2.KeyPressTimer.Enabled := false;
@@ -335,7 +339,7 @@ begin
     Inc(cNum);
   end;
   BuyMoneyText.Text := IntToStr(currentPlayer.money);
-  form2.BuyRoundSkip.Enabled := false;
+  Form2.BuyRoundSkip.Enabled := false;
 end;
 
 procedure TForm2.TryBuyCharacter(Sender: TObject);
@@ -354,8 +358,25 @@ begin
       currentPlayer.boughtCharacters[b.id] := 0;
     end;
     Inc(currentPlayer.boughtCharacters[b.id]);
-    form2.BuyRoundSkip.Enabled := true;
+    Form2.BuyRoundSkip.Enabled := true;
   end;
+end;
+
+procedure TForm2.TryLoopAudio(Sender: TObject);
+var
+  Files: TStringDynArray;
+  RandomIndex: integer;
+begin
+  if MusicPlayer.CurrentTime >= MusicPlayer.Duration then
+  begin
+    Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
+    'Resourses\Audio\Music\');
+    RandomIndex := Random(Length(Files));
+
+    musicPlayer.FileName := Files[RandomIndex];
+    MusicPlayer.Play();
+  end;
+
 end;
 
 procedure TForm2.AttackButtonClick(Sender: TObject);
@@ -402,6 +423,10 @@ begin
     b.Text := line;
     b.isBuilding := false;
     b.id := cNum;
+
+    Readln(f, line);
+    Readln(f, line);
+    b.price := StrToInt(line);
 
     CloseFile(f);
 
@@ -469,27 +494,42 @@ var
   b: PlacerButton;
 begin
   b := PlacerButton(Sender);
-  if (placableCharacterId = -1) and (placableBuildingId = -1) then
+  if prepareMode then
   begin
-    if b.isBuilding then
+    if (placableCharacterId = -1) and (placableBuildingId = -1) then
     begin
-      if currentPlayer.BuildingsCount[b.id] > 0 then
+      if b.isBuilding then
       begin
-        placableBuildingId := b.id;
-        Dec(currentPlayer.BuildingsCount[b.id]);
-      end;
-    end
-    else
-    begin
-      if (Length(currentPlayer.boughtCharacters) >= b.id + 1) and
-        (currentPlayer.boughtCharacters[b.id] > 0) then
+        if currentPlayer.BuildingsCount[b.id] > 0 then
+        begin
+          placableBuildingId := b.id;
+          Dec(currentPlayer.BuildingsCount[b.id]);
+        end;
+      end
+      else
       begin
-        placableCharacterId := b.id;
-        Dec(currentPlayer.boughtCharacters[b.id]);
+        if (Length(currentPlayer.boughtCharacters) >= b.id + 1) and
+          (currentPlayer.boughtCharacters[b.id] > 0) then
+        begin
+          placableCharacterId := b.id;
+          Dec(currentPlayer.boughtCharacters[b.id]);
+        end;
       end;
     end;
+    ShowPlacersCount(currentPlayer);
+  end
+  else
+  begin
+    if (GetActionCount() > 0) and (currentPlayer.money >= b.price) and
+      (currentPlayer.portalCell.building <> nil) and
+      (currentPlayer.portalCell.character = nil) then
+    begin
+      currentPlayer.money := currentPlayer.money - b.price;
+      placableCharacterId := b.id;
+      SetActionCount(GetActionCount() - 1);
+      TryCreateCharacter(currentPlayer.portalCell);
+    end;
   end;
-  ShowPlacersCount(currentPlayer);
 end;
 
 procedure TForm2.BuyRoundSkipClick(Sender: TObject);
@@ -499,7 +539,7 @@ begin
   if curPlayer = 1 then
   begin
     BuyMoneyText.Text := IntToStr(currentPlayer.money);
-    form2.BuyRoundSkip.Enabled := false;
+    Form2.BuyRoundSkip.Enabled := false;
   end
   else
   begin
@@ -527,7 +567,7 @@ end;
 
 function PlacerButton.GetCount: integer;
 begin
-  result := _count;
+  Result := _count;
 end;
 
 procedure ShowPlacersCount(player: TPlayer);
@@ -543,7 +583,7 @@ begin
   for var i := 0 to Length(buildPlacers) - 1 do
   begin
     if buildPlacers[i] <> nil then
-       buildPlacers[i].SetCount(player.BuildingsCount[i]);
+      buildPlacers[i].SetCount(player.BuildingsCount[i]);
   end;
 
 end;

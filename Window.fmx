@@ -26,7 +26,7 @@ object Form2: TForm2
   end
   object KeyPressTimer: TTimer
     Interval = 10
-    OnTimer = KeyPressTimerTimer
+    OnTimer = CheckPressKey
     Left = 528
     Top = 344
   end
@@ -270,5 +270,14 @@ object Form2: TForm2
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
     end
+  end
+  object AudioLooper: TTimer
+    OnTimer = TryLoopAudio
+    Left = 536
+    Top = 352
+  end
+  object MusicPlayer: TMediaPlayer
+    Left = 224
+    Top = 344
   end
 end

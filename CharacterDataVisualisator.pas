@@ -98,12 +98,14 @@ begin
   if curCharacter = nil then
   begin
     panel.Visible := false;
+    form2.PlacerPanel.Visible := true;
     HideMoveIndicators();
   end
   else
   begin
     opText.Text := IntToStr(curCharacter.movePoints);
     panel.Visible := true;
+    form2.PlacerPanel.Visible := false;
     DrawMoveIndicators();
     with form2, curCharacter do
     begin
