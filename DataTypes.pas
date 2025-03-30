@@ -247,6 +247,11 @@ begin
         TryBuild(Self);
       if placableCharacterId > -1 then
         TryCreateCharacter(Self)
+    end
+    else
+    begin
+      form2.IncorrectPlayer.CurrentTime := 0;
+      form2.IncorrectPlayer.Play();
     end;
   end
   else
@@ -261,11 +266,16 @@ begin
         selectedSkill := nil;
         form2.SkipRound.Enabled := true;
         UnselectMap();
+      end
+      else
+      begin
+        form2.IncorrectPlayer.CurrentTime := 0;
+        form2.IncorrectPlayer.Play();
       end;
     end
     else if selectedSkill = nil then
     begin
-      if character = nil then // если режим предварительной расстановки
+      if character = nil then
       begin
         if selectedCharacter.x <> -1 then
         begin
@@ -281,6 +291,13 @@ begin
             UnselectCharacter()
           else
             SelectCharacter(decardPos);
+          form2.SelectPlayer.CurrentTime := 0;
+          form2.SelectPlayer.Play();
+        end
+        else
+        begin
+          form2.IncorrectPlayer.CurrentTime := 0;
+          form2.IncorrectPlayer.Play();
         end;
       end;
     end;
@@ -565,7 +582,8 @@ begin
   cell := c;
   cell.building := Self;
   owner := ow;
-
+  form2.BuildingPlacePlayer.CurrentTime := 0;
+  form2.BuildingPlacePlayer.Play();
   healsBar := THealsContainer.Create;
   healsBar.Init(img, maxHp, buildingHealsBarScale, buildingHealsBarPos,
     OnDemolish);
@@ -574,6 +592,8 @@ end;
 
 procedure TBuilding.OnDemolish();
 begin
+  form2.DemolishPlayer.CurrentTime := 0;
+  form2.DemolishPlayer.Play();
   if curPlayer <> owner then
     currentPlayer.Money := currentPlayer.Money + cost;
   GetCell(pos).building := nil;
@@ -620,6 +640,8 @@ procedure TCharacter.Die();
 begin
   players[owner].RemoveCharacter(Self);
   GetCell(pos).character := nil;
+  form2.DiePlayer.CurrentTime := 0;
+  form2.DiePlayer.Play();
   Self.Free;
 end;
 

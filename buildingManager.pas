@@ -254,6 +254,8 @@ begin
     curDamage := DropDices(damage);
     cell.AtackCell(curDamage);
     cell.building := nil;
+    form2.KapkanPlayer.CurrentTime := 0;
+    form2.KapkanPlayer.Play();
     self.Free;
   end;
 end;

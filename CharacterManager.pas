@@ -225,13 +225,13 @@ begin
 
   CloseFile(f);
 
-  for var I := Low(charTypes) to High(charTypes) do
-   if charTypes[i].name = fileName then
-    result.id	:= i;
+  for var i := Low(charTypes) to High(charTypes) do
+    if charTypes[i].name = FileName then
+      result.id := i;
 
-   result.atack.audioSource := charTypes[result.id].attackPlayer;
-   result.skill1.audioSource := charTypes[result.id].skill1Player;
-   result.skill2.audioSource := charTypes[result.id].skill2Player;
+  result.atack.audioSource := charTypes[result.id].attackPlayer;
+  result.skill1.audioSource := charTypes[result.id].skill1Player;
+  result.skill2.audioSource := charTypes[result.id].skill2Player;
 end;
 
 procedure Init();
@@ -256,13 +256,11 @@ begin
         ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
         names[0] + '.wav';
 
-
       charTypes[Length(charTypes) - 1].skill1Player :=
         TMediaPlayer.Create(form2);
       charTypes[Length(charTypes) - 1].skill1Player.FileName :=
         ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
         names[1] + '.wav';
-
 
       charTypes[Length(charTypes) - 1].skill2Player :=
         TMediaPlayer.Create(form2);
@@ -270,17 +268,15 @@ begin
         ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
         names[2] + '.wav';
 
-
       charTypes[Length(charTypes) - 1].attackPlayer.Volume := 0;
       charTypes[Length(charTypes) - 1].attackPlayer.Play();
-
 
       charTypes[Length(charTypes) - 1].skill1Player.Volume := 0;
       charTypes[Length(charTypes) - 1].skill1Player.Play();
 
-
       charTypes[Length(charTypes) - 1].skill2Player.Volume := 0;
       charTypes[Length(charTypes) - 1].skill2Player.Play();
+
     end;
   end;
 end;
@@ -368,6 +364,14 @@ begin
         dest.character.movePoints := dest.character.movePoints - 2
       else
         dest.character.movePoints := dest.character.movePoints - 1;
+
+    form2.MovePlayer.CurrentTime := 0;
+    form2.MovePlayer.Play();
+  end
+  else
+  begin
+    form2.IncorrectPlayer.CurrentTime := 0;
+    form2.IncorrectPlayer.Play();
   end;
   ReDraw();
 end;
@@ -419,7 +423,11 @@ begin
     result := true;
 
     if prepareMode then
+    begin
       TryEndPrepare();
+      form2.CharacterPlacePlayer.CurrentTime := 0;
+      form2.CharacterPlacePlayer.Play();
+    end;
   end;
 end;
 

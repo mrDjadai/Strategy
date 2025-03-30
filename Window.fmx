@@ -274,13 +274,66 @@ object Form2: TForm2
       Size.PlatformDefault = False
     end
   end
-  object AudioLooper: TTimer
-    OnTimer = TryLoopAudio
-    Left = 536
-    Top = 352
-  end
-  object MusicPlayer: TMediaPlayer
-    Left = 224
-    Top = 344
+  object Audio: TLayout
+    Position.X = 480.000000000000000000
+    Position.Y = 248.000000000000000000
+    TabOrder = 26
+    object AudioLooper: TTimer
+      OnTimer = TryLoopAudio
+      Left = 536
+      Top = 352
+    end
+    object BuildingPlacePlayer: TMediaPlayer
+      Left = 240
+      Top = 360
+    end
+    object BuyPlayer: TMediaPlayer
+      Left = 280
+      Top = 400
+    end
+    object CharacterPlacePlayer: TMediaPlayer
+      Left = 248
+      Top = 368
+    end
+    object ClickPlayer: TMediaPlayer
+      Left = 376
+      Top = 184
+    end
+    object DemolishPlayer: TMediaPlayer
+      Left = 256
+      Top = 376
+    end
+    object DiePlayer: TMediaPlayer
+      Left = 232
+      Top = 352
+    end
+    object IncorrectPlayer: TMediaPlayer
+      Left = 288
+      Top = 408
+    end
+    object KapkanPlayer: TMediaPlayer
+      Left = 264
+      Top = 384
+    end
+    object MovePlayer: TMediaPlayer
+      Left = 272
+      Top = 192
+    end
+    object MusicPlayer: TMediaPlayer
+      Left = 224
+      Top = 344
+    end
+    object PortalPlayer: TMediaPlayer
+      Left = 272
+      Top = 392
+    end
+    object SelectPlayer: TMediaPlayer
+      Left = 296
+      Top = 416
+    end
+    object WinPlayer: TMediaPlayer
+      Left = 368
+      Top = 176
+    end
   end
 end

@@ -47,6 +47,19 @@ type
     BuildingsOrigin: TLayout;
     MusicPlayer: TMediaPlayer;
     AudioLooper: TTimer;
+    MovePlayer: TMediaPlayer;
+    WinPlayer: TMediaPlayer;
+    ClickPlayer: TMediaPlayer;
+    DiePlayer: TMediaPlayer;
+    BuildingPlacePlayer: TMediaPlayer;
+    CharacterPlacePlayer: TMediaPlayer;
+    DemolishPlayer: TMediaPlayer;
+    KapkanPlayer: TMediaPlayer;
+    PortalPlayer: TMediaPlayer;
+    BuyPlayer: TMediaPlayer;
+    IncorrectPlayer: TMediaPlayer;
+    SelectPlayer: TMediaPlayer;
+    Audio: TLayout;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -164,6 +177,72 @@ begin
   BG.Height := Form2.Height;
 end;
 
+procedure InitAudio();
+begin
+  with Form2 do
+  begin
+    MovePlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Move.wav';;
+    MovePlayer.Play();
+    MovePlayer.Stop();
+
+    ClickPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Click.wav';;
+    ClickPlayer.Play();
+    ClickPlayer.Stop();
+
+    WinPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Win.wav';;
+    WinPlayer.Play();
+    WinPlayer.Stop();
+
+    DiePlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Die.wav';;
+    DiePlayer.Play();
+    DiePlayer.Stop();
+
+    DemolishPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Demolish.wav';;
+    DemolishPlayer.Play();
+    DemolishPlayer.Stop();
+
+    KapkanPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Kapkan.wav';;
+    KapkanPlayer.Play();
+    KapkanPlayer.Stop();
+
+    CharacterPlacePlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\PlaceCharacter.wav';;
+    CharacterPlacePlayer.Play();
+    CharacterPlacePlayer.Stop();
+
+    BuildingPlacePlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\PlaceBuilding.wav';;
+    BuildingPlacePlayer.Play();
+    BuildingPlacePlayer.Stop();
+
+    PortalPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Portal.wav';;
+    PortalPlayer.Play();
+    PortalPlayer.Stop();
+
+    BuyPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Buy.wav';;
+    BuyPlayer.Play();
+    BuyPlayer.Stop();
+
+    IncorrectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Incorrect.wav';;
+    IncorrectPlayer.Play();
+    IncorrectPlayer.Stop();
+
+        SelectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Select.wav';;
+    SelectPlayer.Play();
+    SelectPlayer.Stop();
+  end;
+end;
+
 procedure TForm2.CheckPressKey(Sender: TObject);
 begin
   if pressedW then
@@ -189,6 +268,8 @@ end;
 procedure TForm2.MPButonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.BuyMP();
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
 end;
 
 procedure TForm2.OpenGame(Sender: TObject);
@@ -205,23 +286,30 @@ begin
 
   CharacterManager.Init();
   buildingManager.Init();
+  InitAudio();
 end;
 
 procedure TForm2.Skill1ButtonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.skill1.Select
     (GetCell(selectedCharacter));
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
 end;
 
 procedure TForm2.Skill2ButtonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.skill2.Select
     (GetCell(selectedCharacter));
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
 end;
 
 procedure TForm2.SkipRoundClick(Sender: TObject);
 begin
   NextMove();
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
 end;
 
 const
@@ -235,6 +323,8 @@ var
   line: string;
   mapNum: integer;
 begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
   Form2.StartButton.Visible := false;
   Form2.PrepairLayout.Visible := true;
   Form2.BuyPanel.Visible := false;
@@ -256,7 +346,6 @@ begin
   Val(line, curseDamageMultiplier, code);
 
   CloseFile(f);
-
 
   PlayerManager.Init(money, roundMoney);
   CharacterDataVisualisator.Init(OP, CharacterPanel);
@@ -301,6 +390,8 @@ var
   line: string;
   cNum: integer;
 begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
   Form2.MapPanel.Visible := false;
   Form2.BuyPanel.Visible := true;
   Form2.KeyPressTimer.Enabled := false;
@@ -352,6 +443,7 @@ procedure TForm2.TryBuyCharacter(Sender: TObject);
 var
   b: CharButton;
 begin
+
   b := CharButton(Sender);
   if currentPlayer.money >= b.cost then
   begin
@@ -365,6 +457,14 @@ begin
     end;
     Inc(currentPlayer.boughtCharacters[b.id]);
     Form2.BuyRoundSkip.Enabled := true;
+
+    Form2.BuyPlayer.CurrentTime := 0;
+    Form2.BuyPlayer.Play();
+  end
+  else
+  begin
+    Form2.ClickPlayer.CurrentTime := 0;
+    Form2.ClickPlayer.Play();
   end;
 end;
 
@@ -376,10 +476,10 @@ begin
   if MusicPlayer.CurrentTime >= MusicPlayer.Duration then
   begin
     Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
-    'Resourses\Audio\Music\');
+      'Resourses\Audio\Music\');
     RandomIndex := Random(Length(Files));
 
-    musicPlayer.FileName := Files[RandomIndex];
+    MusicPlayer.FileName := Files[RandomIndex];
     MusicPlayer.Play();
   end;
 
@@ -387,6 +487,8 @@ end;
 
 procedure TForm2.AttackButtonClick(Sender: TObject);
 begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
   GetCell(selectedCharacter).character.atack.Select(GetCell(selectedCharacter));
 end;
 
@@ -499,6 +601,8 @@ procedure TForm2.SelectToPlace(Sender: TObject);
 var
   b: PlacerButton;
 begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
   b := PlacerButton(Sender);
   if prepareMode then
   begin
@@ -530,6 +634,10 @@ begin
       (currentPlayer.portalCell.building <> nil) and
       (currentPlayer.portalCell.character = nil) then
     begin
+      Form2.BuyPlayer.CurrentTime := 0;
+      Form2.BuyPlayer.Play();
+      Form2.PortalPlayer.CurrentTime := 0;
+      Form2.PortalPlayer.Play();
       currentPlayer.money := currentPlayer.money - b.price;
       placableCharacterId := b.id;
       SetActionCount(GetActionCount() - 1);
@@ -540,6 +648,8 @@ end;
 
 procedure TForm2.BuyRoundSkipClick(Sender: TObject);
 begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
   curPlayer := 1 - curPlayer;
   currentPlayer := players[curPlayer];
   if curPlayer = 1 then

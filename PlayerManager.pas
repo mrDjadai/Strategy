@@ -164,6 +164,9 @@ begin
 
   Form2.WinnerText.Text := Form2.WinnerText.Text + IntToStr(1 + curPlayer);
   Form2.WinPanel.Visible := true;
+
+  form2.WinPlayer.CurrentTime := 0;
+  form2.WinPlayer.Play();
 end;
 
 procedure Lose(player: TPlayer);
