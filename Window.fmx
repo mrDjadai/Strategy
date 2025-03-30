@@ -1,7 +1,7 @@
 object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Z'
+  Caption = 'Strategy'
   ClientHeight = 720
   ClientWidth = 1080
   FormFactor.Width = 320
@@ -209,11 +209,14 @@ object Form2: TForm2
       Align = Center
       Scale.X = 5.000000000000000000
       Scale.Y = 3.000000000000000000
+      Size.Width = 200.000000000000000000
+      Size.Height = 200.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 0
       object BuyMoneyPrefix: TLabel
         Align = Bottom
-        Position.Y = 96.000000000000000000
-        Size.Width = 120.000000000000000000
+        Position.Y = 176.000000000000000000
+        Size.Width = 200.000000000000000000
         Size.Height = 12.000000000000000000
         Size.PlatformDefault = False
         Text = #1044#1077#1085#1100#1075#1080
@@ -221,8 +224,8 @@ object Form2: TForm2
       end
       object BuyMoneyText: TLabel
         Align = Bottom
-        Position.Y = 108.000000000000000000
-        Size.Width = 120.000000000000000000
+        Position.Y = 188.000000000000000000
+        Size.Width = 200.000000000000000000
         Size.Height = 12.000000000000000000
         Size.PlatformDefault = False
         Text = '0'
@@ -230,8 +233,8 @@ object Form2: TForm2
       end
       object BuyRoundSkip: TButton
         Anchors = [akRight, akBottom]
-        Position.X = 64.000000000000000000
-        Position.Y = 98.000000000000000000
+        Position.X = 144.000000000000000000
+        Position.Y = 178.000000000000000000
         Size.Width = 56.000000000000000000
         Size.Height = 22.000000000000000000
         Size.PlatformDefault = False

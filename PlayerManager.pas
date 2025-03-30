@@ -18,6 +18,8 @@ var
   placableCharacterId: integer;
   placableBuildingId: integer;
 
+  curseDamageMultiplier : real;
+
 procedure Win(player: TPlayer);
 
 procedure Lose(player: TPlayer);

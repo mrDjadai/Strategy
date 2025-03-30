@@ -202,6 +202,9 @@ begin
 
   if useConsole then
     AllocConsole();
+
+  CharacterManager.Init();
+  buildingManager.Init();
 end;
 
 procedure TForm2.Skill1ButtonClick(Sender: TObject);
@@ -227,7 +230,7 @@ const
 procedure TForm2.StartGame(Sender: TObject);
 var
   f: textFile;
-  money, roundMoney: integer;
+  money, roundMoney, code: integer;
   maps: TStringDynArray;
   line: string;
   mapNum: integer;
@@ -248,10 +251,13 @@ begin
   Readln(f, line);
   roundMoney := StrToInt(line);
 
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, curseDamageMultiplier, code);
+
   CloseFile(f);
 
-  CharacterManager.Init();
-  buildingManager.Init();
+
   PlayerManager.Init(money, roundMoney);
   CharacterDataVisualisator.Init(OP, CharacterPanel);
 
@@ -285,8 +291,8 @@ end;
 const
   cButtonScaleX = 80;
   cButtonScaleY = 15;
-  cButtonOffsetX = 40;
-  cButtonOffsetY = 15;
+  cButtonOffsetX = 100;
+  cButtonOffsetY = 20;
   cButtonColumns = 2;
 
 procedure TForm2.OnChooseMap(Sender: TObject);

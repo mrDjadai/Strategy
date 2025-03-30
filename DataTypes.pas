@@ -5,7 +5,8 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects;
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Media;
 
 const
   DicesTypesCount = 5;
@@ -45,6 +46,7 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean;
       virtual; abstract;
   public
+    audioSource: TMediaPlayer;
     name: string;
     reloadTime: integer;
     timeAfterUse: integer;
@@ -52,6 +54,7 @@ Type
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
     Constructor Create(targetable: boolean); overload;
+    procedure PlaySound();
   end;
 
   TBuilding = class
@@ -87,6 +90,7 @@ Type
 
   public
   var
+    id: integer;
     maxHp: integer;
     owner: byte;
     cost: integer;
@@ -98,6 +102,7 @@ Type
     img: TImage;
     movePoints: integer;
     bonusDices: DicesCount;
+    curseRounds: integer;
 
     atack, skill1, skill2: TSkill;
 
@@ -128,7 +133,7 @@ Type
 
   public
   var
-      img: TImage;
+    img: TImage;
     IsSelected: boolean;
     sprite: string;
     decardPos: Vector2;
@@ -166,7 +171,7 @@ Type
 
   public
   var
-    portalCell : TCellData;
+    portalCell: TCellData;
     characters: charList;
     boughtCharacters: TCount;
     BuildingsCount: TCount;
@@ -224,14 +229,7 @@ procedure TCellData.ReDraw();
 var
   cBitmap: TBitMap;
 begin
- // img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
- //   sprite + '.png');
   selector.Visible := IsSelected;
- // if character <> nil then
- //   character.ReDraw();
-
-  //if building <> nil then
-  //  building.ReDraw();
 end;
 
 procedure TCellData.OnClick(sender: Tobject);
@@ -242,7 +240,8 @@ begin
 
   if prepareMode then
   begin
-    if ((curPlayer = 0) and (decardPos.x <= (x-1) div 2)) or ((curPlayer = 1) and (decardPos.x > (x) div 2)) then
+    if ((curPlayer = 0) and (decardPos.x <= (x - 1) div 2)) or
+      ((curPlayer = 1) and (decardPos.x > (x) div 2)) then
     begin
       if placableBuildingId > -1 then
         TryBuild(Self);
@@ -257,6 +256,7 @@ begin
       if selectedSkill.IsCorrectTarget(SelectedCaster, Self) then
       begin
         targetSelectionMode := false;
+        selectedSkill.PlaySound();
         selectedSkill.Use(SelectedCaster, Self);
         selectedSkill := nil;
         form2.SkipRound.Enabled := true;
@@ -325,7 +325,9 @@ begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
     sprite + IntToStr(owner) + '.png');
   if IsSelected then
-    DrawOutline(img, TAlphaColors.Yellow, 50);
+    DrawOutline(img, TAlphaColors.Yellow, 50)
+  else if curseRounds > 0 then
+    DrawOutline(img, TAlphaColors.Purple, 50);
 end;
 
 function decardToCube(pos: Vector2): Vector3;
@@ -373,7 +375,7 @@ procedure TCharacter.Init(form: TForm; maxHp: integer);
 begin
   healsBar := THealsContainer.Create;
   healsBar.Init(img, maxHp, charHealsBarScale, charHealsBarPos, Self.Die);
-  for var i := 0 to Length(bonusDices)-1 do
+  for var i := 0 to Length(bonusDices) - 1 do
     bonusDices[i] := 0;
 end;
 
@@ -483,7 +485,7 @@ begin
   Dispose(temp);
 
   if characters^.next = nil then
-    Lose(self);
+    Lose(Self);
 end;
 
 procedure TPlayer.OnRoundStart();
@@ -500,6 +502,12 @@ begin
       Inc(skill1.timeAfterUse);
       Inc(skill2.timeAfterUse);
       GetCell(pos).OnStay();
+
+      if curseRounds > 0 then
+      begin
+        Dec(curseRounds);
+        ReDraw();
+      end;
     end;
     curChar := curChar^.next;
   end;
@@ -532,6 +540,7 @@ begin
     end
     else
     begin
+      PlaySound();
       Use(caster, caster);
     end;
   end;
@@ -618,6 +627,8 @@ procedure TCellData.AtackCell(damage: integer);
 begin
   if character <> nil then
   begin
+    if character.curseRounds > 0 then
+      damage := Round(damage * curseDamageMultiplier);
     character.HP := character.HP - damage;
   end
   else
@@ -671,6 +682,13 @@ begin
     Result[i] := 0;
   for var i := 1 to Length(s) do
     Result[i - 1] := Ord(s[i]) - Ord('0');
+end;
+
+procedure TSkill.PlaySound();
+begin
+  audioSource.Volume := 1;
+  audioSource.CurrentTime := 0;
+  audioSource.Play();
 end;
 
 end.

@@ -2,3 +2,5 @@ DefaultMoney
 100
 MoneyPerRound
 10
+CurseDamageMultiplier
+2.0

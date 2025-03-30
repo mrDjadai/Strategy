@@ -94,6 +94,15 @@ Type
     procedure Use(caster, target: TCellData); override;
   end;
 
+  Curse = class(TSkill)
+  private
+    function IsCorrectTarget(caster, target: TCellData): boolean; override;
+  public
+  var
+    radius : integer;
+    duration : Integer;
+    procedure Use(caster, target: TCellData); override;
+  end;
 implementation
 
 uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator, buildingManager;
@@ -325,5 +334,22 @@ begin
       cell.AtackCell(nDamage);
   end;
 end;
+
+function Curse.IsCorrectTarget(caster: TCellData;
+  target: TCellData): boolean;
+var
+  dist: integer;
+begin
+  dist := GetDistance(caster.cubePos, target.cubePos);
+  result := (dist <= radius) and
+    (target.character <> nil) and (target.character.owner <> curPlayer);
+end;
+
+procedure Curse.Use(caster, target: TCellData);
+begin
+  Inc(target.character.curseRounds, duration);
+  target.character.ReDraw();
+end;
+
 
 end.

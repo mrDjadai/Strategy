@@ -27,16 +27,23 @@ procedure MoveCharacter(source, dest: TCellData);
 implementation
 
 uses PlayerManager, CellManager, System.SysUtils, Window,
-  CharacterDataVisualisator, System.IOUtils, SkillManager, DiceManager;
+  CharacterDataVisualisator, System.IOUtils, SkillManager, DiceManager,
+  FMX.Media;
 
 const
   movingDuration = 0.5;
 
-var
-  charTypes: TStringDynArray;
-
 type
-  skillData = array [0 .. 6] of string;
+  TCharType = record
+    name: string;
+    attackPlayer, skill1Player, skill2Player: TMediaPlayer;
+  end;
+
+  skillData = array [0 .. 7] of string;
+  TSkillAudioNames = array [0 .. 2] of string;
+
+var
+  charTypes: Array of TCharType;
 
 function LoadSkill(data: skillData): TSkill;
 var
@@ -49,12 +56,12 @@ begin
         var
           splash: SplashAttack;
         splash := SplashAttack.Create;
-        splash.radius := StrToInt(data[3]);
+        splash.radius := StrToInt(data[4]);
         var
           damage: dicesCount;
-        damage := LoadDices(data[4]);
+        damage := LoadDices(data[5]);
         splash.damage := damage;
-        splash.friendlyFire := data[5] = '+';
+        splash.friendlyFire := data[6] = '+';
         result := splash;
         result.hasTarget := false;
       end;
@@ -63,10 +70,10 @@ begin
         var
           target: TargetAttack;
         target := TargetAttack.Create;
-        target.radius := StrToInt(data[3]);
+        target.radius := StrToInt(data[4]);
         var
           damage: dicesCount;
-        damage := LoadDices(data[4]);
+        damage := LoadDices(data[5]);
         target.damage := damage;
         result := target;
         result.hasTarget := true;
@@ -76,9 +83,9 @@ begin
         var
           heal: SplashHeal;
         heal := SplashHeal.Create;
-        heal.radius := StrToInt(data[3]);
+        heal.radius := StrToInt(data[4]);
         var
-        damage := LoadDices(data[4]);
+        damage := LoadDices(data[5]);
         heal.heals := damage;
         result := heal;
         result.hasTarget := false;
@@ -88,13 +95,13 @@ begin
         var
           ex: HonorExecution;
         ex := HonorExecution.Create;
-        ex.radius := StrToInt(data[3]);
+        ex.radius := StrToInt(data[4]);
         var
           damage: dicesCount;
-        damage := LoadDices(data[4]);
+        damage := LoadDices(data[5]);
         ex.bonus := damage;
 
-        damage := LoadDices(data[5]);
+        damage := LoadDices(data[6]);
         ex.damage := damage;
 
         result := ex;
@@ -105,7 +112,7 @@ begin
         var
           tp: Teleport;
         tp := Teleport.Create;
-        tp.radius := StrToInt(data[3]);
+        tp.radius := StrToInt(data[4]);
         result := tp;
         result.hasTarget := true;
       end;
@@ -114,10 +121,10 @@ begin
         var
           sh: Shield;
         sh := Shield.Create;
-        sh.deltaArmor := StrToInt(data[3]);
-        sh.deltaSpeed := StrToInt(data[4]);
-        sh.deltaDamage := LoadDices(data[5]);
-        sh.armoredSprite := data[6];
+        sh.deltaArmor := StrToInt(data[4]);
+        sh.deltaSpeed := StrToInt(data[5]);
+        sh.deltaDamage := LoadDices(data[6]);
+        sh.armoredSprite := data[7];
         sh.isActive := false;
 
         result := sh;
@@ -128,8 +135,8 @@ begin
         var
           bd: BuildingPlacer;
         bd := BuildingPlacer.Create;
-        bd.radius := StrToInt(data[3]);
-        bd.buildingId := StrToInt(data[4]);
+        bd.radius := StrToInt(data[4]);
+        bd.buildingId := StrToInt(data[5]);
         result := bd;
         result.hasTarget := true;
       end;
@@ -138,16 +145,44 @@ begin
         var
           fb: FireBall;
         fb := FireBall.Create;
-        fb.radius := StrToInt(data[3]);
-        fb.neigbourDamage := StrToInt(data[4]);
-        fb.damage := LoadDices(data[5]);
+        fb.radius := StrToInt(data[4]);
+        fb.neigbourDamage := StrToInt(data[5]);
+        fb.damage := LoadDices(data[6]);
         result := fb;
+        result.hasTarget := true;
+      end;
+    8:
+      begin
+        var
+          c: Curse;
+        c := Curse.Create;
+        c.radius := StrToInt(data[4]);
+        c.duration := StrToInt(data[5]);
+        result := c;
         result.hasTarget := true;
       end;
   end;
 
   result.name := data[1];
-  result.reloadTime := StrToInt(data[2]);
+  // result.audioSource := charTypes[0].;
+  result.reloadTime := StrToInt(data[3]);
+end;
+
+function GetSkillAudioNames(FileName: string): TSkillAudioNames;
+var
+  f: TextFile;
+  line: string;
+begin
+  AssignFile(f, FileName);
+  Reset(f);
+  for var c := 0 to 7 do
+    readln(f, line);
+  for var i := 0 to 2 do
+  begin
+    readln(f, result[i]);
+    for var k := 0 to 6 do
+      readln(f, line);
+  end;
 end;
 
 function LoadCharacter(FileName: string): TCharacter;
@@ -189,11 +224,20 @@ begin
   result.skill2 := LoadSkill(data);
 
   CloseFile(f);
+
+  for var I := Low(charTypes) to High(charTypes) do
+   if charTypes[i].name = fileName then
+    result.id	:= i;
+
+   result.atack.audioSource := charTypes[result.id].attackPlayer;
+   result.skill1.audioSource := charTypes[result.id].skill1Player;
+   result.skill2.audioSource := charTypes[result.id].skill2Player;
 end;
 
 procedure Init();
 var
   Files: TStringDynArray;
+  names: TSkillAudioNames;
 begin
   SetLength(charTypes, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
@@ -203,7 +247,40 @@ begin
     if true then // Добавить валидацию
     begin
       SetLength(charTypes, Length(charTypes) + 1);
-      charTypes[Length(charTypes) - 1] := FileName;
+      charTypes[Length(charTypes) - 1].name := FileName;
+      names := GetSkillAudioNames(FileName);
+
+      charTypes[Length(charTypes) - 1].attackPlayer :=
+        TMediaPlayer.Create(form2);
+      charTypes[Length(charTypes) - 1].attackPlayer.FileName :=
+        ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
+        names[0] + '.wav';
+
+
+      charTypes[Length(charTypes) - 1].skill1Player :=
+        TMediaPlayer.Create(form2);
+      charTypes[Length(charTypes) - 1].skill1Player.FileName :=
+        ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
+        names[1] + '.wav';
+
+
+      charTypes[Length(charTypes) - 1].skill2Player :=
+        TMediaPlayer.Create(form2);
+      charTypes[Length(charTypes) - 1].skill2Player.FileName :=
+        ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
+        names[2] + '.wav';
+
+
+      charTypes[Length(charTypes) - 1].attackPlayer.Volume := 0;
+      charTypes[Length(charTypes) - 1].attackPlayer.Play();
+
+
+      charTypes[Length(charTypes) - 1].skill1Player.Volume := 0;
+      charTypes[Length(charTypes) - 1].skill1Player.Play();
+
+
+      charTypes[Length(charTypes) - 1].skill2Player.Volume := 0;
+      charTypes[Length(charTypes) - 1].skill2Player.Play();
     end;
   end;
 end;
@@ -266,7 +343,7 @@ begin
   AnimX.PropertyName := 'Position.X';
   AnimX.StartValue := source.Image.Position.x;
   AnimX.StopValue := dest.Image.Position.x;
-  AnimX.Duration := movingDuration;
+  AnimX.duration := movingDuration;
   AnimX.Start;
 
   AnimY := TFloatAnimation.Create(Image);
@@ -274,11 +351,11 @@ begin
   AnimY.PropertyName := 'Position.Y';
   AnimY.StartValue := source.Image.Position.y;
   AnimY.StopValue := dest.Image.Position.y;
-  AnimY.Duration := movingDuration;
+  AnimY.duration := movingDuration;
   AnimY.Start;
 
-  AnimX.OnFinish := Form2.DeleteAnimation;
-  AnimY.OnFinish := Form2.DeleteAnimation;
+  AnimX.OnFinish := form2.DeleteAnimation;
+  AnimY.OnFinish := form2.DeleteAnimation;
 end;
 
 procedure TryMoveCharacter(source, dest: TCellData);
@@ -302,7 +379,7 @@ procedure CreateCharacter(cell: TCellData; charID: integer);
 begin
   var
     c: TCharacter;
-  c := LoadCharacter(charTypes[charID]);
+  c := LoadCharacter(charTypes[charID].name);
   c.owner := curPlayer;
 
   c.pos := cell.decardPos;
@@ -322,7 +399,7 @@ begin
   myImage.HitTest := false;
   c.img := myImage;
 
-  c.Init(Form2, c.maxHp);
+  c.Init(form2, c.maxHp);
   cell.ReDraw();
 
   c.hp := c.maxHp;
@@ -380,7 +457,10 @@ end;
 
 function GetCharList(): TStringDynArray;
 begin
-  result := charTypes;
+  SetLength(result, Length(charTypes));
+
+  for var i := Low(charTypes) to High(charTypes) do
+    result[i] := charTypes[i].name;
 end;
 
 end.
