@@ -69,6 +69,10 @@ type
     Armor: TLabel;
     BonusDicesLabel: TLabel;
     BonusDices: TLabel;
+    ErrorPanel: TPanel;
+    NoCharError: TLabel;
+    NoMapsError: TLabel;
+    ErrorHeader: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -281,6 +285,9 @@ begin
     Map.Position.Y := minMapY;
 end;
 
+const
+  mapButtonHeight = 20;
+
 procedure TForm2.MPButonClick(Sender: TObject);
 begin
   GetCell(selectedCharacter).character.BuyMP();
@@ -288,7 +295,48 @@ begin
   Form2.ClickPlayer.Play();
 end;
 
+function CreateMapList(): integer;
+var
+  maps: TStringDynArray;
+  line: string;
+  f: textFile;
+  mapNum: integer;
+begin
+  with Form2 do
+  begin
+    maps := GetMapList();
+    mapNum := 0;
+
+    for var M in maps do
+    begin
+      var
+        b: TButton;
+      b := TButton.Create(Form2);
+      b.Parent := Form2.MapPanel;
+      b.Height := mapButtonHeight;
+      b.Width := MapPanel.Width;
+
+      AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + M
+        + '.txt');
+      Reset(f);
+      Readln(f, line);
+      b.Text := line;
+      CloseFile(f);
+
+      b.Name := M;
+      b.OnClick := Form2.OnChooseMap;
+
+      b.Position.Y := mapNum * mapButtonHeight;
+      Inc(mapNum);
+    end;
+  end;
+
+  result := mapNum;
+end;
+
 procedure TForm2.OpenGame(Sender: TObject);
+var
+  mapCount: integer;
 begin
   pressedW := false;
   pressedA := false;
@@ -302,6 +350,22 @@ begin
 
   CharacterManager.Init();
   buildingManager.Init();
+  LoadCells();
+
+  mapCount := CreateMapList();
+
+  if Length(GetCharList()) = 0 then
+  begin
+    ErrorPanel.Visible := true;
+    NoCharError.Visible := true;
+  end;
+
+  if mapCount = 0 then
+  begin
+    ErrorPanel.Visible := true;
+    NoMapsError.Visible := true;
+  end;
+
   InitAudio();
 end;
 
@@ -328,16 +392,12 @@ begin
   Form2.ClickPlayer.Play();
 end;
 
-const
-  mapButtonHeight = 20;
-
 procedure TForm2.StartGame(Sender: TObject);
 var
   f: textFile;
   money, roundMoney, code: integer;
-  maps: TStringDynArray;
   line: string;
-  mapNum: integer;
+
 begin
   Form2.ClickPlayer.CurrentTime := 0;
   Form2.ClickPlayer.Play();
@@ -361,36 +421,15 @@ begin
   Readln(f, line);
   Val(line, curseDamageMultiplier, code);
 
+    Readln(f, line);
+  Readln(f, line);
+  dangerCellDamage   := StrToInt(line);
+
   CloseFile(f);
 
   PlayerManager.Init(money, roundMoney);
   CharacterDataVisualisator.Init(OP, CharacterPanel);
 
-  maps := GetMapList();
-  mapNum := 0;
-
-  for var Map in maps do
-  begin
-    var
-      b: TButton;
-    b := TButton.Create(Form2);
-    b.Parent := Form2.MapPanel;
-    b.Height := mapButtonHeight;
-    b.Width := MapPanel.Width;
-
-    AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + Map
-      + '.txt');
-    Reset(f);
-    Readln(f, line);
-    b.Text := line;
-    CloseFile(f);
-
-    b.Name := Map;
-    b.OnClick := Form2.OnChooseMap;
-
-    b.Position.Y := mapNum * mapButtonHeight;
-    Inc(mapNum);
-  end;
 end;
 
 const
@@ -705,7 +744,7 @@ end;
 
 function PlacerButton.GetCount: integer;
 begin
-  Result := _count;
+  result := _count;
 end;
 
 procedure ShowPlacersCount(player: TPlayer);

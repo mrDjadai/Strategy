@@ -462,7 +462,7 @@ begin
     case dest.cType of
       cBlocked:
         result := false;
-      cDefault:
+      cDefault, cDanger:
         result := character.movePoints > 0;
       cDifficult:
         result := character.movePoints > 1;
@@ -477,7 +477,7 @@ begin
     case dest.cType of
       cBlocked:
         result := false;
-      cDefault:
+      cDefault, cDanger:
         result := src.character.movePoints > 0;
       cDifficult:
         result := src.character.movePoints > 1;

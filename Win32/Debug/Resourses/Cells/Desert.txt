@@ -1,0 +1,6 @@
+--Sprite
+desert
+--literal
+1
+--type	0-blocked 1-default 2-difficult 3-danger
+2

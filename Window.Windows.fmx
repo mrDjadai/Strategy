@@ -14,4 +14,11 @@ inherited Form2_Windows: TForm2_Windows
       end
     end
   end
+  inherited MainMenu: TLayout
+    inherited ErrorPanel: TPanel
+      inherited ErrorHeader: TLabel
+        Position.X = 16.000000000000000000
+      end
+    end
+  end
 end

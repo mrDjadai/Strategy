@@ -52,7 +52,7 @@ Type
     hasTarget: boolean;
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
-    function GetToolTip() : string; virtual; abstract;
+    function GetToolTip(): string; virtual; abstract;
     Constructor Create(targetable: boolean); overload;
     procedure PlaySound();
   end;
@@ -118,7 +118,7 @@ Type
     constructor Create; overload;
   end;
 
-  TCellType = (cBlocked, cDefault, cDifficult);
+  TCellType = (cBlocked, cDefault, cDifficult, cDanger);
 
   TCellData = class
   private
@@ -526,6 +526,7 @@ begin
         ReDraw();
       end;
     end;
+
     curChar := curChar^.next;
   end;
 end;
@@ -628,6 +629,8 @@ procedure TCellData.OnStay();
 begin
   if building <> nil then
     building.OnStay();
+  if (cType = cDanger) and (character <> nil) then
+    character.HP := character.HP - dangerCellDamage;
 end;
 
 procedure TBuilding.ReDraw();

@@ -9,9 +9,12 @@ uses
 
 var
   x: integer;
+  dangerCellDamage: integer;
 
 type
   SelectionCondition = function(caster, target: TCellData): boolean of object;
+
+procedure LoadCells();
 
 function GetMapList(): TStringDynArray;
 
@@ -38,9 +41,17 @@ const
   cellSpaceX = 130;
   cellSpaceY = 110;
 
+type
+  TCellInfo = record
+    sprite: string;
+    literal: char;
+    tp: integer;
+  end;
+
 var
   y: integer;
   map: Array of Array of TCellData;
+  cells: Array of TCellInfo;
 
 function GetCell(pos: vector2): TCellData;
 begin
@@ -50,44 +61,21 @@ begin
     result := map[pos.y, pos.x];
 end;
 
-const
-  nameList: array [0 .. 4] of string = ('meadow', 'desert', 'forest',
-    'hills', 'sea');
-
 function GetCellTypeByName(name: string): TCellType;
 var
   id: integer;
 begin
-  for var I := 0 to Length(nameList) - 1 do
-    if nameList[I] = name then
+  for var I := 0 to Length(cells) - 1 do
+    if cells[I].sprite = name then
       id := I;
-  result := GetCellTypeById(char(Ord('0') + id));
+  result := TCellType(cells[id].tp);
 end;
 
 function GetCellTypeById(id: char): TCellType;
 begin
-  Case id of
-    '0':
-      begin
-        result := cDefault;
-      end;
-    '1':
-      begin
-        result := cDefault;
-      end;
-    '2':
-      begin
-        result := cDifficult;
-      end;
-    '3':
-      begin
-        result := cBlocked;
-      end;
-    '4':
-      begin
-        result := cBlocked;
-      end;
-  End;
+  for var I := 0 to Length(cells) - 1 do
+    if cells[I].literal = id then
+      result := TCellType(cells[I].tp);
 end;
 
 function GetCellById(xpos, ypos: integer; id: char): TCellData;
@@ -101,32 +89,59 @@ begin
     x := cellSpaceX / 2 + x;
   result := TCellData.Create(x, y, cellSize);
 
-  Case id of
-    '0':
-      begin
-        result.sprite := 'meadow';
-      end;
-    '1':
-      begin
-        result.sprite := 'desert';
-      end;
-    '2':
-      begin
-        result.sprite := 'forest';
-      end;
-    '3':
-      begin
-        result.sprite := 'hills';
-      end;
-    '4':
-      begin
-        result.sprite := 'sea';
-      end;
-  End;
-
-  result.cType := GetCellTypeById(id);
+  for var I := 0 to Length(cells) - 1 do
+    if cells[I].literal = id then
+    begin
+      result.sprite := cells[I].sprite;
+      result.cType := TCellType(cells[I].tp);
+    end;
 
   result.ReDraw();
+end;
+
+procedure LoadCells();
+var
+  Files: TStringDynArray;
+  f: TextFile;
+  line: string;
+  correct: boolean;
+  sprite: string;
+  literal: char;
+  tp: integer;
+  code: integer;
+begin
+  SetLength(cells, 0);
+  Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
+    'Resourses\Cells\');
+  for var FileName in Files do
+  begin
+    correct := true;
+
+    AssignFile(f, FileName);
+    Reset(f);
+    readln(f, line);
+    readln(f, sprite);
+
+    readln(f, line);
+    readln(f, line);
+    literal := line[1];
+
+    readln(f, line);
+    readln(f, line);
+    val(line, tp, code);
+
+    if (code > 0) or (tp > 3) then
+      correct := false;
+
+    if correct then
+    begin
+      SetLength(cells, Length(cells) + 1);
+
+      cells[Length(cells) - 1].sprite := sprite;
+      cells[Length(cells) - 1].literal := literal;
+      cells[Length(cells) - 1].tp := tp;
+    end;
+  end;
 end;
 
 procedure Init(mapName: string);
@@ -205,8 +220,8 @@ var
   Files: TStringDynArray;
   f: TextFile;
   line: string;
-  len: integer;
-  correct: boolean;
+  len, j: integer;
+  correct, found: boolean;
 begin
   SetLength(result, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
@@ -230,7 +245,15 @@ begin
           begin
             for var I := 1 to len do
             begin
-              if (line[I] < '0') or (line[I] > '4') then
+              j := 0;
+              found := false;
+              while (not found) and (j < Length(cells)) do
+              begin
+                if (cells[j].literal = line[I]) then
+                  found := true;
+                j := j + 1;
+              end;
+              if not found then
                 correct := false;
             end;
           end;
