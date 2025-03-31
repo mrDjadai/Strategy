@@ -9,6 +9,9 @@ inherited Form2_Windows: TForm2_Windows
       MultiResBitmap.Height = 167
       MultiResBitmap.Width = 167
       MultiResBitmap.TransparentColor = 2763429
+      inherited MPButton: TButton
+        Position.X = 45.000000000000000000
+      end
     end
   end
 end

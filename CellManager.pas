@@ -3,12 +3,13 @@ unit CellManager;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  System.SysUtils, System.Types, System.Classes,
+  FMX.Types, FMX.Controls, FMX.Graphics, FMX.Objects,
   DataTypes;
 
-var x : integer;
+var
+  x: integer;
+
 type
   SelectionCondition = function(caster, target: TCellData): boolean of object;
 
@@ -25,6 +26,7 @@ function GetCellTypeByName(name: string): TCellType;
 function GetCellTypeById(id: char): TCellType;
 
 procedure UnselectMap();
+
 procedure SelectMap(cond: SelectionCondition; caster: TCellData);
 
 implementation
@@ -154,8 +156,8 @@ begin
       map[I][k].decardPos.x := k;
       map[I][k].decardPos.y := I;
       map[I][k].cubePos := decardToCube(map[I][k].decardPos);
-        map[i][k].img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
-    map[i][k].sprite + '.png');
+      map[I][k].img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) +
+        'Resourses\Sprites\' + map[I][k].sprite + '.png');
     end;
 
     inc(I);
@@ -241,13 +243,15 @@ begin
     if correct then
     begin
       SetLength(result, Length(result) + 1);
-      var lastDir : integer;
-      for var k := 1 to Length(fileName) do
-        begin
-          if (fileName[k] = '/')  or (fileName[k] = '\') then
-            lastDir := k;
-        end;
-      result[Length(result) - 1] := Copy(FileName, lastDir + 1, Length(fileName) - lastDir - 4);
+      var
+        lastDir: integer;
+      for var k := 1 to Length(FileName) do
+      begin
+        if (FileName[k] = '/') or (FileName[k] = '\') then
+          lastDir := k;
+      end;
+      result[Length(result) - 1] := Copy(FileName, lastDir + 1,
+        Length(FileName) - lastDir - 4);
     end;
   end;
 end;

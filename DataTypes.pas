@@ -4,8 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
-  System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Objects,
   FMX.Media;
 
 const
@@ -53,6 +52,7 @@ Type
     hasTarget: boolean;
     procedure Select(caster: TCellData);
     procedure Use(caster, target: TCellData); virtual; abstract;
+    function GetToolTip() : string; virtual; abstract;
     Constructor Create(targetable: boolean); overload;
     procedure PlaySound();
   end;

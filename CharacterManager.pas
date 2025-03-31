@@ -164,7 +164,6 @@ begin
   end;
 
   result.name := data[1];
-  // result.audioSource := charTypes[0].;
   result.reloadTime := StrToInt(data[3]);
 end;
 
@@ -175,12 +174,14 @@ var
 begin
   AssignFile(f, FileName);
   Reset(f);
-  for var c := 0 to 7 do
+  for var c := 0 to 15 do
     readln(f, line);
   for var i := 0 to 2 do
   begin
+    readln(f, line);
+    readln(f, line);
     readln(f, result[i]);
-    for var k := 0 to 6 do
+    for var k := 0 to 13 do
       readln(f, line);
   end;
 end;
@@ -196,31 +197,51 @@ begin
   AssignFile(f, FileName);
   Reset(f);
   readln(f, line);
+  readln(f, line);
   result.name := line;
 
+  readln(f, line);
   readln(f, line);
   result.sprite := line;
 
   readln(f, line);
+  readln(f, line);
   result.cost := StrToInt(line);
 
+  readln(f, line);
   readln(f, line);
   result.maxHp := StrToInt(line);
 
   readln(f, line);
+  readln(f, line);
   result.speed := StrToInt(line);
 
   readln(f, line);
+  readln(f, line);
   result.armor := StrToInt(line);
 
+  readln(f, line);
   for var i := 0 to High(skillData) do
+  begin
     readln(f, data[i]);
+    readln(f, data[i]);
+  end;
   result.atack := LoadSkill(data);
+
+  readln(f, line);
   for var i := 0 to High(skillData) do
+  begin
     readln(f, data[i]);
+    readln(f, data[i]);
+  end;
   result.skill1 := LoadSkill(data);
+
+  readln(f, line);
   for var i := 0 to High(skillData) do
+  begin
     readln(f, data[i]);
+    readln(f, data[i]);
+  end;
   result.skill2 := LoadSkill(data);
 
   CloseFile(f);
@@ -352,6 +373,8 @@ begin
 
   AnimX.OnFinish := form2.DeleteAnimation;
   AnimY.OnFinish := form2.DeleteAnimation;
+
+  CharacterDataVisualisator.ReDraw();
 end;
 
 procedure TryMoveCharacter(source, dest: TCellData);

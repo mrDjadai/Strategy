@@ -15,6 +15,7 @@ Type
     friendlyFire: boolean;
     damage: DicesCount;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   TargetAttack = class(TSkill)
@@ -25,6 +26,7 @@ Type
     radius: integer;
     damage: DicesCount;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   SplashHeal = class(TSkill)
@@ -35,6 +37,7 @@ Type
     radius: integer;
     heals: DicesCount;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   HonorExecution = class(TSkill)
@@ -46,6 +49,7 @@ Type
     damage: DicesCount;
     bonus: DicesCount;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   Teleport = class(TSkill)
@@ -55,6 +59,7 @@ Type
   var
     radius: integer;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   Shield = class(TSkill)
@@ -62,15 +67,16 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
   var
-    deltaSpeed : integer;
-    deltaArmor : integer;
-    deltaDamage : dicesCount;
-    armoredSprite : string;
+    deltaSpeed: integer;
+    deltaArmor: integer;
+    deltaDamage: DicesCount;
+    armoredSprite: string;
 
-    baseSprite : string;
-    isActive : boolean;
+    baseSprite: string;
+    isActive: boolean;
 
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   BuildingPlacer = class(TSkill)
@@ -79,8 +85,9 @@ Type
   public
   var
     radius: integer;
-    buildingId : integer;
+    buildingId: integer;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   FireBall = class(TSkill)
@@ -88,10 +95,11 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
   var
-    radius : integer;
-    damage : DicesCount;
-    neigbourDamage : Integer;
+    radius: integer;
+    damage: DicesCount;
+    neigbourDamage: integer;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
 
   Curse = class(TSkill)
@@ -99,13 +107,16 @@ Type
     function IsCorrectTarget(caster, target: TCellData): boolean; override;
   public
   var
-    radius : integer;
-    duration : Integer;
+    radius: integer;
+    duration: integer;
     procedure Use(caster, target: TCellData); override;
+    function GetToolTip(): string; override;
   end;
+
 implementation
 
-uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator, buildingManager;
+uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator,
+  buildingManager, System.SysUtils;
 
 function SplashAttack.IsCorrectTarget(caster: TCellData;
   target: TCellData): boolean;
@@ -142,6 +153,7 @@ begin
       end;
     end;
   end;
+  CharacterDataVisualisator.ReDraw();
 end;
 
 function TargetAttack.IsCorrectTarget(caster: TCellData;
@@ -204,8 +216,8 @@ var
   dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
-  result := (dist > 0) and (dist <= radius) and
-    (target.character <> nil) and (target.character.owner <> curPlayer);
+  result := (dist > 0) and (dist <= radius) and (target.character <> nil) and
+    (target.character.owner <> curPlayer);
 end;
 
 procedure HonorExecution.Use(caster, target: TCellData);
@@ -219,7 +231,8 @@ begin
   if target.character = nil then
   begin
     cur := currentPlayer.characters;
-    var a : charelem;
+    var
+      a: charelem;
     a := cur^;
     while cur^.next <> nil do
     begin
@@ -227,16 +240,19 @@ begin
       cur^.data.bonusDices := SumDices(cur^.data.bonusDices, bonus);
     end;
   end;
+  CharacterDataVisualisator.ReDraw();
 end;
 
-function Teleport.IsCorrectTarget(caster: TCellData;
-  target: TCellData): boolean;
+function Teleport.IsCorrectTarget(caster: TCellData; target: TCellData)
+  : boolean;
 var
   dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
-  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and (target.character = nil)
-  and ((target.building = nil) or (target.building.owner = caster.character.owner));
+  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and
+    (target.character = nil) and
+    ((target.building = nil) or
+    (target.building.owner = caster.character.owner));
 end;
 
 procedure Teleport.Use(caster, target: TCellData);
@@ -244,8 +260,7 @@ begin
   MoveCharacter(caster, target);
 end;
 
-function Shield.IsCorrectTarget(caster: TCellData;
-  target: TCellData): boolean;
+function Shield.IsCorrectTarget(caster: TCellData; target: TCellData): boolean;
 begin
   result := true;
 end;
@@ -256,7 +271,8 @@ begin
   begin
     Inc(caster.character.armor, deltaArmor);
     Inc(caster.character.speed, deltaSpeed);
-    caster.character.bonusDices := SumDices(caster.character.bonusDices, deltaDamage);
+    caster.character.bonusDices := SumDices(caster.character.bonusDices,
+      deltaDamage);
     caster.character.movePoints := 0;
 
     baseSprite := caster.character.sprite;
@@ -266,15 +282,16 @@ begin
   begin
     Dec(caster.character.armor, deltaArmor);
     Dec(caster.character.speed, deltaSpeed);
-    caster.character.bonusDices := SubDices(caster.character.bonusDices, deltaDamage);
+    caster.character.bonusDices := SubDices(caster.character.bonusDices,
+      deltaDamage);
 
     caster.character.sprite := baseSprite;
   end;
 
-    isActive := not isActive;
+  isActive := not isActive;
 
-    caster.character.ReDraw();
-    CharacterDataVisualisator.ReDraw();
+  caster.character.ReDraw();
+  CharacterDataVisualisator.ReDraw();
 end;
 
 function BuildingPlacer.IsCorrectTarget(caster: TCellData;
@@ -283,8 +300,10 @@ var
   dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
-  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and (target.building = nil)
-  and ((target.building = nil) or (target.building.owner = caster.character.owner));
+  result := (dist > 0) and (target.cType <> cBlocked) and (dist <= radius) and
+    (target.building = nil) and
+    ((target.building = nil) or
+    (target.building.owner = caster.character.owner));
 end;
 
 procedure BuildingPlacer.Use(caster, target: TCellData);
@@ -292,8 +311,8 @@ begin
   TryBuild(target, buildingId);
 end;
 
-function FireBall.IsCorrectTarget(caster: TCellData;
-  target: TCellData): boolean;
+function FireBall.IsCorrectTarget(caster: TCellData; target: TCellData)
+  : boolean;
 var
   dist: integer;
 begin
@@ -304,22 +323,17 @@ begin
     (target.building.owner <> curPlayer))));
 end;
 
-const  neignourPositions : array[0..7] of Vector2 =(
-  (x : 1; y : 0),
-  (x : 1; y : 1),
-  (x : 0; y : 1),
-  (x : -1; y : 1),
-  (x : -1; y : 0),
-  (x : -1; y : -1),
-  (x : 0; y : -1),
-  (x : 1; y : -1));
+const
+  neignourPositions: array [0 .. 7] of vector2 = ((x: 1; y: 0), (x: 1; y: 1),
+    (x: 0; y: 1), (x: - 1; y: 1), (x: - 1; y: 0), (x: - 1; y: - 1), (x: 0;
+    y: - 1), (x: 1; y: - 1));
 
 procedure FireBall.Use(caster, target: TCellData);
 var
-  cell : TCellData;
-  curPos : vector2;
+  cell: TCellData;
+  curPos: vector2;
   curDamage: integer;
-  nDamage : integer;
+  nDamage: integer;
 begin
   curDamage := DropDices(SumDices(damage, caster.character.bonusDices));
   nDamage := curDamage div neigbourDamage;
@@ -335,14 +349,13 @@ begin
   end;
 end;
 
-function Curse.IsCorrectTarget(caster: TCellData;
-  target: TCellData): boolean;
+function Curse.IsCorrectTarget(caster: TCellData; target: TCellData): boolean;
 var
   dist: integer;
 begin
   dist := GetDistance(caster.cubePos, target.cubePos);
-  result := (dist <= radius) and
-    (target.character <> nil) and (target.character.owner <> curPlayer);
+  result := (dist <= radius) and (target.character <> nil) and
+    (target.character.owner <> curPlayer);
 end;
 
 procedure Curse.Use(caster, target: TCellData);
@@ -351,5 +364,109 @@ begin
   target.character.ReDraw();
 end;
 
+function SplashAttack.GetToolTip(): string;
+begin
+  if friendlyFire then
+  begin
+    if radius = 1 then
+      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' + IntToStr(radius) + ' клетки'
+    else
+      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' + IntToStr(radius) + ' клеток';
+  end
+  else
+  begin
+    begin
+      if radius = 1 then
+        result := 'Наносит урон ' + GetCubeText(damage) + ' всем противникам в радиусе ' + IntToStr(radius)
+          + ' клетки'
+      else
+        result := 'Наносит урон ' + GetCubeText(damage) + ' всем противникам в радиусе ' + IntToStr(radius)
+          + ' клеток';
+    end;
+  end;
+end;
+
+function TargetAttack.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клетки'
+  else
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клеток'
+
+end;
+
+function SplashHeal.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Восстанавливает здоровье ' + GetCubeText(heals) + ' всем союзникам в радиусе ' +
+      IntToStr(radius) + ' клетки'
+  else
+    result := 'Восстанавливает здоровье ' + GetCubeText(heals) + ' всем союзникам в радиусе ' +
+      IntToStr(radius) + ' клеток'
+end;
+
+function HonorExecution.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клетки. Если противник умрёт то все союзники получат бонус к атаке' + GetCubeText(bonus)
+  else
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клеток. Если противник умрёт то все союзники получат бонус к атаке' + GetCubeText(bonus);
+end;
+
+function Teleport.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Вы перемещаетесь в любую позицию в радиусе ' + IntToStr(radius) +
+      ' клетки'
+  else
+    result := 'Вы перемещаетесь в любую позицию в радиусе ' + IntToStr(radius) +
+      ' клеток'
+end;
+
+function Shield.GetToolTip(): string;
+begin
+  if isActive then
+    result := 'Понижает защиту на ' + IntToStr(deltaArmor) +
+      '. Повышает скорость на ' + IntToStr(-deltaSpeed) + '. Понижает урон на ' + GetCubeText(deltaDamage)
+  else
+    result := 'Повышает защиту на ' + IntToStr(deltaArmor) +
+      '. Понижает скорость на ' + IntToStr(-deltaSpeed) + '. Повышает урон на '  + GetCubeText(deltaDamage);
+end;
+
+function FireBall.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клетки. И всем его соседям в ' + IntToStr(neigbourDamage) + ' раза меньше урона'
+  else
+    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
+      + ' клеток. И всем его соседям в ' + IntToStr(neigbourDamage) + ' раза меньше урона'
+end;
+
+function BuildingPlacer.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Ставит ' + GetBuildingName(buildingId) +
+      ' на выбранную клетку в радиусе ' + IntToStr(radius) + ' клетки'
+  else
+    result := 'Ставит ' + GetBuildingName(buildingId) +
+      ' на выбранную клетку в радиусе ' + IntToStr(radius) + ' клеток'
+end;
+
+function Curse.GetToolTip(): string;
+begin
+  if radius = 1 then
+    result := 'Повышает входящий урон выбранному противнику в радиусе ' +
+      IntToStr(radius) + ' клетки в ' + FloatToStr(curseDamageMultiplier) +
+      ' раза на ' + IntToStr(duration) + ' раунда'
+  else
+    result := 'Повышает входящий урон выбранному противнику в радиусе ' +
+      IntToStr(radius) + ' клеток в ' + FloatToStr(curseDamageMultiplier) +
+      ' раза на ' + IntToStr(duration) + ' раунда'
+end;
 
 end.

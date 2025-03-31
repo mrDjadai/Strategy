@@ -1,6 +1,6 @@
-DefaultMoney
+--DefaultMoney
 100
-MoneyPerRound
+--MoneyPerRound
 10
-CurseDamageMultiplier
+--CurseDamageMultiplier
 2.0

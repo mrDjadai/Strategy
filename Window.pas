@@ -60,6 +60,15 @@ type
     IncorrectPlayer: TMediaPlayer;
     SelectPlayer: TMediaPlayer;
     Audio: TLayout;
+    EscPlayer: TMediaPlayer;
+    SpeedLabel: TLabel;
+    HPLabel: TLabel;
+    ArmorLabel: TLabel;
+    Speed: TLabel;
+    Hp: TLabel;
+    Armor: TLabel;
+    BonusDicesLabel: TLabel;
+    BonusDices: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -141,6 +150,8 @@ begin
       UnselectMap();
       SetActionCount(GetActionCount() + 1);
       CharacterDataVisualisator.ReDraw();
+      EscPlayer.CurrentTime := 0;
+      EscPlayer.Play();
     end;
     Key := 0;
   end;
@@ -236,10 +247,15 @@ begin
     IncorrectPlayer.Play();
     IncorrectPlayer.Stop();
 
-        SelectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+    SelectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
       'Resourses\Audio\Other\Select.wav';;
     SelectPlayer.Play();
     SelectPlayer.Stop();
+
+    EscPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Esc.wav';;
+    EscPlayer.Play();
+    EscPlayer.Stop();
   end;
 end;
 
@@ -418,8 +434,11 @@ begin
     AssignFile(f, c);
     Reset(f);
     Readln(f, line);
+    Readln(f, line);
     b.Text := line;
 
+    Readln(f, line);
+    Readln(f, line);
     Readln(f, line);
     Readln(f, line);
     b.cost := StrToInt(line);
@@ -528,10 +547,13 @@ begin
     AssignFile(f, c);
     Reset(f);
     Readln(f, line);
+    Readln(f, line);
     b.Text := line;
     b.isBuilding := false;
     b.id := cNum;
 
+    Readln(f, line);
+    Readln(f, line);
     Readln(f, line);
     Readln(f, line);
     b.price := StrToInt(line);

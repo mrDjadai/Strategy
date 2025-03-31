@@ -3,8 +3,8 @@ unit Drawer;
 interface
 
 uses
-  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Objects, FMX.StdCtrls;
+  System.SysUtils, System.Types, System.UITypes,
+  FMX.Types, FMX.Controls, FMX.Graphics, FMX.Objects;
 
 procedure ColorizeImage(Image: TImage; color : TAlphaColor);
 
