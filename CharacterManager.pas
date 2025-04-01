@@ -62,6 +62,7 @@ begin
         damage := LoadDices(data[5]);
         splash.damage := damage;
         splash.friendlyFire := data[6] = '+';
+        splash.isBlockable := data[7] = '+';
         result := splash;
         result.hasTarget := false;
       end;
@@ -74,6 +75,7 @@ begin
         var
           damage: dicesCount;
         damage := LoadDices(data[5]);
+        target.isBlockable := data[6] = '+';
         target.damage := damage;
         result := target;
         result.hasTarget := true;
@@ -86,6 +88,7 @@ begin
         heal.radius := StrToInt(data[4]);
         var
         damage := LoadDices(data[5]);
+        heal.isBlockable := data[6] = '+';
         heal.heals := damage;
         result := heal;
         result.hasTarget := false;
@@ -316,6 +319,13 @@ begin
   begin
     GetCell(last).character.ReDraw();
   end;
+
+  { for var i in GetCellBetween(decardToCube(pos), currentPlayer.portalCell.cubePos) do
+    begin
+    i.IsSelected := true;
+    i.ReDraw();
+    end; }
+
 end;
 
 procedure UnselectCharacter();
@@ -329,6 +339,7 @@ begin
     selectedCharacter.y := -1;
     GetCell(last).character.ReDraw();
     SetCaharcter(nil);
+    // UnselectMap();
   end;
 end;
 

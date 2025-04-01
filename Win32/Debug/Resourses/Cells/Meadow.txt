@@ -4,3 +4,5 @@ meadow
 0
 --type	0-blocked 1-default 2-difficult 3-danger
 1
+--isAttackBlocker
+-

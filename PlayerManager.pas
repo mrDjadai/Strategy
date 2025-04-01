@@ -18,7 +18,7 @@ var
   placableCharacterId: integer;
   placableBuildingId: integer;
 
-  curseDamageMultiplier : real;
+  curseDamageMultiplier: real;
 
 procedure Win(player: TPlayer);
 
@@ -150,6 +150,7 @@ begin
   end
   else
     ShowPlacersCount(currentPlayer);
+  ShowMoveData();
 end;
 
 procedure Win(player: TPlayer);
@@ -165,8 +166,8 @@ begin
   Form2.WinnerText.Text := Form2.WinnerText.Text + IntToStr(1 + curPlayer);
   Form2.WinPanel.Visible := true;
 
-  form2.WinPlayer.CurrentTime := 0;
-  form2.WinPlayer.Play();
+  Form2.WinPlayer.CurrentTime := 0;
+  Form2.WinPlayer.Play();
 end;
 
 procedure Lose(player: TPlayer);

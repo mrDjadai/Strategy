@@ -14,6 +14,7 @@ Type
     radius: integer;
     friendlyFire: boolean;
     damage: DicesCount;
+    isBlockable: boolean;
     procedure Use(caster, target: TCellData); override;
     function GetToolTip(): string; override;
   end;
@@ -25,6 +26,7 @@ Type
   var
     radius: integer;
     damage: DicesCount;
+    isBlockable: boolean;
     procedure Use(caster, target: TCellData); override;
     function GetToolTip(): string; override;
   end;
@@ -36,6 +38,7 @@ Type
   var
     radius: integer;
     heals: DicesCount;
+    isBlockable: boolean;
     procedure Use(caster, target: TCellData); override;
     function GetToolTip(): string; override;
   end;
@@ -118,6 +121,15 @@ implementation
 uses CellManager, PlayerManager, CharacterManager, CharacterDataVisualisator,
   buildingManager, System.SysUtils;
 
+function IsPointVisible(a, b: TCellData): boolean;
+begin
+  result := true;
+
+  for var cell in GetCellBetween(a, b) do
+    if cell.attackBlocker then
+      result := false;
+end;
+
 function SplashAttack.IsCorrectTarget(caster: TCellData;
   target: TCellData): boolean;
 var
@@ -145,8 +157,8 @@ begin
         curChar := GetCell(cur).character;
         if IsCorrectTarget(caster, GetCell(cur)) and
           (((curChar <> nil) and (friendlyFire or (GetCell(cur).character.owner
-          <> curPlayer))) or ((curChar = nil) and (GetCell(cur).building <>
-          nil))) then
+          <> curPlayer))) or ((curChar = nil) and (GetCell(cur).building <> nil)
+          )) and ((isBlockable = false) or IsPointVisible(caster, target)) then
         begin
           GetCell(cur).AtackCell(curDamage);
         end;
@@ -165,7 +177,8 @@ begin
   result := (dist > 0) and (dist <= radius) and
     (((target.character <> nil) and (target.character.owner <> curPlayer) or
     ((target.character = nil) and (target.building <> nil) and
-    (target.building.owner <> curPlayer))));
+    (target.building.owner <> curPlayer)))) and
+    ((isBlockable = false) or IsPointVisible(caster, target));
 end;
 
 procedure TargetAttack.Use(caster, target: TCellData);
@@ -201,7 +214,8 @@ begin
       if GetCell(cur) <> nil then
       begin
         curChar := GetCell(cur).character;
-        if (curChar <> nil) and IsCorrectTarget(caster, GetCell(cur)) then
+        if (curChar <> nil) and IsCorrectTarget(caster, GetCell(cur)) and
+          ((isBlockable = false) or IsPointVisible(caster, target)) then
         begin
           curChar.HP := curChar.HP + curHeal;
         end;
@@ -369,52 +383,65 @@ begin
   if friendlyFire then
   begin
     if radius = 1 then
-      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' + IntToStr(radius) + ' клетки'
+      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' +
+        IntToStr(radius) + ' клетки'
     else
-      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' + IntToStr(radius) + ' клеток';
+      result := 'Наносит урон ' + GetCubeText(damage) + ' всем в радиусе ' +
+        IntToStr(radius) + ' клеток';
   end
   else
   begin
     begin
       if radius = 1 then
-        result := 'Наносит урон ' + GetCubeText(damage) + ' всем противникам в радиусе ' + IntToStr(radius)
-          + ' клетки'
+        result := 'Наносит урон ' + GetCubeText(damage) +
+          ' всем противникам в радиусе ' + IntToStr(radius) + ' клетки'
       else
-        result := 'Наносит урон ' + GetCubeText(damage) + ' всем противникам в радиусе ' + IntToStr(radius)
-          + ' клеток';
+        result := 'Наносит урон ' + GetCubeText(damage) +
+          ' всем противникам в радиусе ' + IntToStr(radius) + ' клеток';
     end;
   end;
+  if isBlockable then
+    result := result + '. Блокируется укрытиями';
 end;
 
 function TargetAttack.GetToolTip(): string;
 begin
   if radius = 1 then
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клетки'
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) + ' клетки'
   else
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клеток'
-
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) + ' клеток';
+      
+  if isBlockable = false then
+    result := result + '. Атакует навесом';
 end;
 
 function SplashHeal.GetToolTip(): string;
 begin
   if radius = 1 then
-    result := 'Восстанавливает здоровье ' + GetCubeText(heals) + ' всем союзникам в радиусе ' +
-      IntToStr(radius) + ' клетки'
+    result := 'Восстанавливает здоровье ' + GetCubeText(heals) +
+      ' всем союзникам в радиусе ' + IntToStr(radius) + ' клетки'
   else
-    result := 'Восстанавливает здоровье ' + GetCubeText(heals) + ' всем союзникам в радиусе ' +
-      IntToStr(radius) + ' клеток'
+    result := 'Восстанавливает здоровье ' + GetCubeText(heals) +
+      ' всем союзникам в радиусе ' + IntToStr(radius) + ' клеток';
+      
+  if isBlockable then
+    result := result + '. Блокируется укрытиями';
 end;
 
 function HonorExecution.GetToolTip(): string;
 begin
   if radius = 1 then
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клетки. Если противник умрёт то все союзники получат бонус к атаке' + GetCubeText(bonus)
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) +
+      ' клетки. Если противник умрёт то все союзники получат бонус к атаке' +
+      GetCubeText(bonus)
   else
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клеток. Если противник умрёт то все союзники получат бонус к атаке' + GetCubeText(bonus);
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) +
+      ' клеток. Если противник умрёт то все союзники получат бонус к атаке' +
+      GetCubeText(bonus);
 end;
 
 function Teleport.GetToolTip(): string;
@@ -431,20 +458,26 @@ function Shield.GetToolTip(): string;
 begin
   if isActive then
     result := 'Понижает защиту на ' + IntToStr(deltaArmor) +
-      '. Повышает скорость на ' + IntToStr(-deltaSpeed) + '. Понижает урон на ' + GetCubeText(deltaDamage)
+      '. Повышает скорость на ' + IntToStr(-deltaSpeed) + '. Понижает урон на '
+      + GetCubeText(deltaDamage)
   else
     result := 'Повышает защиту на ' + IntToStr(deltaArmor) +
-      '. Понижает скорость на ' + IntToStr(-deltaSpeed) + '. Повышает урон на '  + GetCubeText(deltaDamage);
+      '. Понижает скорость на ' + IntToStr(-deltaSpeed) + '. Повышает урон на '
+      + GetCubeText(deltaDamage);
 end;
 
 function FireBall.GetToolTip(): string;
 begin
   if radius = 1 then
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клетки. И всем его соседям в ' + IntToStr(neigbourDamage) + ' раза меньше урона'
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) +
+      ' клетки. И всем его соседям в ' + IntToStr(neigbourDamage) +
+      ' раза меньше урона'
   else
-    result := 'Наносит урон ' + GetCubeText(damage) + ' выбранному противнику в радиусе ' + IntToStr(radius)
-      + ' клеток. И всем его соседям в ' + IntToStr(neigbourDamage) + ' раза меньше урона'
+    result := 'Наносит урон ' + GetCubeText(damage) +
+      ' выбранному противнику в радиусе ' + IntToStr(radius) +
+      ' клеток. И всем его соседям в ' + IntToStr(neigbourDamage) +
+      ' раза меньше урона'
 end;
 
 function BuildingPlacer.GetToolTip(): string;

@@ -24,7 +24,7 @@ Sword
 ----Parametr2
 0102
 ----Parametr3
-.
+-
 ----Parametr4
 .
 --Skill1

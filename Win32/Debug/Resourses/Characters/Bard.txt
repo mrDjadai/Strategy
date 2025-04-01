@@ -26,7 +26,7 @@ BadMelody
 ----Parametr3
 +
 ----Parametr4
-.
+-
 --Skill1
 ----Type
 2
@@ -41,7 +41,7 @@ Heal
 ----Parametr2
 003
 ----Parametr3
-.
+-
 ----Parametr4
 .
 --Skill2

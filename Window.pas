@@ -73,6 +73,8 @@ type
     NoCharError: TLabel;
     NoMapsError: TLabel;
     ErrorHeader: TLabel;
+    NoCellError: TLabel;
+    CubeOrigin: TLayout;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -336,7 +338,7 @@ end;
 
 procedure TForm2.OpenGame(Sender: TObject);
 var
-  mapCount: integer;
+  mapCount, cellCount: integer;
 begin
   pressedW := false;
   pressedA := false;
@@ -350,20 +352,28 @@ begin
 
   CharacterManager.Init();
   buildingManager.Init();
-  LoadCells();
+  cellCount := LoadCells();
 
-  mapCount := CreateMapList();
+  if cellCount > 0 then
+  begin
+    mapCount := CreateMapList();
 
-  if Length(GetCharList()) = 0 then
+    if Length(GetCharList()) = 0 then
+    begin
+      ErrorPanel.Visible := true;
+      NoCharError.Visible := true;
+    end;
+
+    if mapCount = 0 then
+    begin
+      ErrorPanel.Visible := true;
+      NoMapsError.Visible := true;
+    end;
+  end
+  else
   begin
     ErrorPanel.Visible := true;
-    NoCharError.Visible := true;
-  end;
-
-  if mapCount = 0 then
-  begin
-    ErrorPanel.Visible := true;
-    NoMapsError.Visible := true;
+    NoCellError.Visible := true;
   end;
 
   InitAudio();
@@ -421,9 +431,9 @@ begin
   Readln(f, line);
   Val(line, curseDamageMultiplier, code);
 
-    Readln(f, line);
   Readln(f, line);
-  dangerCellDamage   := StrToInt(line);
+  Readln(f, line);
+  dangerCellDamage := StrToInt(line);
 
   CloseFile(f);
 

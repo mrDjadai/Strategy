@@ -24,7 +24,7 @@ Arrow
 ----Parametr2
 002
 ----Parametr3
-.
++
 ----Parametr4
 .
 --Skill1
@@ -41,7 +41,7 @@ HeavyArrow
 ----Parametr2
 4103
 ----Parametr3
-.
+-
 ----Parametr4
 .
 --Skill2

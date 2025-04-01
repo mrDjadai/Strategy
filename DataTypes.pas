@@ -141,6 +141,7 @@ Type
     cType: TCellType;
     character: TCharacter;
     building: TBuilding;
+    attackBlocker: boolean;
 
     procedure ReDraw();
     procedure OnEnter();
@@ -184,8 +185,10 @@ Type
   end;
 
 function decardToCube(pos: Vector2): Vector3;
-
+function cubeToDecard(pos: Vector3): Vector2;
+function LerpCubePos(a, b: Vector3; t: real): Vector3;
 function GetDistance(a, b: Vector3): integer;
+
 function SumDices(a, b: DicesCount): DicesCount;
 function SubDices(a, b: DicesCount): DicesCount;
 function LoadDices(s: string): DicesCount;
@@ -354,6 +357,12 @@ begin
   Result.z := -Result.x - Result.y;
 end;
 
+function cubeToDecard(pos: Vector3): Vector2;
+begin
+  Result.x := pos.x + (pos.y + (pos.y and 1)) div 2;
+  Result.y := pos.y;
+end;
+
 function GetDistance(a, b: Vector3): integer;
 begin
   Result := (Abs(a.x - b.x) + Abs(a.y - b.y) + Abs(a.z - b.z)) div 2;
@@ -507,13 +516,14 @@ end;
 
 procedure TPlayer.OnRoundStart();
 var
-  curChar: charList;
+  curChar, nextChar: charList;
 begin
   curChar := characters^.next;
   while curChar <> nil do
   begin
     with curChar^.data do
     begin
+      nextChar := curChar^.next;
       movePoints := 0;
       Inc(atack.timeAfterUse);
       Inc(skill1.timeAfterUse);
@@ -527,7 +537,7 @@ begin
       end;
     end;
 
-    curChar := curChar^.next;
+    curChar := nextChar;
   end;
 end;
 
@@ -714,6 +724,13 @@ begin
   audioSource.Volume := 1;
   audioSource.CurrentTime := 0;
   audioSource.Play();
+end;
+
+function LerpCubePos(a, b: Vector3; t: real): Vector3;
+begin
+  Result.x := a.x + Round(t * (b.x - a.x));
+  Result.y := a.y + Round(t * (b.y - a.y));
+  Result.z := a.z + Round(t * (b.z - a.z));
 end;
 
 end.

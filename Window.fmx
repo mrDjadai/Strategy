@@ -44,6 +44,14 @@ object Form2: TForm2
       Size.Height = 721.000000000000000000
       Size.PlatformDefault = False
       TabOrder = 1
+      object CubeOrigin: TLayout
+        Align = MostBottom
+        Position.Y = 671.000000000000000000
+        Size.Width = 242.000000000000000000
+        Size.Height = 50.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 0
+      end
     end
     object CharacterPanel: TImage
       MultiResBitmap.Height = 167
@@ -263,7 +271,7 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1087#1077#1088#1089#1086#1085#1072#1078#1077#1081' '#1087#1091#1089#1090
         Visible = False
-        TabOrder = 2
+        TabOrder = 3
       end
       object NoMapsError: TLabel
         StyledSettings = [Family, Style, FontColor]
@@ -275,17 +283,29 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1082#1072#1088#1090' '#1087#1091#1089#1090
         Visible = False
-        TabOrder = 1
+        TabOrder = 2
       end
       object ErrorHeader: TLabel
         StyledSettings = [Family, Style, FontColor]
-        Position.Y = 168.000000000000000000
+        Position.Y = 112.000000000000000000
         Size.Width = 800.000000000000000000
         Size.Height = 40.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.Size = 30.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #1042#1086#1079#1085#1080#1082#1083#1072' '#1086#1096#1080#1073#1082#1072' '#1087#1088#1080' '#1079#1072#1087#1091#1089#1082#1077
+        TabOrder = 1
+      end
+      object NoCellError: TLabel
+        StyledSettings = [Family, Style, FontColor]
+        Position.Y = 176.000000000000000000
+        Size.Width = 800.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Size = 30.000000000000000000
+        TextSettings.HorzAlign = Center
+        Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1082#1083#1077#1090#1086#1082' '#1087#1091#1089#1090
+        Visible = False
         TabOrder = 0
       end
     end

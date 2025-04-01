@@ -13,8 +13,12 @@ var
 
 type
   SelectionCondition = function(caster, target: TCellData): boolean of object;
+  TCellList = Array of TCellData;
 
-procedure LoadCells();
+function GetCellBetween(a, b : TCellData) : TCellList; overload;
+function GetCellBetween(a, b : Vector3) : TCellList; overload;
+
+function LoadCells() : integer;
 
 function GetMapList(): TStringDynArray;
 
@@ -46,6 +50,7 @@ type
     sprite: string;
     literal: char;
     tp: integer;
+    attackBlocker : boolean;
   end;
 
 var
@@ -94,12 +99,13 @@ begin
     begin
       result.sprite := cells[I].sprite;
       result.cType := TCellType(cells[I].tp);
+      result.attackBlocker := cells[i].attackBlocker;
     end;
 
   result.ReDraw();
 end;
 
-procedure LoadCells();
+function LoadCells() : integer;
 var
   Files: TStringDynArray;
   f: TextFile;
@@ -109,6 +115,7 @@ var
   literal: char;
   tp: integer;
   code: integer;
+  isBlocker : boolean;
 begin
   SetLength(cells, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
@@ -130,6 +137,10 @@ begin
     readln(f, line);
     val(line, tp, code);
 
+    readln(f, line);
+    readln(f, line);
+    isBlocker := line[1] = '+';
+
     if (code > 0) or (tp > 3) then
       correct := false;
 
@@ -140,8 +151,10 @@ begin
       cells[Length(cells) - 1].sprite := sprite;
       cells[Length(cells) - 1].literal := literal;
       cells[Length(cells) - 1].tp := tp;
+      cells[Length(cells) - 1].attackBlocker := isBlocker;
     end;
   end;
+  result := Length(cells);
 end;
 
 procedure Init(mapName: string);
@@ -277,6 +290,21 @@ begin
         Length(FileName) - lastDir - 4);
     end;
   end;
+end;
+
+function GetCellBetween(a, b : TCellData) : TCellList;
+begin
+  result := GetCellBetween(a.cubePos, b.cubePos);
+end;
+
+function GetCellBetween(a, b : Vector3) : TCellList;
+var n : integer;
+begin
+  n := GetDistance(a, b);
+  SetLength(result, n + 1);
+
+  for var i := 0 to n do
+    result[i] := GetCell(CubeToDecard(LerpCubePos(a, b, i * (1/n))));
 end;
 
 end.

@@ -35,9 +35,9 @@ const
     minValue: 1; maxValue: 6), (sprite: 'd8.png'; minValue: 1; maxValue: 8),
     (sprite: 'd20.png'; minValue: 1; maxValue: 20));
 
-  firstDiceX = 1000;
-  firstDiceY = 500;
-  deltaDicePos = 100;
+  firstDiceX = 170;
+  firstDiceY = -50;
+  deltaDicePos = -75;
   diceRowCount = 3;
 
 var
@@ -59,7 +59,7 @@ var
   MyText: TLabel;
 begin
   MyImage := TImage.Create(Form2);
-  MyImage.Parent := Form2;
+  MyImage.Parent := Form2.CubeOrigin;
 
   MyImage.Position.X := pos.X;
   MyImage.Position.Y := pos.Y;
@@ -68,7 +68,7 @@ begin
   MyImage.Height := DiceSize;
 
   MyText := TLabel.Create(Form2);
-  MyText.Parent := Form2;
+  MyText.Parent := Form2.CubeOrigin;
 
   MyImage.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) +
     'Resourses\Sprites\' + sprite);

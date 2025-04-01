@@ -24,7 +24,7 @@ Electro
 ----Parametr2
 1111
 ----Parametr3
-.
++
 ----Parametr4
 .
 --Skill1
