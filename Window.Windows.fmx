@@ -15,10 +15,12 @@ inherited Form2_Windows: TForm2_Windows
     end
   end
   inherited MainMenu: TLayout
-    inherited ErrorPanel: TPanel
+    inherited ErrorPanel: TPanel [1]
       inherited ErrorHeader: TLabel
         Position.X = 16.000000000000000000
       end
+    end
+    inherited GameExiter: TButton [2]
     end
   end
 end

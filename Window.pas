@@ -80,6 +80,7 @@ type
     ExitTimer: TTimer;
     WinExit: TButton;
     GameExiter: TButton;
+    NoParametrsError: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -133,7 +134,7 @@ var
   minMapX, minMapY: integer;
   charPlacers: Array of PlacerButton;
   buildPlacers: Array of PlacerButton;
-
+  money, roundMoney: integer;
 procedure ShowPlacersCount(player: TPlayer);
 
 implementation
@@ -144,7 +145,7 @@ uses CellManager, Winapi.Windows, CharacterDataVisualisator,
 {$R *.Windows.fmx MSWINDOWS}
 
 const
-  useConsole = true;
+  useConsole = false;
 
   mapMovingSpeed = 2; // движение карты
 
@@ -563,6 +564,37 @@ begin
   end;
 end;
 
+function TryLoadParametrs(): boolean;
+var
+  f: textFile;
+  code1, code2, code3, code4: integer;
+  line: string;
+begin
+  AssignFile(f, ExtractFilePath(ParamStr(0)) +
+    'Resourses\Configs\Parametrs.txt');
+  Reset(f);
+
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, money, code1);
+
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, roundMoney, code2);
+
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, curseDamageMultiplier, code3);
+
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, dangerCellDamage, code4);
+
+  CloseFile(f);
+
+  result := not((code1 > 0) or (code2 > 0) or (code3 > 0) or (code4 > 0));
+end;
+
 procedure TForm2.OpenGame(Sender: TObject);
 var
   mapCount, cellCount: integer;
@@ -604,6 +636,12 @@ begin
     NoCellError.Visible := true;
   end;
 
+  if not TryLoadParametrs then
+  begin
+    ErrorPanel.Visible := true;
+    NoParametrsError.Visible := true;
+  end;
+
   if ErrorPanel.Visible = false then
   begin
     CreateBuyList();
@@ -637,10 +675,6 @@ begin
 end;
 
 procedure TForm2.StartGame(Sender: TObject);
-var
-  f: textFile;
-  money, roundMoney, code: integer;
-  line: string;
 
 begin
   Form2.ClickPlayer.CurrentTime := 0;
@@ -650,31 +684,8 @@ begin
   Form2.MapPanel.Visible := true;
   Form2.BuyPanel.Visible := false;
 
-  AssignFile(f, ExtractFilePath(ParamStr(0)) +
-    'Resourses\Configs\Parametrs.txt');
-  Reset(f);
-
-  Readln(f, line);
-  Readln(f, line);
-  money := StrToInt(line);
-
-  Readln(f, line);
-  Readln(f, line);
-  roundMoney := StrToInt(line);
-
-  Readln(f, line);
-  Readln(f, line);
-  Val(line, curseDamageMultiplier, code);
-
-  Readln(f, line);
-  Readln(f, line);
-  dangerCellDamage := StrToInt(line);
-
-  CloseFile(f);
-
   PlayerManager.Init(money, roundMoney);
   CharacterDataVisualisator.Init(OP, CharacterPanel);
-
 end;
 
 procedure TForm2.OnChooseMap(Sender: TObject);

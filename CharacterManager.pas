@@ -39,7 +39,6 @@ type
     attackPlayer, skill1Player, skill2Player: TMediaPlayer;
   end;
 
-  skillData = array [0 .. 7] of string;
   TSkillAudioNames = array [0 .. 2] of string;
 
 var
@@ -258,6 +257,173 @@ begin
   result.skill2.audioSource := charTypes[result.id].skill2Player;
 end;
 
+function IsValidSkill(data: skillData): boolean;
+var
+  int, int1, int2, id, code, code1, code2: integer;
+begin
+  result := true;
+
+  Val(data[0], id, code);
+
+  if not FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
+    data[2] + '.wav') then
+    code := 1;
+  Val(data[3], int, code1);
+
+  if (code = 0) and (code1 = 0) and (id >= 0) and (id <= 8) then
+  begin
+    case id of
+      0:
+        begin
+          Val(data[5], int1, code);
+          Val(data[4], int, code1);
+          result := (code = 0) and (code1 = 0) and (int > 0) and (int1 >= 0) and
+            ((data[6] = '+') or (data[6] = '-')) and
+            ((data[7] = '+') or (data[7] = '-'));
+        end;
+      1, 2:
+        begin
+          Val(data[5], int1, code);
+          Val(data[4], int, code1);
+          result := (code = 0) and (code1 = 0) and (int > 0) and (int1 >= 0) and
+            ((data[6] = '+') or (data[6] = '-'));
+        end;
+      3:
+        begin
+          Val(data[5], int, code);
+          Val(data[4], int1, code1);
+          Val(data[6], int2, code2);
+          result := (code = 0) and (code1 = 0) and (code2 = 0) and (int > 0) and
+            (int1 > 0) and (int2 > 0);
+        end;
+      4:
+        begin
+          Val(data[4], int, code);
+          result := (code = 0) and (int > 0);
+        end;
+      5:
+        begin
+          Val(data[4], int, code);
+          Val(data[5], int, code1);
+          Val(data[6], int1, code2);
+          result := (code = 0) and (code1 = 0) and (code2 = 0) and (int1 > 0)
+            and FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+            data[7] + '0.png') and
+            FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+            data[7] + '1.png');
+        end;
+      6:
+        begin
+          Val(data[5], int, code);
+          Val(data[4], int1, code1);
+          result := (code = 0) and (code1 = 0) and (int > 0) and (int1 >= 0);
+        end;
+      7:
+        begin
+          Val(data[6], int, code);
+          Val(data[5], int1, code1);
+          Val(data[4], int2, code2);
+          result := (code = 0) and (code1 = 0) and (int > 0) and (int1 > 0) and
+            (int2 > 0);
+        end;
+      8:
+        begin
+          Val(data[5], int1, code1);
+          Val(data[4], int2, code2);
+          result := (code = 0) and (code1 = 0) and (int1 > 0) and (int2 > 0);
+        end;
+    end;
+  end
+  else
+    result := false;
+end;
+
+function IsValidChar(FileName: string): boolean;
+var
+  line: string;
+  f: TextFile;
+  data: skillData;
+  code, int: integer;
+begin
+  result := true;
+
+  AssignFile(f, FileName);
+  Reset(f);
+
+  readln(f, line);
+  readln(f, line);
+
+  readln(f, line);
+  readln(f, line);
+
+  if not FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + line +
+    '0.png') then
+    result := false;
+  if not FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + line +
+    '1.png') then
+    result := false;
+
+  readln(f, line);
+  readln(f, line);
+
+  Val(line, int, code);
+  if code > 0 then
+    result := false;
+
+  readln(f, line);
+  readln(f, line);
+
+  Val(line, int, code);
+  if code > 0 then
+    result := false;
+
+  readln(f, line);
+  readln(f, line);
+
+  Val(line, int, code);
+  if code > 0 then
+    result := false;
+
+  readln(f, line);
+  readln(f, line);
+
+  Val(line, int, code);
+  if code > 0 then
+    result := false;
+
+  readln(f, line);
+  for var i := 0 to High(skillData) do
+  begin
+    readln(f, data[i]);
+    readln(f, data[i]);
+  end;
+
+  if not IsValidSkill(data) then
+    result := false;
+
+  readln(f, line);
+  for var i := 0 to High(skillData) do
+  begin
+    readln(f, data[i]);
+    readln(f, data[i]);
+  end;
+
+  if not IsValidSkill(data) then
+    result := false;
+
+  readln(f, line);
+  for var i := 0 to High(skillData) do
+  begin
+    readln(f, data[i]);
+    readln(f, data[i]);
+  end;
+
+  if not IsValidSkill(data) then
+    result := false;
+
+  CloseFile(f);
+end;
+
 procedure Init();
 var
   Files: TStringDynArray;
@@ -268,7 +434,7 @@ begin
     'Resourses\Characters\');
   for var FileName in Files do
   begin
-    if true then // Добавить валидацию
+    if IsValidChar(FileName) then
     begin
       SetLength(charTypes, Length(charTypes) + 1);
       charTypes[Length(charTypes) - 1].name := FileName;

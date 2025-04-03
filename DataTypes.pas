@@ -15,6 +15,8 @@ Type
 
   DicesCount = array [0 .. (DicesTypesCount - 1)] of integer;
 
+  skillData = array [0 .. 7] of string;
+
   Vector2 = Record
     x, y: integer;
   End;
