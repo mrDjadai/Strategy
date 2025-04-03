@@ -20,6 +20,8 @@ var
 
   curseDamageMultiplier: real;
 
+procedure ClearPlayerData();
+
 procedure Win(player: TPlayer);
 
 procedure Lose(player: TPlayer);
@@ -42,9 +44,30 @@ const
   actionsPerRound = 3;
 
 var
+
   round: integer;
   actions: integer;
   moneyPerRound: integer;
+
+procedure ClearPlayerData();
+var cur : charList;
+begin
+  for var p in players do
+  begin
+    cur := p.characters;
+
+    while (p.characters^.next <> nil) and (p.characters^.next^.next <> nil) do
+    begin
+      while cur^.next^.next <> nil do
+        cur := cur^.next;
+      Dispose(cur^.next);
+      cur^.next := nil;
+    end;
+      if cur^.next <> nil then
+      Dispose(cur^.next);
+    Dispose(cur);
+  end;
+end;
 
 procedure ShowMoveData();
 begin

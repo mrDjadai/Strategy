@@ -15,10 +15,12 @@ type
   SelectionCondition = function(caster, target: TCellData): boolean of object;
   TCellList = Array of TCellData;
 
-function GetCellBetween(a, b : TCellData) : TCellList; overload;
-function GetCellBetween(a, b : Vector3) : TCellList; overload;
+procedure DeleteMap();
 
-function LoadCells() : integer;
+function GetCellBetween(a, b: TCellData): TCellList; overload;
+function GetCellBetween(a, b: Vector3): TCellList; overload;
+
+function LoadCells(): integer;
 
 function GetMapList(): TStringDynArray;
 
@@ -50,13 +52,29 @@ type
     sprite: string;
     literal: char;
     tp: integer;
-    attackBlocker : boolean;
+    attackBlocker: boolean;
   end;
 
 var
   y: integer;
   map: Array of Array of TCellData;
   cells: Array of TCellInfo;
+
+procedure DeleteMap();
+begin
+  for var I := 0 to x do
+  begin
+    for var k := 0 to y do
+    begin
+      if map[k][I].character <> nil then
+        map[k][I].character.Free;
+      if map[k][I].building <> nil then
+        map[k][I].building.Free;
+      map[k][I].Free;
+    end;
+  end;
+  SetLength(map, 0);
+end;
 
 function GetCell(pos: vector2): TCellData;
 begin
@@ -99,13 +117,13 @@ begin
     begin
       result.sprite := cells[I].sprite;
       result.cType := TCellType(cells[I].tp);
-      result.attackBlocker := cells[i].attackBlocker;
+      result.attackBlocker := cells[I].attackBlocker;
     end;
 
   result.ReDraw();
 end;
 
-function LoadCells() : integer;
+function LoadCells(): integer;
 var
   Files: TStringDynArray;
   f: TextFile;
@@ -115,7 +133,7 @@ var
   literal: char;
   tp: integer;
   code: integer;
-  isBlocker : boolean;
+  isBlocker: boolean;
 begin
   SetLength(cells, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
@@ -292,19 +310,20 @@ begin
   end;
 end;
 
-function GetCellBetween(a, b : TCellData) : TCellList;
+function GetCellBetween(a, b: TCellData): TCellList;
 begin
   result := GetCellBetween(a.cubePos, b.cubePos);
 end;
 
-function GetCellBetween(a, b : Vector3) : TCellList;
-var n : integer;
+function GetCellBetween(a, b: Vector3): TCellList;
+var
+  n: integer;
 begin
   n := GetDistance(a, b);
   SetLength(result, n + 1);
 
-  for var i := 0 to n do
-    result[i] := GetCell(CubeToDecard(LerpCubePos(a, b, i * (1/n))));
+  for var I := 0 to n do
+    result[I] := GetCell(CubeToDecard(LerpCubePos(a, b, I * (1 / n))));
 end;
 
 end.

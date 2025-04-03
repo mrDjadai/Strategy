@@ -324,6 +324,7 @@ destructor TCharacter.Destroy();
 begin
   WriteLn('Kill ' + name);
   img.Free;
+  healsBar.Free;
   inherited Destroy;
 end;
 
@@ -331,6 +332,7 @@ destructor TBuilding.Destroy();
 begin
   WriteLn('Destroy ' + name);
   img.Free;
+  healsBar.Free;
   inherited Destroy;
 end;
 

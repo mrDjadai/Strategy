@@ -75,6 +75,11 @@ type
     ErrorHeader: TLabel;
     NoCellError: TLabel;
     CubeOrigin: TLayout;
+    MenuExitButton: TButton;
+    ExitBar: TProgressBar;
+    ExitTimer: TTimer;
+    WinExit: TButton;
+    GameExiter: TButton;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -90,6 +95,10 @@ type
     procedure StartGame(Sender: TObject);
     procedure BuyRoundSkipClick(Sender: TObject);
     procedure TryLoopAudio(Sender: TObject);
+    procedure MenuExitButtonClick(Sender: TObject);
+    procedure ExitTimerTimer(Sender: TObject);
+    procedure ExitToMenu(Sender: TObject);
+    procedure GameExiterClick(Sender: TObject);
   private
     procedure OnChooseMap(Sender: TObject);
     procedure TryBuyCharacter(Sender: TObject);
@@ -141,6 +150,7 @@ const
 
 var
   pressedA, pressedW, pressedD, pressedS: boolean;
+  wantExit: boolean;
 
 procedure TForm2.FormKeyDown(Sender: TObject; var Key: Word;
   var KeyChar: WideChar; Shift: TShiftState);
@@ -192,6 +202,11 @@ procedure TForm2.FormResize(Sender: TObject);
 begin
   RightMenu.Height := Form2.Height;
   BG.Height := Form2.Height;
+end;
+
+procedure TForm2.GameExiterClick(Sender: TObject);
+begin
+  Application.Terminate();
 end;
 
 procedure InitAudio();
@@ -288,182 +303,18 @@ begin
 end;
 
 const
-  mapButtonHeight = 20;
-
-procedure TForm2.MPButonClick(Sender: TObject);
-begin
-  GetCell(selectedCharacter).character.BuyMP();
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-end;
-
-function CreateMapList(): integer;
-var
-  maps: TStringDynArray;
-  line: string;
-  f: textFile;
-  mapNum: integer;
-begin
-  with Form2 do
-  begin
-    maps := GetMapList();
-    mapNum := 0;
-
-    for var M in maps do
-    begin
-      var
-        b: TButton;
-      b := TButton.Create(Form2);
-      b.Parent := Form2.MapPanel;
-      b.Height := mapButtonHeight;
-      b.Width := MapPanel.Width;
-
-      AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + M
-        + '.txt');
-      Reset(f);
-      Readln(f, line);
-      b.Text := line;
-      CloseFile(f);
-
-      b.Name := M;
-      b.OnClick := Form2.OnChooseMap;
-
-      b.Position.Y := mapNum * mapButtonHeight;
-      Inc(mapNum);
-    end;
-  end;
-
-  result := mapNum;
-end;
-
-procedure TForm2.OpenGame(Sender: TObject);
-var
-  mapCount, cellCount: integer;
-begin
-  pressedW := false;
-  pressedA := false;
-  pressedS := false;
-  pressedD := false;
-
-  Randomize();
-
-  if useConsole then
-    AllocConsole();
-
-  CharacterManager.Init();
-  buildingManager.Init();
-  cellCount := LoadCells();
-
-  if cellCount > 0 then
-  begin
-    mapCount := CreateMapList();
-
-    if Length(GetCharList()) = 0 then
-    begin
-      ErrorPanel.Visible := true;
-      NoCharError.Visible := true;
-    end;
-
-    if mapCount = 0 then
-    begin
-      ErrorPanel.Visible := true;
-      NoMapsError.Visible := true;
-    end;
-  end
-  else
-  begin
-    ErrorPanel.Visible := true;
-    NoCellError.Visible := true;
-  end;
-
-  InitAudio();
-end;
-
-procedure TForm2.Skill1ButtonClick(Sender: TObject);
-begin
-  GetCell(selectedCharacter).character.skill1.Select
-    (GetCell(selectedCharacter));
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-end;
-
-procedure TForm2.Skill2ButtonClick(Sender: TObject);
-begin
-  GetCell(selectedCharacter).character.skill2.Select
-    (GetCell(selectedCharacter));
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-end;
-
-procedure TForm2.SkipRoundClick(Sender: TObject);
-begin
-  NextMove();
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-end;
-
-procedure TForm2.StartGame(Sender: TObject);
-var
-  f: textFile;
-  money, roundMoney, code: integer;
-  line: string;
-
-begin
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-  Form2.StartButton.Visible := false;
-  Form2.PrepairLayout.Visible := true;
-  Form2.BuyPanel.Visible := false;
-
-  AssignFile(f, ExtractFilePath(ParamStr(0)) +
-    'Resourses\Configs\Parametrs.txt');
-  Reset(f);
-
-  Readln(f, line);
-  Readln(f, line);
-  money := StrToInt(line);
-
-  Readln(f, line);
-  Readln(f, line);
-  roundMoney := StrToInt(line);
-
-  Readln(f, line);
-  Readln(f, line);
-  Val(line, curseDamageMultiplier, code);
-
-  Readln(f, line);
-  Readln(f, line);
-  dangerCellDamage := StrToInt(line);
-
-  CloseFile(f);
-
-  PlayerManager.Init(money, roundMoney);
-  CharacterDataVisualisator.Init(OP, CharacterPanel);
-
-end;
-
-const
   cButtonScaleX = 80;
   cButtonScaleY = 15;
   cButtonOffsetX = 100;
   cButtonOffsetY = 20;
   cButtonColumns = 2;
 
-procedure TForm2.OnChooseMap(Sender: TObject);
+procedure CreateBuyList();
 var
   f: textFile;
   line: string;
   cNum: integer;
 begin
-  Form2.ClickPlayer.CurrentTime := 0;
-  Form2.ClickPlayer.Play();
-  Form2.MapPanel.Visible := false;
-  Form2.BuyPanel.Visible := true;
-  Form2.KeyPressTimer.Enabled := false;
-
-  CellManager.Init(TButton(Sender).Name);
-  prepareMode := true;
-
   // создание списка для покупки персов
   var
     chars: TStringDynArray;
@@ -503,61 +354,107 @@ begin
     b.Position.X := (cNum mod cButtonColumns) * cButtonOffsetX;
     Inc(cNum);
   end;
-  BuyMoneyText.Text := IntToStr(currentPlayer.money);
-  Form2.BuyRoundSkip.Enabled := false;
 end;
 
-procedure TForm2.TryBuyCharacter(Sender: TObject);
-var
-  b: CharButton;
+procedure TForm2.ExitToMenu(Sender: TObject);
 begin
-
-  b := CharButton(Sender);
-  if currentPlayer.money >= b.cost then
+  DeleteMap();
+  ClearPlayerData();
+  with Form2 do
   begin
-    currentPlayer.money := currentPlayer.money - b.cost;
-    BuyMoneyText.Text := IntToStr(currentPlayer.money);
+    RightMenu.Visible := false;
+    DownMenu.Visible := false;
+    MainMenu.Visible := true;
+    PrepairLayout.Visible := false;
+  end;
 
-    if Length(currentPlayer.boughtCharacters) <= b.id then
+  for var item1 in buildPlacers do
+    if item1 <> nil then
     begin
-      SetLength(currentPlayer.boughtCharacters, b.id + 1);
-      currentPlayer.boughtCharacters[b.id] := 0;
+      item1.Visible := true;
+      item1.txt.Visible := true;
     end;
-    Inc(currentPlayer.boughtCharacters[b.id]);
-    Form2.BuyRoundSkip.Enabled := true;
-
-    Form2.BuyPlayer.CurrentTime := 0;
-    Form2.BuyPlayer.Play();
-  end
-  else
-  begin
-    Form2.ClickPlayer.CurrentTime := 0;
-    Form2.ClickPlayer.Play();
-  end;
 end;
 
-procedure TForm2.TryLoopAudio(Sender: TObject);
-var
-  Files: TStringDynArray;
-  RandomIndex: integer;
-begin
-  if MusicPlayer.CurrentTime >= MusicPlayer.Duration then
-  begin
-    Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Music\');
-    RandomIndex := Random(Length(Files));
-
-    MusicPlayer.FileName := Files[RandomIndex];
-    MusicPlayer.Play();
-  end;
-
-end;
-
-procedure TForm2.AttackButtonClick(Sender: TObject);
+procedure TForm2.MenuExitButtonClick(Sender: TObject);
 begin
   Form2.ClickPlayer.CurrentTime := 0;
   Form2.ClickPlayer.Play();
-  GetCell(selectedCharacter).character.atack.Select(GetCell(selectedCharacter));
+
+  if wantExit then
+  begin
+    ExitToMenu(Sender);
+  end
+  else
+  begin
+    ExitTimer.Enabled := true;
+    ExitBar.Value := 100;
+    ExitBar.Visible := true;
+
+    wantExit := true;
+  end;
+end;
+
+procedure TForm2.ExitTimerTimer(Sender: TObject);
+begin
+  ExitBar.Value := ExitBar.Value - 1;
+
+  if ExitBar.Value = 0 then
+  begin
+    ExitTimer.Enabled := false;
+    ExitBar.Visible := false;
+
+    wantExit := false;
+  end;
+end;
+
+procedure TForm2.MPButonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.BuyMP();
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+end;
+
+const
+  mapButtonHeight = 20;
+
+function CreateMapList(): integer;
+var
+  maps: TStringDynArray;
+  line: string;
+  f: textFile;
+  mapNum: integer;
+begin
+  with Form2 do
+  begin
+    maps := GetMapList();
+    mapNum := 0;
+
+    for var M in maps do
+    begin
+      var
+        b: TButton;
+      b := TButton.Create(Form2);
+      b.Parent := Form2.MapPanel;
+      b.Height := mapButtonHeight;
+      b.Width := MapPanel.Width;
+
+      AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + M
+        + '.txt');
+      Reset(f);
+      Readln(f, line);
+      b.Text := line;
+      CloseFile(f);
+
+      b.Name := M;
+      b.OnClick := Form2.OnChooseMap;
+
+      b.Position.Y := mapNum * mapButtonHeight;
+      Inc(mapNum);
+    end;
+  end;
+
+  result := mapNum;
 end;
 
 const
@@ -664,8 +561,188 @@ begin
       buildPlacers[Length(buildPlacers) - 1] := b;
     end;
   end;
+end;
 
-  ShowPlacersCount(players[0]);
+procedure TForm2.OpenGame(Sender: TObject);
+var
+  mapCount, cellCount: integer;
+begin
+  pressedW := false;
+  pressedA := false;
+  pressedS := false;
+  pressedD := false;
+  wantExit := false;
+
+  Randomize();
+
+  if useConsole then
+    AllocConsole();
+
+  CharacterManager.Init();
+  buildingManager.Init();
+  cellCount := LoadCells();
+
+  if cellCount > 0 then
+  begin
+    mapCount := CreateMapList();
+
+    if Length(GetCharList()) = 0 then
+    begin
+      ErrorPanel.Visible := true;
+      NoCharError.Visible := true;
+    end;
+
+    if mapCount = 0 then
+    begin
+      ErrorPanel.Visible := true;
+      NoMapsError.Visible := true;
+    end;
+  end
+  else
+  begin
+    ErrorPanel.Visible := true;
+    NoCellError.Visible := true;
+  end;
+
+  if ErrorPanel.Visible = false then
+  begin
+    CreateBuyList();
+    CreateBuyButtons();
+  end;
+
+  InitAudio();
+end;
+
+procedure TForm2.Skill1ButtonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.skill1.Select
+    (GetCell(selectedCharacter));
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+end;
+
+procedure TForm2.Skill2ButtonClick(Sender: TObject);
+begin
+  GetCell(selectedCharacter).character.skill2.Select
+    (GetCell(selectedCharacter));
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+end;
+
+procedure TForm2.SkipRoundClick(Sender: TObject);
+begin
+  NextMove();
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+end;
+
+procedure TForm2.StartGame(Sender: TObject);
+var
+  f: textFile;
+  money, roundMoney, code: integer;
+  line: string;
+
+begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+  Form2.MainMenu.Visible := false;
+  Form2.PrepairLayout.Visible := true;
+  Form2.MapPanel.Visible := true;
+  Form2.BuyPanel.Visible := false;
+
+  AssignFile(f, ExtractFilePath(ParamStr(0)) +
+    'Resourses\Configs\Parametrs.txt');
+  Reset(f);
+
+  Readln(f, line);
+  Readln(f, line);
+  money := StrToInt(line);
+
+  Readln(f, line);
+  Readln(f, line);
+  roundMoney := StrToInt(line);
+
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, curseDamageMultiplier, code);
+
+  Readln(f, line);
+  Readln(f, line);
+  dangerCellDamage := StrToInt(line);
+
+  CloseFile(f);
+
+  PlayerManager.Init(money, roundMoney);
+  CharacterDataVisualisator.Init(OP, CharacterPanel);
+
+end;
+
+procedure TForm2.OnChooseMap(Sender: TObject);
+begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+  Form2.MapPanel.Visible := false;
+  Form2.BuyPanel.Visible := true;
+  Form2.KeyPressTimer.Enabled := false;
+
+  CellManager.Init(TButton(Sender).Name);
+  prepareMode := true;
+
+  BuyMoneyText.Text := IntToStr(currentPlayer.money);
+  Form2.BuyRoundSkip.Enabled := false;
+end;
+
+procedure TForm2.TryBuyCharacter(Sender: TObject);
+var
+  b: CharButton;
+begin
+
+  b := CharButton(Sender);
+  if currentPlayer.money >= b.cost then
+  begin
+    currentPlayer.money := currentPlayer.money - b.cost;
+    BuyMoneyText.Text := IntToStr(currentPlayer.money);
+
+    if Length(currentPlayer.boughtCharacters) <= b.id then
+    begin
+      SetLength(currentPlayer.boughtCharacters, b.id + 1);
+      currentPlayer.boughtCharacters[b.id] := 0;
+    end;
+    Inc(currentPlayer.boughtCharacters[b.id]);
+    Form2.BuyRoundSkip.Enabled := true;
+
+    Form2.BuyPlayer.CurrentTime := 0;
+    Form2.BuyPlayer.Play();
+  end
+  else
+  begin
+    Form2.ClickPlayer.CurrentTime := 0;
+    Form2.ClickPlayer.Play();
+  end;
+end;
+
+procedure TForm2.TryLoopAudio(Sender: TObject);
+var
+  Files: TStringDynArray;
+  RandomIndex: integer;
+begin
+  if MusicPlayer.CurrentTime >= MusicPlayer.Duration then
+  begin
+    Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Music\');
+    RandomIndex := Random(Length(Files));
+
+    MusicPlayer.FileName := Files[RandomIndex];
+    MusicPlayer.Play();
+  end;
+
+end;
+
+procedure TForm2.AttackButtonClick(Sender: TObject);
+begin
+  Form2.ClickPlayer.CurrentTime := 0;
+  Form2.ClickPlayer.Play();
+  GetCell(selectedCharacter).character.atack.Select(GetCell(selectedCharacter));
 end;
 
 procedure TForm2.SelectToPlace(Sender: TObject);
@@ -737,7 +814,7 @@ begin
     Form2.SkipRound.Enabled := false;
     Form2.PrepairLayout.Visible := false;
 
-    CreateBuyButtons();
+    ShowPlacersCount(players[0]);
   end;
 end;
 

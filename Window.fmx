@@ -37,6 +37,7 @@ object Form2: TForm2
     Size.Width = 50.000000000000000000
     Size.Height = 50.000000000000000000
     Size.PlatformDefault = False
+    Visible = False
     TabOrder = 3
     object BG: TPanel
       Position.X = -192.000000000000000000
@@ -195,8 +196,8 @@ object Form2: TForm2
     object SkipRound: TButton
       Position.X = -16.000000000000000000
       Position.Y = 20.000000000000000000
-      TabOrder = 0
-      Text = 'SkipRound'
+      TabOrder = 1
+      Text = #1055#1077#1088#1077#1076#1072#1090#1100' '#1093#1086#1076
       TextSettings.Trimming = None
       OnClick = SkipRoundClick
     end
@@ -210,35 +211,59 @@ object Form2: TForm2
       Position.X = -144.000000000000000000
       Position.Y = 9.000000000000000000
       Text = 'Round:'
-      TabOrder = 7
+      TabOrder = 8
     end
     object RoundText: TLabel
       Position.X = -144.000000000000000000
       Position.Y = 34.000000000000000000
       Text = '0'
-      TabOrder = 2
+      TabOrder = 3
     end
     object ActionsPrefix: TLabel
       Position.X = 104.000000000000000000
       Text = 'Actions:'
-      TabOrder = 6
+      TabOrder = 7
     end
     object ActionsText: TLabel
       Position.X = 104.000000000000000000
       Position.Y = 25.000000000000000000
       Text = '0/0'
-      TabOrder = 3
+      TabOrder = 4
     end
     object MoneyPrefix: TLabel
       Position.X = 168.000000000000000000
       Text = 'Money:'
-      TabOrder = 5
+      TabOrder = 6
     end
     object MoneyText: TLabel
       Position.X = 168.000000000000000000
       Position.Y = 25.000000000000000000
       Text = '0'
-      TabOrder = 4
+      TabOrder = 5
+    end
+    object MenuExitButton: TButton
+      Position.X = -250.000000000000000000
+      Position.Y = 20.000000000000000000
+      TabOrder = 0
+      Text = #1042#1099#1081#1090#1080
+      TextSettings.Trimming = None
+      OnClick = MenuExitButtonClick
+    end
+    object ExitBar: TProgressBar
+      Orientation = Horizontal
+      Position.X = -250.000000000000000000
+      Position.Y = 10.000000000000000000
+      Size.Width = 78.000000000000000000
+      Size.Height = 7.000000000000000000
+      Size.PlatformDefault = False
+      Visible = False
+      object ExitTimer: TTimer
+        Enabled = False
+        Interval = 10
+        OnTimer = ExitTimerTimer
+        Left = 560
+        Top = 472
+      end
     end
   end
   object MainMenu: TLayout
@@ -249,7 +274,7 @@ object Form2: TForm2
     TabOrder = 6
     object StartButton: TButton
       Align = Center
-      TabOrder = 0
+      TabOrder = 1
       Text = #1048#1075#1088#1072#1090#1100
       TextSettings.Trimming = None
       OnClick = StartGame
@@ -260,7 +285,7 @@ object Form2: TForm2
       Size.Height = 500.000000000000000000
       Size.PlatformDefault = False
       Visible = False
-      TabOrder = 1
+      TabOrder = 2
       object NoCharError: TLabel
         StyledSettings = [Family, Style, FontColor]
         Position.Y = 230.000000000000000000
@@ -308,6 +333,14 @@ object Form2: TForm2
         Visible = False
         TabOrder = 0
       end
+    end
+    object GameExiter: TButton
+      Align = Center
+      Margins.Top = 50.000000000000000000
+      TabOrder = 0
+      Text = #1042#1099#1081#1090#1080
+      TextSettings.Trimming = None
+      OnClick = GameExiterClick
     end
   end
   object PrepairLayout: TLayout
@@ -390,6 +423,17 @@ object Form2: TForm2
       Size.Width = 425.000000000000000000
       Size.Height = 50.000000000000000000
       Size.PlatformDefault = False
+    end
+    object WinExit: TButton
+      Align = Bottom
+      Position.Y = 202.000000000000000000
+      Size.Width = 425.000000000000000000
+      Size.Height = 22.000000000000000000
+      Size.PlatformDefault = False
+      TabOrder = 1
+      Text = #1042' '#1084#1077#1085#1102
+      TextSettings.Trimming = None
+      OnClick = ExitToMenu
     end
   end
   object Audio: TLayout
