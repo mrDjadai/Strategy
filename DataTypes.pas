@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Objects,
-  FMX.Media;
+  FMX.Media, System.Generics.Collections;
 
 const
   DicesTypesCount = 5;
@@ -78,7 +78,16 @@ Type
     procedure OnStay(); virtual;
     procedure OnExit(); virtual;
     procedure ReDraw();
+
+    class function CanBeBuilded(cell : TCellData) : boolean; virtual;
   end;
+
+  TAnimationQueueItem = record
+    Source: TCellData;
+    Dest: TCellData;
+  end;
+
+  TAnimationQueue = TQueue<TAnimationQueueItem>;
 
   TCharacter = class
   private
@@ -105,6 +114,8 @@ Type
     movePoints: integer;
     bonusDices: DicesCount;
     curseRounds: integer;
+    animationQueue : TAnimationQueue;
+    isAnimating : boolean;
 
     atack, skill1, skill2: TSkill;
 
@@ -239,9 +250,11 @@ end;
 
 procedure TCellData.OnClick(sender: Tobject);
 begin
-  WriteLn('clicked    ' + sprite + '  at decard  x=', decardPos.x, '  y=',
-    decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,
-    '   has character  ', character <> nil);
+
+  if useConsole then
+    WriteLn('clicked    ' + sprite + '  at decard  x=', decardPos.x, '  y=',
+      decardPos.y, '/cube  x=', cubePos.x, '  y=', cubePos.y, '  z=', cubePos.z,
+      '   has character  ', character <> nil);
 
   if prepareMode then
   begin
@@ -324,15 +337,17 @@ end;
 
 destructor TCharacter.Destroy();
 begin
-  WriteLn('Kill ' + name);
+  if useConsole then
+    WriteLn('Kill ' + name);
   img.Free;
-  healsBar.Free;
+  animationQueue.Free;
   inherited Destroy;
 end;
 
 destructor TBuilding.Destroy();
 begin
-  WriteLn('Destroy ' + name);
+  if useConsole then
+    WriteLn('Destroy ' + name);
   img.Free;
   healsBar.Free;
   inherited Destroy;
@@ -407,6 +422,9 @@ begin
   healsBar.Init(img, maxHp, charHealsBarScale, charHealsBarPos, Self.Die);
   for var i := 0 to Length(bonusDices) - 1 do
     bonusDices[i] := 0;
+
+  isAnimating := false;
+  animationQueue:= TAnimationQueue.Create;
 end;
 
 function TCharacter.GetHP(): integer;
@@ -735,6 +753,11 @@ begin
   Result.x := a.x + Round(t * (b.x - a.x));
   Result.y := a.y + Round(t * (b.y - a.y));
   Result.z := a.z + Round(t * (b.z - a.z));
+end;
+
+class function TBuilding.CanBeBuilded(cell : TCellData) : boolean;
+begin
+  result := true;
 end;
 
 end.

@@ -3,7 +3,7 @@
 --Sprite
 wall
 --Count
-0
+1
 --HP
 30
 --Cost
@@ -17,7 +17,7 @@ wall
 --Sprite
 palatka
 --Count
-1
+0
 --HP
 10
 --Cost
@@ -43,7 +43,7 @@ fort
 --Name
 Капкан
 --Sprite
-palatka
+kapkan
 --Count
 0
 --HP
@@ -57,7 +57,7 @@ palatka
 --Name
 Портал
 --Sprite
-fort
+portal
 --Count(Always = 1)
 1
 --HP

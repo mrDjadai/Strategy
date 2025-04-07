@@ -137,6 +137,9 @@ var
   money, roundMoney: integer;
 procedure ShowPlacersCount(player: TPlayer);
 
+const
+  useConsole = false;
+
 implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
@@ -145,8 +148,6 @@ uses CellManager, Winapi.Windows, CharacterDataVisualisator,
 {$R *.Windows.fmx MSWINDOWS}
 
 const
-  useConsole = false;
-
   mapMovingSpeed = 2; // движение карты
 
 var
@@ -337,7 +338,6 @@ begin
     Readln(f, line);
     Readln(f, line);
     b.Text := line;
-
     Readln(f, line);
     Readln(f, line);
     Readln(f, line);
@@ -375,6 +375,7 @@ begin
       item1.Visible := true;
       item1.txt.Visible := true;
     end;
+  WinPanel.Visible := false;
 end;
 
 procedure TForm2.MenuExitButtonClick(Sender: TObject);
@@ -830,7 +831,17 @@ begin
 end;
 
 procedure TForm2.DeleteAnimation(Sender: TObject);
+var
+  c: TCharacter;
 begin
+  c := TCharacterAnimation(Sender).c;
+
+  if TCharacterAnimation(Sender).removeFromQueue then
+  begin
+    c.AnimationQueue.Dequeue;
+    c.IsAnimating := false;
+    AnimateMoving(c);
+  end;
   Sender.Free;
 end;
 

@@ -44,8 +44,8 @@ uses Window, WinApi.Windows, System.IOUtils;
 
 const
   cellSize = 150;
-  cellSpaceX = 130;
-  cellSpaceY = 110;
+  cellSpaceX = 129;
+  cellSpaceY = 112;
 
 type
   TCellInfo = record

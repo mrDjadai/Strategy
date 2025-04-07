@@ -28,6 +28,7 @@ type
   public
     procedure OnBuild(c: TCellData; ow: integer); override;
     procedure OnDemolish(); override;
+    class function CanBeBuilded(cell : TCellData) : boolean; override;
   end;
 
   Hospital = class(TBuilding)
@@ -60,6 +61,23 @@ type
 
 var
   buildingCount: integer;
+
+
+function CanBeBuilded(id : integer; cell : TCellData) : boolean;
+begin
+  case id of
+    0:
+      result := Wall.CanBeBuilded(cell);
+    1:
+      result := Hospital.CanBeBuilded(cell);
+    2:
+      result := Fort.CanBeBuilded(cell);
+    3:
+      result := Kapkan.CanBeBuilded(cell);
+    4:
+      result := Portal.CanBeBuilded(cell);
+  end;
+end;
 
 function CreateBuilding(id: integer): TBuilding;
 var
@@ -183,7 +201,7 @@ function TryBuild(cell: TCellData; id: integer): boolean;
 begin
   result := false;
 
-  if (cell.cType <> cBlocked) and (cell.building = nil) then
+  if (cell.cType <> cBlocked) and (cell.building = nil) and (CanBeBuilded(id, cell)) then
   begin
     Build(cell, id);
     placableBuildingId := -1;
@@ -271,6 +289,11 @@ procedure Portal.OnBuild(c: TCellData; ow: integer);
 begin
   inherited OnBuild(c, ow);
   players[ow].portalCell := c;
+end;
+
+class function Wall.CanBeBuilded(cell : TCellData) : boolean;
+begin
+  result := cell.character = nil;
 end;
 
 end.

@@ -1,7 +1,7 @@
 --DisplayName
 Воин
 --SpriteFileName
-pers
+warrior
 --Cost
 30
 --HP

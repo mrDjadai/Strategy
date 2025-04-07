@@ -5,9 +5,16 @@ interface
 uses DataTypes, FMX.Objects, System.Classes, FMX.Controls, FMX.Ani,
   System.Types;
 
+  type TCharacterAnimation = class(TFloatAnimation)
+    public c : TCharacter;
+    removeFromQueue : boolean;
+  end;
+
 procedure SelectCharacter(pos: Vector2);
 
 procedure UnselectCharacter();
+
+procedure AnimateMoving(c: TCharacter);
 
 procedure TryMoveCharacter(source, dest: TCellData);
 
@@ -509,18 +516,52 @@ begin
   end;
 end;
 
-procedure AnimationFinished(Sender: TObject);
+procedure AnimateMoving(c: TCharacter);
+var
+  Item: TAnimationQueueItem;
+  AnimX, AnimY: TCharacterAnimation;
+  Image: TImage;
 begin
-  if Sender is TFloatAnimation then
-    TFloatAnimation(Sender).Free;
+  if c.AnimationQueue.Count <> 0 then
+  begin
+    c.IsAnimating := true;
+    Item := c.AnimationQueue.Peek;
+
+    Image := c.img;
+
+    AnimX := TCharacterAnimation.Create(Image);
+    AnimX.Parent := Image;
+    AnimX.PropertyName := 'Position.X';
+    AnimX.StartValue := Item.source.Image.Position.x;
+    AnimX.StopValue := Item.dest.Image.Position.x;
+    AnimX.duration := movingDuration;
+
+    AnimY := TCharacterAnimation.Create(Image);
+    AnimY.Parent := Image;
+    AnimY.PropertyName := 'Position.Y';
+    AnimY.StartValue := Item.source.Image.Position.y;
+    AnimY.StopValue := Item.dest.Image.Position.y;
+    AnimY.duration := movingDuration;
+
+    AnimX.c := c;
+    AnimY.c := c;
+
+    AnimX.removeFromQueue := true;
+    AnimY.removeFromQueue := false;
+
+    AnimX.OnFinish := Form2.DeleteAnimation;
+    AnimY.OnFinish := Form2.DeleteAnimation;
+
+    AnimX.Start;
+    AnimY.Start;
+  end;
 end;
 
 procedure MoveCharacter(source, dest: TCellData);
 var
-  AnimX, AnimY: TFloatAnimation;
-  Image: TImage;
+  Item: TAnimationQueueItem;
 begin
-  Image := source.character.img;
+  // Логика
   selectedCharacter := dest.decardPos;
 
   dest.character := source.character;
@@ -529,29 +570,14 @@ begin
   source.OnExit();
   dest.OnEnter();
   source.character := nil;
-
-  // Анимация
-
-  AnimX := TFloatAnimation.Create(Image);
-  AnimX.Parent := Image;
-  AnimX.PropertyName := 'Position.X';
-  AnimX.StartValue := source.Image.Position.x;
-  AnimX.StopValue := dest.Image.Position.x;
-  AnimX.duration := movingDuration;
-  AnimX.Start;
-
-  AnimY := TFloatAnimation.Create(Image);
-  AnimY.Parent := Image;
-  AnimY.PropertyName := 'Position.Y';
-  AnimY.StartValue := source.Image.Position.y;
-  AnimY.StopValue := dest.Image.Position.y;
-  AnimY.duration := movingDuration;
-  AnimY.Start;
-
-  AnimX.OnFinish := form2.DeleteAnimation;
-  AnimY.OnFinish := form2.DeleteAnimation;
-
   CharacterDataVisualisator.ReDraw();
+  // Отрисовка
+
+  Item.source := source;
+  Item.dest := dest;
+  dest.character.AnimationQueue.Enqueue(Item);
+  if not dest.character.IsAnimating then
+    AnimateMoving(dest.character);
 end;
 
 procedure TryMoveCharacter(source, dest: TCellData);

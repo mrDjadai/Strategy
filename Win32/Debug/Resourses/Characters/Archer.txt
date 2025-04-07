@@ -1,7 +1,7 @@
 --DisplayName
 Лучник
 --SpriteFileName
-pers
+archer
 --Cost
 25
 --HP
