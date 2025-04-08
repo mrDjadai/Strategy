@@ -66,10 +66,8 @@ begin
   begin
     for var k := 0 to y do
     begin
-      if map[k][I].character <> nil then
-        map[k][I].character.Free;
-      if map[k][I].building <> nil then
-        map[k][I].building.Free;
+      map[k][I].character.Free;
+      map[k][I].building.Free;
       map[k][I].Free;
     end;
   end;

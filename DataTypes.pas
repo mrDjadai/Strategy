@@ -399,8 +399,6 @@ begin
   healsBar.position.x := position.x;
   healsBar.position.y := position.y;
 
-  healsBar.Width := scale.x;
-  healsBar.Height := scale.y;
 
   healsBar.Bitmap.Width := scale.x;
   healsBar.Bitmap.Height := scale.y;
@@ -412,7 +410,7 @@ begin
   healsBar.BringToFront;
   maxHp := mHp;
   heals := mHp;
-  imageScale := scale;
+
   onDie := dieAction;
 end;
 
@@ -460,19 +458,17 @@ begin
   else
     heals := h;
 
-  healsBar.Bitmap.Width := imageScale.x;
-  healsBar.Bitmap.Height := imageScale.y;
-
   healsBar.Bitmap.Canvas.BeginScene();
 
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Brown;
-  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, imageScale.x,
-    imageScale.y), 0, 0, [], 1);
+  healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0, healsBar.Bitmap.Width,
+    healsBar.Bitmap.Height), 0, 0, [], 1);
   healsBar.Bitmap.Canvas.Fill.Color := TAlphaColors.Crimson;
   healsBar.Bitmap.Canvas.FillRect(TRectF.Create(0, 0,
-    Round(imageScale.x * (heals / maxHp)), imageScale.y), 0, 0, [], 1);
+    healsBar.Bitmap.Width * (heals / maxHp) / healsBar.Scene.GetSceneScale, healsBar.Bitmap.Height), 0, 0, [], 1);
 
   healsBar.Bitmap.Canvas.EndScene();
+
 
   if heals <= 0 then
   begin

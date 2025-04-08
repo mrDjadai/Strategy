@@ -1,7 +1,7 @@
 object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Strategy'
+  Caption = 'Hexspire'
   ClientHeight = 720
   ClientWidth = 1080
   FormFactor.Width = 320
@@ -353,6 +353,36 @@ object Form2: TForm2
         Visible = False
         TabOrder = 2
       end
+    end
+    object MusicBar: TTrackBar
+      CanParentFocus = True
+      Max = 1.000000000000000000
+      Orientation = Horizontal
+      Position.X = 168.000000000000000000
+      Position.Y = 8.000000000000000000
+      TabOrder = 4
+      OnChange = MusicBarChange
+    end
+    object SoundBar: TTrackBar
+      CanParentFocus = True
+      Max = 1.000000000000000000
+      Orientation = Horizontal
+      Position.X = 168.000000000000000000
+      Position.Y = 35.000000000000000000
+      TabOrder = 3
+      OnChange = SoundBarChange
+    end
+    object MusicLabel: TLabel
+      Position.X = 276.000000000000000000
+      Position.Y = 8.000000000000000000
+      Text = #1052#1091#1079#1099#1082#1072
+      TabOrder = 6
+    end
+    object SoundLabel: TLabel
+      Position.X = 276.000000000000000000
+      Position.Y = 37.000000000000000000
+      Text = #1047#1074#1091#1082#1080
+      TabOrder = 5
     end
   end
   object PrepairLayout: TLayout

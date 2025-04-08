@@ -81,6 +81,10 @@ type
     WinExit: TButton;
     GameExiter: TButton;
     NoParametrsError: TLabel;
+    MusicBar: TTrackBar;
+    SoundBar: TTrackBar;
+    MusicLabel: TLabel;
+    SoundLabel: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -100,6 +104,8 @@ type
     procedure ExitTimerTimer(Sender: TObject);
     procedure ExitToMenu(Sender: TObject);
     procedure GameExiterClick(Sender: TObject);
+    procedure SoundBarChange(Sender: TObject);
+    procedure MusicBarChange(Sender: TObject);
   private
     procedure OnChooseMap(Sender: TObject);
     procedure TryBuyCharacter(Sender: TObject);
@@ -143,7 +149,7 @@ const
 implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
-  CharacterManager, PlayerManager, buildingManager, System.IOUtils;
+  CharacterManager, PlayerManager, buildingManager, System.IOUtils, SettingsManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -417,6 +423,8 @@ begin
   Form2.ClickPlayer.Play();
 end;
 
+
+
 const
   mapButtonHeight = 20;
 
@@ -650,6 +658,7 @@ begin
   end;
 
   InitAudio();
+  SettingsManager.Init();
 end;
 
 procedure TForm2.Skill1ButtonClick(Sender: TObject);
@@ -673,6 +682,16 @@ begin
   NextMove();
   Form2.ClickPlayer.CurrentTime := 0;
   Form2.ClickPlayer.Play();
+end;
+
+procedure TForm2.SoundBarChange(Sender: TObject);
+begin
+  ChangeSound(TTrackBar(sender).Value);
+end;
+
+procedure TForm2.MusicBarChange(Sender: TObject);
+begin
+  ChangeMusic(TTrackBar(sender).Value);
 end;
 
 procedure TForm2.StartGame(Sender: TObject);
