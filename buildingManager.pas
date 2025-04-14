@@ -15,6 +15,8 @@ function TryBuild(cell: TCellData; id: integer): boolean; overload;
 
 function GetBuildingName(id: integer): string;
 
+function IsBuildingFileValid(): boolean;
+
 implementation
 
 uses
@@ -28,7 +30,7 @@ type
   public
     procedure OnBuild(c: TCellData; ow: integer); override;
     procedure OnDemolish(); override;
-    class function CanBeBuilded(cell : TCellData) : boolean; override;
+    class function CanBeBuilded(cell: TCellData): boolean; override;
   end;
 
   Hospital = class(TBuilding)
@@ -62,8 +64,7 @@ type
 var
   buildingCount: integer;
 
-
-function CanBeBuilded(id : integer; cell : TCellData) : boolean;
+function CanBeBuilded(id: integer; cell: TCellData): boolean;
 begin
   case id of
     0:
@@ -201,7 +202,8 @@ function TryBuild(cell: TCellData; id: integer): boolean;
 begin
   result := false;
 
-  if (cell.cType <> cBlocked) and (cell.building = nil) and (CanBeBuilded(id, cell)) then
+  if (cell.cType <> cBlocked) and (cell.building = nil) and
+    (CanBeBuilded(id, cell)) then
   begin
     Build(cell, id);
     placableBuildingId := -1;
@@ -238,6 +240,83 @@ begin
   end;
 
   CloseFile(f);
+end;
+
+function IsBuildingFileValid(): boolean;
+var
+  f: TextFile;
+  line: string;
+  errors, code, t: integer;
+begin
+  errors := 0;
+  try
+    try
+      AssignFile(f, ExtractFilePath(ParamStr(0)) +
+        'Resourses\Configs\BuildingsData.txt');
+      Reset(f);
+      for var I := 1 to 5 do
+      begin
+        Readln(f, line);
+        Readln(f, line);
+        Readln(f, line);
+        Readln(f, line);
+        if not(FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
+          line + '0' + '.png') and FileExists(ExtractFilePath(ParamStr(0)) +
+          'Resourses\Sprites\' + line + '1' + '.png')) then
+          Inc(errors);
+
+        Readln(f, line);
+        Readln(f, line);
+        Val(line, t, code);
+        errors := errors + code;
+
+        Readln(f, line);
+        Readln(f, line);
+        Val(line, t, code);
+        errors := errors + code;
+
+        Readln(f, line);
+        Readln(f, line);
+        Val(line, t, code);
+        errors := errors + code;
+
+        case I of
+          1, 5:
+            begin
+              Readln(f, line);
+              Readln(f, line);
+              Readln(f, line);
+              Readln(f, line);
+            end;
+          2, 4:
+            begin
+              Readln(f, line);
+              Readln(f, line);
+              Val(line, t, code);
+              errors := errors + code;
+              Readln(f, line);
+              Readln(f, line);
+            end;
+          3:
+            begin
+              Readln(f, line);
+              Readln(f, line);
+              Val(line, t, code);
+              errors := errors + code;
+              Readln(f, line);
+              Readln(f, line);
+              Val(line, t, code);
+              errors := errors + code;
+            end;
+        end;
+      end;
+    finally
+      CloseFile(f);
+    end;
+  except
+    Inc(errors);
+  end;
+  result := errors = 0;
 end;
 
 procedure Wall.OnBuild(c: TCellData; ow: integer);
@@ -291,7 +370,7 @@ begin
   players[ow].portalCell := c;
 end;
 
-class function Wall.CanBeBuilded(cell : TCellData) : boolean;
+class function Wall.CanBeBuilded(cell: TCellData): boolean;
 begin
   result := cell.character = nil;
 end;

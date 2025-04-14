@@ -6,3 +6,5 @@
 2.0
 --DangerCellDamage
 5
+--AddedMoneyMultiplier
+0.2

@@ -137,7 +137,6 @@ Type
   private
     procedure OnClick(sender: Tobject);
     procedure SetImage(im: TImage);
-    function GetImage(): TImage;
     destructor Destroy(); override;
 
   var
@@ -162,7 +161,7 @@ Type
     procedure OnExit();
     procedure AtackCell(damage: integer);
 
-    property Image: TImage read GetImage write SetImage;
+    property Image: TImage read img write SetImage;
 
     Constructor Create(x, y: extended; size: integer);
 
@@ -180,7 +179,6 @@ Type
   var
     playerMoney: integer;
     procedure SetMoney(m: integer);
-    function GetMoney(): integer;
     destructor Destroy();
 
   public
@@ -189,7 +187,7 @@ Type
     characters: charList;
     boughtCharacters: TCount;
     BuildingsCount: TCount;
-    property Money: integer read GetMoney write SetMoney;
+    property Money: integer read playermoney write SetMoney;
     procedure AddCharacter(c: TCharacter);
     procedure RemoveCharacter(c: TCharacter);
     procedure Init();
@@ -330,11 +328,6 @@ begin
   img.OnClick := OnClick;
 end;
 
-function TCellData.GetImage: TImage;
-begin
-  Result := img;
-end;
-
 destructor TCharacter.Destroy();
 begin
   if useConsole then
@@ -349,7 +342,6 @@ begin
   if useConsole then
     WriteLn('Destroy ' + name);
   img.Free;
-  healsBar.Free;
   inherited Destroy;
 end;
 
@@ -673,6 +665,8 @@ begin
   GetCell(pos).character := nil;
   form2.DiePlayer.CurrentTime := 0;
   form2.DiePlayer.Play();
+  if curPlayer <> owner then
+    currentPlayer.SetMoney(currentPlayer.Money + Round( addedMoneyMultiplier * cost));
   Self.Free;
 end;
 
@@ -695,11 +689,6 @@ procedure TPlayer.SetMoney(m: integer);
 begin
   playerMoney := m;
   form2.MoneyText.Text := IntToStr(m);
-end;
-
-function TPlayer.GetMoney(): integer;
-begin
-  Result := playerMoney;
 end;
 
 function TPlayer.CanPlace(): boolean;

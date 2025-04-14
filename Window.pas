@@ -85,6 +85,9 @@ type
     SoundBar: TTrackBar;
     MusicLabel: TLabel;
     SoundLabel: TLabel;
+    NextMapPage: TButton;
+    LastMapPage: TButton;
+    NoBuildingsError: TLabel;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -106,6 +109,8 @@ type
     procedure GameExiterClick(Sender: TObject);
     procedure SoundBarChange(Sender: TObject);
     procedure MusicBarChange(Sender: TObject);
+    procedure LastMapPageClick(Sender: TObject);
+    procedure NextMapPageClick(Sender: TObject);
   private
     procedure OnChooseMap(Sender: TObject);
     procedure TryBuyCharacter(Sender: TObject);
@@ -141,6 +146,10 @@ var
   charPlacers: Array of PlacerButton;
   buildPlacers: Array of PlacerButton;
   money, roundMoney: integer;
+
+  mapList: Array of TButton;
+  mapPage: integer;
+
 procedure ShowPlacersCount(player: TPlayer);
 
 const
@@ -149,7 +158,8 @@ const
 implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
-  CharacterManager, PlayerManager, buildingManager, System.IOUtils, SettingsManager;
+  CharacterManager, PlayerManager, buildingManager, System.IOUtils,
+  SettingsManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -423,7 +433,33 @@ begin
   Form2.ClickPlayer.Play();
 end;
 
+const
+  mapPageCount = 4;
 
+procedure SetMapPage(num: integer);
+begin
+  mapPage := num;
+
+  Form2.LastMapPage.Enabled := num > 0;
+  Form2.NextMapPage.Enabled := num < Length(mapList) div mapPageCount;
+
+  for var b in mapList do
+    b.Visible := false;
+
+  for var i := mapPageCount * num to mapPageCount * (num + 1) - 1 do
+    if i < Length(mapList) then
+      mapList[i].Visible := true;
+end;
+
+procedure TForm2.LastMapPageClick(Sender: TObject);
+begin
+  SetMapPage(mapPage - 1);
+end;
+
+procedure TForm2.NextMapPageClick(Sender: TObject);
+begin
+  SetMapPage(mapPage + 1);
+end;
 
 const
   mapButtonHeight = 20;
@@ -438,6 +474,8 @@ begin
   with Form2 do
   begin
     maps := GetMapList();
+    SetLength(mapList, Length(maps));
+
     mapNum := 0;
 
     for var M in maps do
@@ -459,9 +497,11 @@ begin
       b.Name := M;
       b.OnClick := Form2.OnChooseMap;
 
-      b.Position.Y := mapNum * mapButtonHeight;
+      b.Position.Y := mapButtonHeight * (mapNum mod mapPageCount);
+      mapList[mapNum] := b;
       Inc(mapNum);
     end;
+    SetMapPage(0);
   end;
 
   result := mapNum;
@@ -576,7 +616,7 @@ end;
 function TryLoadParametrs(): boolean;
 var
   f: textFile;
-  code1, code2, code3, code4: integer;
+  code1, code2, code3, code4, code5: integer;
   line: string;
 begin
   AssignFile(f, ExtractFilePath(ParamStr(0)) +
@@ -599,9 +639,14 @@ begin
   Readln(f, line);
   Val(line, dangerCellDamage, code4);
 
+  Readln(f, line);
+  Readln(f, line);
+  Val(line, addedMoneyMultiplier, code5);
+
   CloseFile(f);
 
-  result := not((code1 > 0) or (code2 > 0) or (code3 > 0) or (code4 > 0));
+  result := not((code1 > 0) or (code2 > 0) or (code3 > 0) or (code4 > 0) or
+    (code5 > 0));
 end;
 
 procedure TForm2.OpenGame(Sender: TObject);
@@ -620,7 +665,7 @@ begin
     AllocConsole();
 
   CharacterManager.Init();
-  buildingManager.Init();
+
   cellCount := LoadCells();
 
   if cellCount > 0 then
@@ -638,6 +683,12 @@ begin
       ErrorPanel.Visible := true;
       NoMapsError.Visible := true;
     end;
+
+    if IsBuildingFileValid() = false then
+    begin
+      ErrorPanel.Visible := true;
+      NoBuildingsError.Visible := true;
+    end;
   end
   else
   begin
@@ -653,6 +704,7 @@ begin
 
   if ErrorPanel.Visible = false then
   begin
+    buildingManager.Init();
     CreateBuyList();
     CreateBuyButtons();
   end;
@@ -686,12 +738,12 @@ end;
 
 procedure TForm2.SoundBarChange(Sender: TObject);
 begin
-  ChangeSound(TTrackBar(sender).Value);
+  ChangeSound(TTrackBar(Sender).Value);
 end;
 
 procedure TForm2.MusicBarChange(Sender: TObject);
 begin
-  ChangeMusic(TTrackBar(sender).Value);
+  ChangeMusic(TTrackBar(Sender).Value);
 end;
 
 procedure TForm2.StartGame(Sender: TObject);

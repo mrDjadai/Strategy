@@ -1,7 +1,7 @@
 --DisplayName
 Бард
 --SpriteFileName
-pers
+bard
 --Cost
 40
 --HP

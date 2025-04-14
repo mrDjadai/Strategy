@@ -17,7 +17,7 @@ wall
 --Sprite
 palatka
 --Count
-0
+1
 --HP
 10
 --Cost
@@ -25,13 +25,13 @@ palatka
 --HealingHp
 5
 --Parametr2
--
+.
 --Name
 Форт
 --Sprite
 fort
 --Count
-0
+1
 --HP
 40
 --Cost
@@ -53,7 +53,7 @@ kapkan
 --Damage
 020
 --Parametr2
--
+.
 --Name
 Портал
 --Sprite
@@ -65,6 +65,6 @@ portal
 --Cost
 40
 --Parametr1
--
+.
 --Parametr2
--
+.

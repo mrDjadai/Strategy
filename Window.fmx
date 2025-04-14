@@ -304,7 +304,7 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1087#1077#1088#1089#1086#1085#1072#1078#1077#1081' '#1087#1091#1089#1090
         Visible = False
-        TabOrder = 4
+        TabOrder = 5
       end
       object NoMapsError: TLabel
         StyledSettings = [Family, Style, FontColor]
@@ -316,7 +316,7 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1082#1072#1088#1090' '#1087#1091#1089#1090
         Visible = False
-        TabOrder = 3
+        TabOrder = 4
       end
       object ErrorHeader: TLabel
         StyledSettings = [Family, Style, FontColor]
@@ -327,7 +327,7 @@ object Form2: TForm2
         TextSettings.Font.Size = 30.000000000000000000
         TextSettings.HorzAlign = Center
         Text = #1042#1086#1079#1085#1080#1082#1083#1072' '#1086#1096#1080#1073#1082#1072' '#1087#1088#1080' '#1079#1072#1087#1091#1089#1082#1077
-        TabOrder = 1
+        TabOrder = 2
       end
       object NoCellError: TLabel
         StyledSettings = [Family, Style, FontColor]
@@ -339,7 +339,7 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1057#1087#1080#1089#1086#1082' '#1076#1086#1089#1090#1091#1087#1085#1099#1093' '#1082#1083#1077#1090#1086#1082' '#1087#1091#1089#1090
         Visible = False
-        TabOrder = 0
+        TabOrder = 1
       end
       object NoParametrsError: TLabel
         StyledSettings = [Family, Style, FontColor]
@@ -351,7 +351,19 @@ object Form2: TForm2
         TextSettings.HorzAlign = Center
         Text = #1053#1077' '#1087#1086#1083#1091#1095#1080#1083#1086#1089#1100' '#1079#1072#1075#1088#1091#1079#1080#1090#1100' '#1087#1072#1088#1072#1084#1077#1090#1088#1099' '#1080#1075#1088#1099
         Visible = False
-        TabOrder = 2
+        TabOrder = 3
+      end
+      object NoBuildingsError: TLabel
+        StyledSettings = [Family, Style, FontColor]
+        Position.Y = 400.000000000000000000
+        Size.Width = 800.000000000000000000
+        Size.Height = 40.000000000000000000
+        Size.PlatformDefault = False
+        TextSettings.Font.Size = 30.000000000000000000
+        TextSettings.HorzAlign = Center
+        Text = #1054#1096#1080#1073#1082#1072' '#1087#1088#1080' '#1095#1090#1077#1085#1080#1080' '#1092#1072#1081#1083#1072' '#1079#1076#1072#1085#1080#1081
+        Visible = False
+        TabOrder = 0
       end
     end
     object MusicBar: TTrackBar
@@ -396,7 +408,34 @@ object Form2: TForm2
       Align = Center
       Scale.X = 5.000000000000000000
       Scale.Y = 3.000000000000000000
+      Size.Width = 200.000000000000000000
+      Size.Height = 200.000000000000000000
+      Size.PlatformDefault = False
       TabOrder = 1
+      object NextMapPage: TButton
+        Anchors = [akRight, akBottom]
+        Position.X = 165.000000000000000000
+        Position.Y = 172.000000000000000000
+        Size.Width = 32.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 2
+        Text = #1057#1083#1077#1076'.'
+        TextSettings.Trimming = None
+        OnClick = NextMapPageClick
+      end
+      object LastMapPage: TButton
+        Anchors = [akRight, akBottom]
+        Position.X = 3.000000000000000000
+        Position.Y = 172.000000000000000000
+        Size.Width = 32.000000000000000000
+        Size.Height = 24.000000000000000000
+        Size.PlatformDefault = False
+        TabOrder = 1
+        Text = #1055#1088#1077#1076'.'
+        TextSettings.Trimming = None
+        OnClick = LastMapPageClick
+      end
     end
     object BuyPanel: TPanel
       Align = Center
@@ -405,6 +444,7 @@ object Form2: TForm2
       Size.Width = 200.000000000000000000
       Size.Height = 200.000000000000000000
       Size.PlatformDefault = False
+      Visible = False
       TabOrder = 0
       object BuyMoneyPrefix: TLabel
         Align = Bottom

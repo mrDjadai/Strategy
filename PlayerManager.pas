@@ -19,7 +19,7 @@ var
   placableBuildingId: integer;
 
   curseDamageMultiplier: real;
-
+  addedMoneyMultiplier: real;
 procedure ClearPlayerData();
 
 procedure Win(player: TPlayer);

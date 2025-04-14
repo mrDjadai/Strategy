@@ -1,7 +1,7 @@
 --DisplayName
 Маг
 --SpriteFileName
-pers
+wizard
 --Cost
 30
 --HP
