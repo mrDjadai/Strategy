@@ -8,6 +8,7 @@ object Form2: TForm2
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
   OnCreate = OpenGame
+  OnClose = FormClose
   OnKeyDown = FormKeyDown
   OnKeyUp = FormKeyUp
   OnResize = FormResize
@@ -582,6 +583,10 @@ object Form2: TForm2
     object EscPlayer: TMediaPlayer
       Left = 304
       Top = 424
+    end
+    object SliderPlayer: TMediaPlayer
+      Left = 384
+      Top = 192
     end
   end
 end

@@ -88,6 +88,7 @@ type
     NextMapPage: TButton;
     LastMapPage: TButton;
     NoBuildingsError: TLabel;
+    SliderPlayer: TMediaPlayer;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -111,6 +112,7 @@ type
     procedure MusicBarChange(Sender: TObject);
     procedure LastMapPageClick(Sender: TObject);
     procedure NextMapPageClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
   private
     procedure OnChooseMap(Sender: TObject);
     procedure TryBuyCharacter(Sender: TObject);
@@ -170,6 +172,18 @@ var
   pressedA, pressedW, pressedD, pressedS: boolean;
   wantExit: boolean;
 
+procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
+begin
+  if MainMenu.Visible = false then
+  begin
+    ClearPlayerData();
+    DeleteMap();
+  end;
+
+  for var p in players do
+    p.Free;
+end;
+
 procedure TForm2.FormKeyDown(Sender: TObject; var Key: Word;
   var KeyChar: WideChar; Shift: TShiftState);
 begin
@@ -224,7 +238,7 @@ end;
 
 procedure TForm2.GameExiterClick(Sender: TObject);
 begin
-  Application.Terminate();
+  Form2.Close();
 end;
 
 procedure InitAudio();
@@ -232,69 +246,46 @@ begin
   with Form2 do
   begin
     MovePlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Move.wav';;
-    MovePlayer.Play();
-    MovePlayer.Stop();
+      'Resourses\Audio\Other\Move.wav';
 
     ClickPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Click.wav';;
-    ClickPlayer.Play();
-    ClickPlayer.Stop();
+      'Resourses\Audio\Other\Click.wav';
 
     WinPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Win.wav';;
-    WinPlayer.Play();
-    WinPlayer.Stop();
+      'Resourses\Audio\Other\Win.wav';
 
     DiePlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Die.wav';;
-    DiePlayer.Play();
-    DiePlayer.Stop();
+      'Resourses\Audio\Other\Die.wav';
 
     DemolishPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Demolish.wav';;
-    DemolishPlayer.Play();
-    DemolishPlayer.Stop();
+      'Resourses\Audio\Other\Demolish.wav';
 
     KapkanPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Kapkan.wav';;
-    KapkanPlayer.Play();
-    KapkanPlayer.Stop();
+      'Resourses\Audio\Other\Kapkan.wav';
 
     CharacterPlacePlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\PlaceCharacter.wav';;
-    CharacterPlacePlayer.Play();
-    CharacterPlacePlayer.Stop();
+      'Resourses\Audio\Other\PlaceCharacter.wav';
 
     BuildingPlacePlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\PlaceBuilding.wav';;
-    BuildingPlacePlayer.Play();
-    BuildingPlacePlayer.Stop();
+      'Resourses\Audio\Other\PlaceBuilding.wav';
 
     PortalPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Portal.wav';;
-    PortalPlayer.Play();
-    PortalPlayer.Stop();
+      'Resourses\Audio\Other\Portal.wav';
 
     BuyPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Buy.wav';;
-    BuyPlayer.Play();
-    BuyPlayer.Stop();
+      'Resourses\Audio\Other\Buy.wav';
 
     IncorrectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Incorrect.wav';;
-    IncorrectPlayer.Play();
-    IncorrectPlayer.Stop();
+      'Resourses\Audio\Other\Incorrect.wav';
 
     SelectPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Select.wav';;
-    SelectPlayer.Play();
-    SelectPlayer.Stop();
+      'Resourses\Audio\Other\Select.wav';
 
     EscPlayer.FileName := ExtractFilePath(ParamStr(0)) +
-      'Resourses\Audio\Other\Esc.wav';;
-    EscPlayer.Play();
-    EscPlayer.Stop();
+      'Resourses\Audio\Other\Esc.wav';
+
+    SliderPlayer.FileName := ExtractFilePath(ParamStr(0)) +
+      'Resourses\Audio\Other\Slider.wav';
   end;
 end;
 
@@ -739,11 +730,21 @@ end;
 procedure TForm2.SoundBarChange(Sender: TObject);
 begin
   ChangeSound(TTrackBar(Sender).Value);
+  if SliderPlayer.State <> TMediaState.Playing then
+  begin
+    SliderPlayer.CurrentTime := 0;
+    SliderPlayer.Play();
+  end;
 end;
 
 procedure TForm2.MusicBarChange(Sender: TObject);
 begin
   ChangeMusic(TTrackBar(Sender).Value);
+  if SliderPlayer.State <> TMediaState.Playing then
+  begin
+    SliderPlayer.CurrentTime := 0;
+    SliderPlayer.Play();
+  end;
 end;
 
 procedure TForm2.StartGame(Sender: TObject);

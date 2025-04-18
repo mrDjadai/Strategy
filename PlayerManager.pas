@@ -20,6 +20,8 @@ var
 
   curseDamageMultiplier: real;
   addedMoneyMultiplier: real;
+
+
 procedure ClearPlayerData();
 
 procedure Win(player: TPlayer);
@@ -50,7 +52,8 @@ var
   moneyPerRound: integer;
 
 procedure ClearPlayerData();
-var cur : charList;
+var
+  cur: charList;
 begin
   for var p in players do
   begin
@@ -63,7 +66,7 @@ begin
       Dispose(cur^.next);
       cur^.next := nil;
     end;
-      if cur^.next <> nil then
+    if cur^.next <> nil then
       Dispose(cur^.next);
     Dispose(cur);
   end;

@@ -332,6 +332,11 @@ destructor TCharacter.Destroy();
 begin
   if useConsole then
     WriteLn('Kill ' + name);
+
+  atack.Free;
+  skill1.Free;
+  skill2.Free;
+
   img.Free;
   animationQueue.Free;
   inherited Destroy;

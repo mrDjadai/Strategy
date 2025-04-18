@@ -431,18 +431,23 @@ begin
   CloseFile(f);
 end;
 
+const maxCharCount = 16;
+
 procedure Init();
 var
   Files: TStringDynArray;
   names: TSkillAudioNames;
+  count : integer;
 begin
+  count := 0;
   SetLength(charTypes, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
     'Resourses\Characters\');
   for var FileName in Files do
   begin
-    if IsValidChar(FileName) then
+    if (count < maxCharCount) and IsValidChar(FileName) then
     begin
+      Inc(count);
       SetLength(charTypes, Length(charTypes) + 1);
       charTypes[Length(charTypes) - 1].name := FileName;
       names := GetSkillAudioNames(FileName);
@@ -464,15 +469,6 @@ begin
       charTypes[Length(charTypes) - 1].skill2Player.FileName :=
         ExtractFilePath(ParamStr(0)) + 'Resourses\Audio\Skills\' +
         names[2] + '.wav';
-
-      charTypes[Length(charTypes) - 1].attackPlayer.Volume := 0;
-      charTypes[Length(charTypes) - 1].attackPlayer.Play();
-
-      charTypes[Length(charTypes) - 1].skill1Player.Volume := 0;
-      charTypes[Length(charTypes) - 1].skill1Player.Play();
-
-      charTypes[Length(charTypes) - 1].skill2Player.Volume := 0;
-      charTypes[Length(charTypes) - 1].skill2Player.Play();
 
     end;
   end;
