@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.Classes,
   FMX.Types, FMX.Controls, FMX.Graphics, FMX.Objects,
-  DataTypes;
+  DataTypes, System.UITypes;
 
 var
   x: integer;
@@ -14,6 +14,22 @@ var
 type
   SelectionCondition = function(caster, target: TCellData): boolean of object;
   TCellList = Array of TCellData;
+
+  TTransparencyMap = array of array of boolean;
+
+  TTransparentHitImage = class(TImage)
+  private
+    FTransparencyMap: TTransparencyMap;
+    FTransparencyThreshold: byte;
+
+  protected
+    function PointInObject(x, Y: Single): boolean; override;
+  public
+    procedure InitializeTransparencyMap;
+    procedure SetTransparencyThreshold(Threshold: byte);
+    constructor Create(AOwner: TComponent); override;
+    procedure UpdateTransparencyMap;
+  end;
 
 procedure DeleteMap();
 
@@ -56,7 +72,7 @@ type
   end;
 
 var
-  y: integer;
+  Y: integer;
   map: Array of Array of TCellData;
   cells: Array of TCellInfo;
 
@@ -64,7 +80,7 @@ procedure DeleteMap();
 begin
   for var I := 0 to x do
   begin
-    for var k := 0 to y do
+    for var k := 0 to Y do
     begin
       map[k][I].character.Free;
       map[k][I].building.Free;
@@ -76,10 +92,10 @@ end;
 
 function GetCell(pos: vector2): TCellData;
 begin
-  if (pos.x < 0) or (pos.y < 0) or (pos.x > x) or (pos.y > y) then
+  if (pos.x < 0) or (pos.Y < 0) or (pos.x > x) or (pos.Y > Y) then
     result := nil
   else
-    result := map[pos.y, pos.x];
+    result := map[pos.Y, pos.x];
 end;
 
 function GetCellTypeByName(name: string): TCellType;
@@ -101,14 +117,14 @@ end;
 
 function GetCellById(xpos, ypos: integer; id: char): TCellData;
 var
-  x, y: extended;
+  x, Y: extended;
 begin
-  y := cellSpaceY * ypos;
+  Y := cellSpaceY * ypos;
   x := cellSpaceX * xpos;
 
   if ypos mod 2 = 0 then
     x := cellSpaceX / 2 + x;
-  result := TCellData.Create(x, y, cellSize);
+  result := TCellData.Create(x, Y, cellSize);
 
   for var I := 0 to Length(cells) - 1 do
     if cells[I].literal = id then
@@ -190,18 +206,20 @@ begin
 
     SetLength(map, I + 1);
     SetLength(map[I], Length(line));
-    y := I;
+    Y := I;
     x := Length(line) - 1;
     minMapY := -x * cellSpaceY div 2;
-    minMapX := -y * cellSpaceY div 4;
+    minMapX := -Y * cellSpaceY div 4;
     for var k := 0 to Length(line) - 1 do
     begin
       map[I][k] := GetCellById(k, I, line[k + 1]);
       map[I][k].decardPos.x := k;
-      map[I][k].decardPos.y := I;
+      map[I][k].decardPos.Y := I;
       map[I][k].cubePos := decardToCube(map[I][k].decardPos);
       map[I][k].img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) +
         'Resourses\Sprites\' + map[I][k].sprite + '.png');
+
+      TTransparentHitImage(map[I][k].img).InitializeTransparencyMap();
     end;
 
     inc(I);
@@ -217,14 +235,14 @@ end;
 function GetMapScale(): vector2;
 begin
   result.x := x;
-  result.y := y;
+  result.Y := Y;
 end;
 
 procedure UnselectMap();
 begin
   for var I := 0 to x do
   begin
-    for var k := 0 to y do
+    for var k := 0 to Y do
     begin
       map[k][I].IsSelected := false;
       map[k][I].ReDraw();
@@ -236,7 +254,7 @@ procedure SelectMap(cond: SelectionCondition; caster: TCellData);
 begin
   for var I := 0 to x do
   begin
-    for var k := 0 to y do
+    for var k := 0 to Y do
     begin
       map[k][I].IsSelected := cond(caster, map[k][I]);
       map[k][I].ReDraw();
@@ -324,4 +342,75 @@ begin
     result[I] := GetCell(CubeToDecard(LerpCubePos(a, b, I * (1 / n))));
 end;
 
+constructor TTransparentHitImage.Create(AOwner: TComponent);
+begin
+  inherited;
+  FTransparencyThreshold := 10;
+end;
+
+procedure TTransparentHitImage.SetTransparencyThreshold(Threshold: byte);
+begin
+  if FTransparencyThreshold <> Threshold then
+  begin
+    FTransparencyThreshold := Threshold;
+    UpdateTransparencyMap();
+  end;
+end;
+
+procedure TTransparentHitImage.InitializeTransparencyMap();
+begin
+  if (Bitmap <> nil) and not Bitmap.IsEmpty then
+  begin
+    SetLength(FTransparencyMap, Bitmap.Width, Bitmap.Height);
+    UpdateTransparencyMap();
+  end;
+end;
+
+procedure TTransparentHitImage.UpdateTransparencyMap();
+var
+  BitmapData: TBitmapData;
+  x, Y: integer;
+  PixelColor: TAlphaColor;
+begin
+  if (Bitmap <> nil) and not Bitmap.IsEmpty then
+    if Bitmap.map(TMapAccess.Read, BitmapData) then
+      try
+        for Y := 0 to Bitmap.Height - 1 do
+          for x := 0 to Bitmap.Width - 1 do
+          begin
+            PixelColor := BitmapData.GetPixel(x, Y);
+            FTransparencyMap[x, Y] := TAlphaColorRec(PixelColor).a <
+              FTransparencyThreshold;
+          end;
+      finally
+        Bitmap.Unmap(BitmapData);
+      end;
+end;
+
+function TTransparentHitImage.PointInObject(x, Y: Single): boolean;
+var
+  LocalPoint: TPointF;
+  BitmapX, BitmapY: integer;
+  PixelColor: TAlphaColor;
+begin
+  result := inherited PointInObject(x, Y);
+
+  if result and (Bitmap <> nil) and not Bitmap.IsEmpty then
+  begin
+    LocalPoint := AbsoluteToLocal(TPointF.Create(x, Y));
+
+    BitmapX := Trunc(LocalPoint.x * Bitmap.Width / Width);
+    BitmapY := Trunc(LocalPoint.Y * Bitmap.Height / Height);
+
+    if (BitmapX >= 0) and (BitmapX < Bitmap.Width) and (BitmapY >= 0) and (BitmapY < Bitmap.Height) then
+    begin
+      result := not FTransparencyMap[BitmapX, BitmapY];
+    end
+    else
+      result := false;
+  end;
+end;
+
 end.
+
+  end.

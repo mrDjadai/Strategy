@@ -11,6 +11,7 @@ const
   DicesTypesCount = 5;
 
 Type
+  
   TCount = Array of integer;
 
   DicesCount = array [0 .. (DicesTypesCount - 1)] of integer;
@@ -212,7 +213,7 @@ uses Drawer, CharacterManager, PlayerManager, CellManager,
 Constructor TCellData.Create(x, y: extended; size: integer);
 begin
   inherited Create;
-  Image := TImage.Create(form2);
+  Image := TTransparentHitImage.Create(form2);
 
   Image.Parent := form2.Map;
 
