@@ -132,14 +132,13 @@ type
   private
     _count: integer;
     procedure SetCount(c: integer);
-    function GetCount(): integer;
   public
   var
     txt: TLabel;
     isBuilding: boolean;
     id: integer;
     price: integer;
-    property Count: integer read GetCount write SetCount;
+    property Count: integer read _count write SetCount;
   end;
 
 var
@@ -345,6 +344,12 @@ begin
     Readln(f, line);
     Readln(f, line);
     b.Text := line;
+
+    Readln(f, line);
+    Readln(f, line);
+    b.Hint := line;
+    b.ShowHint := true;
+
     Readln(f, line);
     Readln(f, line);
     Readln(f, line);
@@ -368,6 +373,7 @@ procedure TForm2.ExitToMenu(Sender: TObject);
 begin
   DeleteMap();
   ClearPlayerData();
+  HideMoveIndicators();
   with Form2 do
   begin
     RightMenu.Visible := false;
@@ -536,6 +542,12 @@ begin
     Readln(f, line);
     Readln(f, line);
     b.Text := line;
+
+    Readln(f, line);
+    Readln(f, line);
+    b.Hint := line;
+    b.ShowHint := true;
+
     b.isBuilding := false;
     b.id := cNum;
 
@@ -583,7 +595,10 @@ begin
       b.Height := buyButtonScaleY;
       b.Width := buyButtonScaleX;
 
-      b.Text := GetBuildingName(i);
+      b.Text := GetBuildingName(i, line);
+      b.Hint := line;
+      b.ShowHint := true;
+
       b.isBuilding := true;
       b.id := i;
 
@@ -702,6 +717,7 @@ begin
 
   InitAudio();
   SettingsManager.Init();
+  CharacterDataVisualisator.Init(OP, CharacterPanel);
 end;
 
 procedure TForm2.Skill1ButtonClick(Sender: TObject);
@@ -758,7 +774,6 @@ begin
   Form2.BuyPanel.Visible := false;
 
   PlayerManager.Init(money, roundMoney);
-  CharacterDataVisualisator.Init(OP, CharacterPanel);
 end;
 
 procedure TForm2.OnChooseMap(Sender: TObject);
@@ -921,11 +936,6 @@ procedure PlacerButton.SetCount(c: integer);
 begin
   _count := c;
   txt.Text := IntToStr(c);
-end;
-
-function PlacerButton.GetCount: integer;
-begin
-  result := _count;
 end;
 
 procedure ShowPlacersCount(player: TPlayer);

@@ -36,7 +36,6 @@ Type
     onDie: Action;
     imageScale: Vector2;
     procedure SetHP(h: integer);
-    function GetHP(): integer;
     procedure Init(img: TImage; mHp: integer; scale, position: Vector2;
       dieAction: Action);
   end;
@@ -124,12 +123,9 @@ Type
 
     property HP: integer read GetHP write SetHP;
     procedure Init(form: TForm; maxHp: integer);
-    procedure ResetMP();
     procedure BuyMP();
     procedure ReDraw();
     function IsSelected(): boolean;
-
-    constructor Create; overload;
   end;
 
   TCellType = (cBlocked, cDefault, cDifficult, cDanger);
@@ -137,7 +133,6 @@ Type
   TCellData = class
   private
     procedure OnClick(sender: Tobject);
-    procedure SetImage(im: TImage);
     destructor Destroy(); override;
 
   var
@@ -162,7 +157,7 @@ Type
     procedure OnExit();
     procedure AtackCell(damage: integer);
 
-    property Image: TImage read img write SetImage;
+    property Image: TImage read img;
 
     Constructor Create(x, y: extended; size: integer);
 
@@ -213,8 +208,8 @@ uses Drawer, CharacterManager, PlayerManager, CellManager,
 Constructor TCellData.Create(x, y: extended; size: integer);
 begin
   inherited Create;
-  Image := TTransparentHitImage.Create(form2);
-
+  img := TTransparentHitImage.Create(form2);
+  img.OnClick := OnClick;
   Image.Parent := form2.Map;
 
   Image.position.x := x;
@@ -321,14 +316,6 @@ begin
   end;
 end;
 
-procedure TCellData.SetImage(im: TImage);
-begin
-  if img <> nil then
-    img.OnClick := nil;
-  img := im;
-  img.OnClick := OnClick;
-end;
-
 destructor TCharacter.Destroy();
 begin
   if useConsole then
@@ -357,14 +344,15 @@ begin
   inherited Destroy;
 end;
 
+const outlineWidth = 15;
 procedure TCharacter.ReDraw();
 begin
   img.Bitmap.LoadFromFile(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' +
     sprite + IntToStr(owner) + '.png');
   if IsSelected then
-    DrawOutline(img, TAlphaColors.Yellow, 50)
+    DrawOutline(img, TAlphaColors.Yellow, outlineWidth)
   else if curseRounds > 0 then
-    DrawOutline(img, TAlphaColors.Purple, 50);
+    DrawOutline(img, TAlphaColors.Purple, outlineWidth);
 end;
 
 function decardToCube(pos: Vector2): Vector3;
@@ -425,12 +413,7 @@ end;
 
 function TCharacter.GetHP(): integer;
 begin
-  Result := healsBar.GetHP();
-end;
-
-function THealsContainer.GetHP(): integer;
-begin
-  Result := heals;
+  Result := healsBar.heals;
 end;
 
 function TCharacter.RecalculateDamage(h: integer): integer;
@@ -442,9 +425,9 @@ end;
 
 procedure TCharacter.SetHP(h: integer);
 begin
-  if h < healsBar.GetHP() then // урон
+  if h < healsBar.heals then // урон
   begin
-    h := healsBar.GetHP() - RecalculateDamage(healsBar.GetHP() - h);
+    h := healsBar.heals - RecalculateDamage(healsBar.heals - h);
   end;
   healsBar.SetHP(h);
 end;
@@ -475,10 +458,6 @@ begin
   end;
 end;
 
-procedure TCharacter.ResetMP();
-begin
-  movePoints := 0;
-end;
 
 procedure TCharacter.BuyMP();
 begin
@@ -563,8 +542,17 @@ begin
 end;
 
 destructor TPlayer.Destroy();
+var
+  current, temp: charList;
 begin
-  Dispose(characters);
+ current := characters;
+
+  while current <> nil do
+  begin
+    temp := current;
+    current := current^.next;
+    Dispose(temp);
+  end;
 end;
 
 procedure TSkill.Select(caster: TCellData);
@@ -593,11 +581,6 @@ end;
 Constructor TSkill.Create(targetable: boolean);
 begin
   hasTarget := targetable;
-end;
-
-Constructor TCharacter.Create();
-begin
-  inherited Create;
 end;
 
 const
@@ -687,7 +670,7 @@ begin
   else
   begin
     if building <> nil then
-      building.healsBar.SetHP(building.healsBar.GetHP() - damage);
+      building.healsBar.SetHP(building.healsBar.heals - damage);
   end;
 end;
 

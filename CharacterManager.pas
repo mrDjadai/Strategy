@@ -183,7 +183,7 @@ var
 begin
   AssignFile(f, FileName);
   Reset(f);
-  for var c := 0 to 15 do
+  for var c := 0 to 17 do
     readln(f, line);
   for var i := 0 to 2 do
   begin
@@ -208,6 +208,9 @@ begin
   readln(f, line);
   readln(f, line);
   result.name := line;
+
+  readln(f, line);    //  hint
+  readln(f, line);
 
   readln(f, line);
   readln(f, line);
@@ -363,6 +366,9 @@ begin
   readln(f, line);
   readln(f, line);
 
+  readln(f, line);
+  readln(f, line);
+
   if not FileExists(ExtractFilePath(ParamStr(0)) + 'Resourses\Sprites\' + line +
     '0.png') then
     result := false;
@@ -489,12 +495,6 @@ begin
     GetCell(last).character.ReDraw();
   end;
 
-  { for var i in GetCellBetween(decardToCube(pos), currentPlayer.portalCell.cubePos) do
-    begin
-    i.IsSelected := true;
-    i.ReDraw();
-    end; }
-
 end;
 
 procedure UnselectCharacter();
@@ -508,7 +508,6 @@ begin
     selectedCharacter.y := -1;
     GetCell(last).character.ReDraw();
     SetCaharcter(nil);
-    // UnselectMap();
   end;
 end;
 

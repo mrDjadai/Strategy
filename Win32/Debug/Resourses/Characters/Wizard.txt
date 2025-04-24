@@ -1,5 +1,7 @@
 --DisplayName
 Маг
+--Hint
+Боец, атакующий редко, но сильно
 --SpriteFileName
 wizard
 --Cost

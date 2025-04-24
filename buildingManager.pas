@@ -13,7 +13,7 @@ function TryBuild(cell: TCellData): boolean; overload;
 
 function TryBuild(cell: TCellData; id: integer): boolean; overload;
 
-function GetBuildingName(id: integer): string;
+function GetBuildingName(id: integer; out hint: string): string;
 
 function IsBuildingFileValid(): boolean;
 
@@ -102,12 +102,15 @@ begin
     'Resourses\Configs\BuildingsData.txt');
   Reset(f);
   for var I := 0 to id - 1 do
-    for var j := 1 to 14 do
+    for var j := 1 to 16 do
       Readln(f, line);
 
   Readln(f, line);
   Readln(f, line);
   result.name := line;
+
+  Readln(f, line);
+  Readln(f, line);
 
   Readln(f, line);
   Readln(f, line);
@@ -147,7 +150,7 @@ begin
   CloseFile(f);
 end;
 
-function GetBuildingName(id: integer): string;
+function GetBuildingName(id: integer; out hint: string): string;
 var
   f: TextFile;
   data1, data2: string;
@@ -156,11 +159,15 @@ begin
     'Resourses\Configs\BuildingsData.txt');
   Reset(f);
   for var I := 0 to id - 1 do
-    for var j := 1 to 14 do
+    for var j := 1 to 16 do
       Readln(f, result);
 
   Readln(f, result);
   Readln(f, result);
+
+  Readln(f, hint);
+  Readln(f, hint);
+
   CloseFile(f);
 end;
 
@@ -230,12 +237,12 @@ begin
   begin
     Readln(f, line);
     Inc(I);
-    if I mod 14 = 7 then
+    if I mod 16 = 9 then
     begin
       SetLength(defaulBuildingsCount, Length(defaulBuildingsCount) + 1);
       defaulBuildingsCount[Length(defaulBuildingsCount) - 1] := StrToInt(line);
     end;
-    if I mod 14 = 0 then
+    if I mod 16 = 0 then
       Inc(buildingCount);
   end;
 
@@ -256,6 +263,8 @@ begin
       Reset(f);
       for var I := 1 to 5 do
       begin
+        Readln(f, line);
+        Readln(f, line);
         Readln(f, line);
         Readln(f, line);
         Readln(f, line);

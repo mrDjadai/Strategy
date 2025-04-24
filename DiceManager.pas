@@ -106,7 +106,7 @@ begin
     if dices[i] > 0 then
     begin
       cur := DiceTypes[i].minValue +
-        random(DiceTypes[i].maxValue - DiceTypes[i].minValue);
+        random(DiceTypes[i].maxValue + 1 - DiceTypes[i].minValue);
       Inc(sum, cur);
 
       SetLength(spawnedCubes, num + 1);

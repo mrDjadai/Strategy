@@ -1,5 +1,7 @@
 --DisplayName
 Лучник
+--Hint
+Стандартный боец дальнего боя
 --SpriteFileName
 archer
 --Cost

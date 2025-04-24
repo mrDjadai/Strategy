@@ -1,9 +1,11 @@
 --Name
 Стена
+--Hint
+Делает клетку непроходимой
 --Sprite
 wall
 --Count
-1
+0
 --HP
 30
 --Cost
@@ -14,10 +16,12 @@ wall
 .
 --Name
 Медицинская палатка
+--Hint
+Лечит бойца на своей клетке
 --Sprite
 palatka
 --Count
-1
+0
 --HP
 10
 --Cost
@@ -28,10 +32,12 @@ palatka
 .
 --Name
 Форт
+--Hint
+Защищает и усиливает бойца на своей клетке
 --Sprite
 fort
 --Count
-1
+0
 --HP
 40
 --Cost
@@ -42,6 +48,8 @@ fort
 01
 --Name
 Капкан
+--Hint
+Наносит урон противнику на своей клетке
 --Sprite
 kapkan
 --Count
@@ -56,6 +64,8 @@ kapkan
 .
 --Name
 Портал
+--Hint
+Место появления новых бойцов
 --Sprite
 portal
 --Count(Always = 1)

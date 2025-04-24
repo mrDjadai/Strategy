@@ -1,5 +1,7 @@
 --DisplayName
 Воин
+--Hint
+Сильный боец ближнего боя
 --SpriteFileName
 warrior
 --Cost

@@ -481,12 +481,13 @@ begin
 end;
 
 function BuildingPlacer.GetToolTip(): string;
+var test : string;
 begin
   if radius = 1 then
-    result := 'Ставит ' + GetBuildingName(buildingId) +
+    result := 'Ставит ' + GetBuildingName(buildingId, test) +
       ' на выбранную клетку в радиусе ' + IntToStr(radius) + ' клетки'
   else
-    result := 'Ставит ' + GetBuildingName(buildingId) +
+    result := 'Ставит ' + GetBuildingName(buildingId, test) +
       ' на выбранную клетку в радиусе ' + IntToStr(radius) + ' клеток'
 end;
 

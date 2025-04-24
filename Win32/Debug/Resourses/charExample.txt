@@ -1,4 +1,5 @@
 --DisplayName
+--Hint
 --SpriteFileName
 --Cost
 --HP

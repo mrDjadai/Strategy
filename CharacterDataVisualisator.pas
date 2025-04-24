@@ -9,6 +9,8 @@ uses
 
 procedure Init(_opText: TLabel; pan: TImage);
 
+procedure HideMoveIndicators();
+
 procedure SetCaharcter(c: TCharacter);
 
 procedure ReDraw();
@@ -106,7 +108,7 @@ begin
       IntToStr(curCharacter.maxHP);
     form2.Speed.Text := IntToStr(curCharacter.Speed);
     form2.Armor.Text := IntToStr(curCharacter.Armor);
-    form2.BonusDices.Text := GetCubeText(curCharacter.bonusDices);
+    form2.BonusDices.Text := GetCubeText(curCharacter.BonusDices);
 
     panel.Visible := true;
     form2.PlacerPanel.Visible := false;

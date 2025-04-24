@@ -1,5 +1,7 @@
 --DisplayName
 Бард
+--Hint
+Боец поддержки, помогающий союзникам
 --SpriteFileName
 bard
 --Cost

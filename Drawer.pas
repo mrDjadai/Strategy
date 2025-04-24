@@ -84,7 +84,7 @@ begin
   BorderRect := RectF(0, 0,
                         Bitmap.Width, Bitmap.Height);
 
-  DestRect := RectF(BorderWidth, BorderWidth/2,
+  DestRect := RectF(BorderWidth, BorderWidth,
                         Bitmap.Width - BorderWidth, Bitmap.Height - BorderWidth);
 
   Bitmap.Canvas.DrawBitmap(Image.Bitmap,
