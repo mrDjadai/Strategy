@@ -1,216 +1,238 @@
 ﻿[OP]
-Coordinates=84,10,40,58
+Coordinates=84,10,40,51
 
 [OPLabel]
-Coordinates=10,10,64,58
+Coordinates=10,10,56,51
 
 []
-Coordinates=557,545,91,36
+Coordinates=530,188,40,33
 Visible=True
 
 [ActionsPrefix]
-Coordinates=119,1,90,58
+Coordinates=119,1,80,51
 
 [AttackButton]
-Coordinates=247,1,88,58
+Coordinates=247,1,78,51
 
 [MPButton]
-Coordinates=168,183,71,58
+Coordinates=168,183,62,51
 
 [RoundPrefix]
-Coordinates=100,77,85,58
+Coordinates=100,77,75,51
 
 [Skill1Button]
-Coordinates=295,279,83,58
+Coordinates=295,279,74,51
 
 [DownMenu]
-Coordinates=28,279,79,36
-
-[StartButton]
-Coordinates=79,183,79,58
+Coordinates=28,279,69,33
 
 [BuyMoneyPrefix]
-Coordinates=384,1,108,58
+Coordinates=384,1,95,51
 
 [KeyPressTimer]
-Coordinates=530,78,102,36
-
-[MapPanel]
-Coordinates=0,147,72,36
+Coordinates=530,78,89,33
 
 [Map]
-Coordinates=530,133,40,36
+Coordinates=530,133,40,33
 
 [Skill2Button]
-Coordinates=247,155,83,58
-
-[BG]
-Coordinates=530,188,40,36
+Coordinates=247,155,74,51
 
 [RoundText]
-Coordinates=384,155,77,58
+Coordinates=384,155,68,51
 
 [MoneyPrefix]
-Coordinates=117,279,86,58
+Coordinates=117,279,75,51
 
 [BuyRoundSkip]
-Coordinates=247,78,99,58
+Coordinates=247,78,88,51
 
 [SkipRound]
-Coordinates=21,87,77,58
+Coordinates=21,87,68,51
 
 [BuyMoneyText]
-Coordinates=0,0,100,58
+Coordinates=0,0,87,51
 
 [RightMenu]
-Coordinates=530,243,77,36
+Coordinates=530,243,67,33
 
 [MoneyText]
-Coordinates=384,232,78,58
+Coordinates=384,232,68,51
 
 [PlacerPanel]
-Coordinates=530,298,84,36
-
-[BuyPanel]
-Coordinates=530,353,69,36
+Coordinates=530,298,72,33
 
 [PlayerIndicator]
-Coordinates=530,1,101,58
+Coordinates=530,1,88,51
 
 [ActionsText]
-Coordinates=206,279,82,58
+Coordinates=206,279,73,51
 
 [MainMenu]
-Coordinates=451,375,74,36
+Coordinates=451,375,64,33
 
 [PrepairLayout]
-Coordinates=352,375,95,36
+Coordinates=352,375,83,33
 
 [CharacterPanel]
-Coordinates=384,78,104,58
+Coordinates=384,78,89,51
 
 [WinPanel]
-Coordinates=293,375,70,36
+Coordinates=293,375,60,33
 Visible=True
 
 [HPLabel]
-Coordinates=315,279,64,58
+Coordinates=315,279,55,51
 
 [CubeOrigin]
-Coordinates=670,155,80,36
+Coordinates=670,155,70,33
 
 [CharacterPlacePlayer]
-Coordinates=813,1,140,36
+Coordinates=813,1,120,33
 
 [DiePlayer]
-Coordinates=670,210,70,36
+Coordinates=670,210,61,33
 
 [ErrorPanel]
-Coordinates=670,265,76,36
+Coordinates=670,265,67,33
 Visible=True
 
 [MovePlayer]
-Coordinates=670,320,82,36
+Coordinates=670,320,71,33
 
 [DemolishPlayer]
-Coordinates=670,375,105,36
+Coordinates=670,375,91,33
 
 [NoCellError]
-Coordinates=28,279,82,58
+Coordinates=28,279,72,51
 
 [Audio]
-Coordinates=670,430,47,36
+Coordinates=670,430,43,33
 
 [MusicPlayer]
-Coordinates=651,471,85,36
+Coordinates=651,471,74,33
 
 [WinnerIndicator]
-Coordinates=670,1,105,58
+Coordinates=670,1,92,51
 
 [Armor]
-Coordinates=236,279,49,58
+Coordinates=236,279,45,51
 
 [ErrorHeader]
-Coordinates=537,133,85,58
+Coordinates=537,133,74,51
 
 [BuyPlayer]
-Coordinates=572,471,73,36
+Coordinates=572,471,64,33
 
 [Speed]
-Coordinates=46,375,51,58
+Coordinates=46,375,45,51
 
 [BonusDicesLabel]
-Coordinates=384,232,115,58
+Coordinates=384,232,100,51
 
 [BuildingPlacePlayer]
-Coordinates=813,56,129,36
+Coordinates=813,56,113,33
 
 [ArmorLabel]
-Coordinates=105,375,81,58
+Coordinates=105,375,72,51
 
 [CharactersOrigin]
-Coordinates=813,111,112,36
+Coordinates=813,111,98,33
 
 [SpeedLabel]
-Coordinates=11,77,83,58
+Coordinates=11,77,72,51
 
 [Hp]
-Coordinates=481,375,40,58
+Coordinates=481,375,40,51
 
 [ClickPlayer]
-Coordinates=483,471,79,36
+Coordinates=483,471,69,33
 
 [NoMapsError]
-Coordinates=194,375,91,58
+Coordinates=194,375,79,51
 
 [IncorrectPlayer]
-Coordinates=374,471,101,36
+Coordinates=374,471,89,33
 
 [NoCharError]
-Coordinates=0,0,87,58
+Coordinates=0,0,76,51
 
 [PortalPlayer]
-Coordinates=285,471,85,36
+Coordinates=285,471,74,33
 
 [EscPlayer]
-Coordinates=206,471,72,36
+Coordinates=206,471,63,33
 
 [KapkanPlayer]
-Coordinates=107,471,94,36
+Coordinates=107,471,82,33
 
 [BuildingsOrigin]
-Coordinates=0,435,102,36
+Coordinates=0,435,91,33
 
 [WinPlayer]
-Coordinates=813,166,73,36
+Coordinates=813,166,64,33
 
 [AudioLooper]
-Coordinates=813,221,87,36
+Coordinates=813,221,78,33
 
 [SelectPlayer]
-Coordinates=813,276,87,36
+Coordinates=813,276,75,33
 
 [BonusDices]
-Coordinates=670,78,83,58
+Coordinates=670,78,73,51
 
 [WinnerText]
-Coordinates=79,173,80,58
+Coordinates=79,173,70,51
 
 [ExitBar]
-Coordinates=735,545,56,58
+Coordinates=735,545,50,51
 
 [ExitTimer]
-Coordinates=656,545,69,36
+Coordinates=656,545,61,33
 
 [MenuExitButton]
-Coordinates=813,485,105,58
+Coordinates=813,485,93,51
 
 [GameExiter]
-Coordinates=813,331,82,58
+Coordinates=813,331,71,51
 
 [WinExit]
-Coordinates=794,545,58,58
+Coordinates=794,545,52,51
 
 [NoParametrsError]
-Coordinates=813,408,119,58
+Coordinates=813,408,103,51
+
+[BuyPanel]
+Coordinates=0,0,61,51
+
+[LastMapPage]
+Coordinates=468,545,80,51
+
+[SoundLabel]
+Coordinates=567,545,73,51
+
+[SoundBar]
+Coordinates=537,353,63,51
+
+[MusicBar]
+Coordinates=399,545,60,51
+
+[SliderPlayer]
+Coordinates=310,545,73,33
+
+[NoBuildingsError]
+Coordinates=813,56,100,51
+
+[NextMapPage]
+Coordinates=143,1,81,51
+
+[MapPanel]
+Coordinates=670,1,62,51
+
+[MusicLabel]
+Coordinates=277,1,70,51
+
+[StartButton]
+Coordinates=79,183,70,51
+Visible=True
 

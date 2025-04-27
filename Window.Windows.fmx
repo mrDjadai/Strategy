@@ -1,11 +1,9 @@
 inherited Form2_Windows: TForm2_Windows
   DesignerMasterStyle = 0
-  inherited Map: TLayout
-    Position.X = -40.000000000000000000
-    Position.Y = -40.000000000000000000
+  inherited KeyPressTimer: TTimer [0]
   end
-  inherited RightMenu: TLayout
-    inherited CharacterPanel: TImage
+  inherited RightMenu: TLayout [1]
+    inherited CharacterPanel: TImage [0]
       MultiResBitmap.Height = 167
       MultiResBitmap.Width = 167
       MultiResBitmap.TransparentColor = 2763429
@@ -13,12 +11,50 @@ inherited Form2_Windows: TForm2_Windows
         Position.X = 45.000000000000000000
       end
     end
+    inherited CubeOrigin: TLayout [1]
+    end
+    inherited PlacerPanel: TLayout [2]
+    end
+    inherited BG: TImage [3]
+      MultiResBitmap.Height = 1080
+      MultiResBitmap.Width = 564
+      BitmapMargins.Top = -10.000000000000000000
+      Scale.Y = 1.500000000000000000
+    end
   end
-  inherited MainMenu: TLayout
+  inherited DownMenu: TLayout [2]
+  end
+  inherited MainMenu: TLayout [3]
+    inherited StartButton: TButton
+      ImageIndex = 0
+    end
+    inherited GameExiter: TButton
+      ImageIndex = 0
+    end
     inherited ErrorPanel: TPanel
       inherited ErrorHeader: TLabel
         Position.X = 16.000000000000000000
       end
     end
+  end
+  inherited PrepairLayout: TLayout [4]
+    inherited BuyPanel: TImage
+      MultiResBitmap.Height = 1080
+      MultiResBitmap.Width = 1920
+      inherited BuyMoneyPrefix: TLabel
+        Margins.Bottom = 50.000000000000000000
+        Position.Y = 390.000000000000000000
+      end
+    end
+    inherited MapPanel: TImage
+      MultiResBitmap.Height = 1080
+      MultiResBitmap.Width = 1920
+    end
+  end
+  inherited WinPanel: TPanel [5]
+  end
+  inherited Audio: TLayout [6]
+  end
+  inherited Map: TLayout [7]
   end
 end

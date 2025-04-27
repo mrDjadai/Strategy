@@ -77,9 +77,9 @@ begin
   Form2.RoundText.Text := IntToStr(round);
 
   if curPlayer = 0 then
-    DrawColoredImage(Form2.PlayerIndicator, 'd6.png', TAlphaColors.blue)
+    DrawColoredImage(Form2.PlayerIndicator, 'playerIndicator.png', TAlphaColors.Darkblue)
   else
-    DrawColoredImage(Form2.PlayerIndicator, 'd6.png', TAlphaColors.red);
+    DrawColoredImage(Form2.PlayerIndicator, 'playerIndicator.png', TAlphaColors.Darkred);
 end;
 
 procedure Init(baseMoney: integer; roundMoney: integer);
@@ -185,9 +185,9 @@ begin
     curPlayer := 1 - curPlayer;
 
   if curPlayer = 0 then
-    DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.blue)
+    DrawColoredImage(Form2.WinnerIndicator, 'playerIndicator.png', TAlphaColors.Darkblue)
   else
-    DrawColoredImage(Form2.WinnerIndicator, 'd6.png', TAlphaColors.red);
+    DrawColoredImage(Form2.WinnerIndicator, 'playerIndicator.png', TAlphaColors.Darkred);
 
   Form2.WinnerText.Text := Form2.WinnerText.Text + IntToStr(1 + curPlayer);
   Form2.WinPanel.Visible := true;

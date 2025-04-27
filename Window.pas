@@ -7,7 +7,7 @@ uses
   System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, FMX.Ani,
   FMX.StdCtrls, FMX.Controls.Presentation, FMX.Objects, FMX.Layouts, DataTypes,
-  FMX.Media;
+  FMX.Media, System.ImageList, FMX.ImgList, FMX.Styles.Objects;
 
 type
   TForm2 = class(TForm)
@@ -17,7 +17,6 @@ type
     Map: TLayout;
     KeyPressTimer: TTimer;
     RightMenu: TLayout;
-    BG: TPanel;
     DownMenu: TLayout;
     SkipRound: TButton;
     PlayerIndicator: TImage;
@@ -34,8 +33,6 @@ type
     MainMenu: TLayout;
     StartButton: TButton;
     PrepairLayout: TLayout;
-    MapPanel: TPanel;
-    BuyPanel: TPanel;
     BuyMoneyPrefix: TLabel;
     BuyMoneyText: TLabel;
     BuyRoundSkip: TButton;
@@ -89,6 +86,9 @@ type
     LastMapPage: TButton;
     NoBuildingsError: TLabel;
     SliderPlayer: TMediaPlayer;
+    BuyPanel: TImage;
+    MapPanel: TImage;
+    BG: TImage;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -100,7 +100,6 @@ type
     procedure AttackButtonClick(Sender: TObject);
     procedure Skill1ButtonClick(Sender: TObject);
     procedure Skill2ButtonClick(Sender: TObject);
-    procedure FormResize(Sender: TObject);
     procedure StartGame(Sender: TObject);
     procedure BuyRoundSkipClick(Sender: TObject);
     procedure TryLoopAudio(Sender: TObject);
@@ -229,12 +228,6 @@ begin
   end;
 end;
 
-procedure TForm2.FormResize(Sender: TObject);
-begin
-  RightMenu.Height := Form2.Height;
-  BG.Height := Form2.Height;
-end;
-
 procedure TForm2.GameExiterClick(Sender: TObject);
 begin
   Form2.Close();
@@ -311,11 +304,16 @@ begin
 end;
 
 const
-  cButtonScaleX = 80;
-  cButtonScaleY = 15;
-  cButtonOffsetX = 100;
-  cButtonOffsetY = 20;
-  cButtonColumns = 2;
+  cButtonScaleX = 200;
+  cButtonScaleY = 40;
+
+  cButtonOffsetX = 300;
+  cButtonOffsetY = 80;
+
+  cButtonStartX = 100;
+  cButtonStartY = 65;
+
+  cButtonColumns = 3;
 
 procedure CreateBuyList();
 var
@@ -363,8 +361,8 @@ begin
     b.Name := 'charButton' + IntToStr(b.id);
     b.OnClick := Form2.TryBuyCharacter;
 
-    b.Position.Y := (cNum div cButtonColumns) * cButtonOffsetY;
-    b.Position.X := (cNum mod cButtonColumns) * cButtonOffsetX;
+    b.Position.Y := (cNum div cButtonColumns) * cButtonOffsetY + cButtonStartY;
+    b.Position.X := (cNum mod cButtonColumns) * cButtonOffsetX + cButtonStartX;
     Inc(cNum);
   end;
 end;
@@ -459,7 +457,7 @@ begin
 end;
 
 const
-  mapButtonHeight = 20;
+  mapButtonHeight = 50;
 
 function CreateMapList(): integer;
 var
@@ -508,6 +506,7 @@ const
   buyButtonScaleX = 80;
   buyButtonScaleY = 30;
   buyButtonOffset = 40;
+  buyButtonStart = -150;
   buyLabelOffset = 100;
 
 procedure CreateBuyButtons();
@@ -563,7 +562,7 @@ begin
     b.OnClick := Form2.SelectToPlace;
 
     b.Position.Y := cNum * buyButtonOffset;
-    b.Position.X := 0;
+    b.Position.X := buyButtonStart;
 
     lb.Position.Y := b.Position.Y;
     lb.Position.X := b.Position.X + buyLabelOffset;
@@ -606,7 +605,7 @@ begin
       b.OnClick := Form2.SelectToPlace;
 
       b.Position.Y := cNum * buyButtonOffset;
-      b.Position.X := 0;
+      b.Position.X := buyButtonStart;
 
       lb.Position.Y := b.Position.Y;
       lb.Position.X := b.Position.X + buyLabelOffset;
@@ -766,7 +765,6 @@ end;
 procedure TForm2.StartGame(Sender: TObject);
 
 begin
-  Form2.ClickPlayer.CurrentTime := 0;
   Form2.ClickPlayer.Play();
   Form2.MainMenu.Visible := false;
   Form2.PrepairLayout.Visible := true;
