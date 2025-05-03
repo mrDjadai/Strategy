@@ -83,45 +83,82 @@ var
 
 function CheckMapEdges(): TMapEdge;
 var
-  temp, p1, p2: TPointF;
-  ScreenRect: TRectF;
+  mapLeft, mapRight, mapTop, mapBottom: Single;
+  screenLeft, screenRight, screenTop, screenBottom: Single;
+  firstCell, lastCell: TCellData;
+  cellPos: TPointF;
+  mapWidth, mapHeight: Single;
 begin
   Result := meNone;
   if Length(map) = 0 then
-    exit;
+    Exit;
 
-  ScreenRect := RectF(0, 0, Form2.ClientWidth, Form2.ClientHeight);
+  // Получаем границы экрана
+  screenLeft := 0;
+  screenTop := 0;
+  screenRight := Form2.ClientWidth;
+  screenBottom := Form2.ClientHeight;
 
-  temp.x := 0;
-  temp.Y := cellSize;
-  p2 := map[0][0].img.LocalToAbsolute(temp);
-  p2.X := p2.X + cellSize;
-  p2.Y := p2.Y + cellSize;
+  // Получаем первую и последнюю клетки карты
+  firstCell := map[0][0];
+  lastCell := map[Length(map)-1][Length(map[0])-1];
 
-  temp.x := cellSize;
-  temp.Y := 0;
+  // Получаем абсолютные позиции клеток относительно формы
+  cellPos := firstCell.img.LocalToAbsolute(PointF(0, cellSize));
+  mapLeft := cellPos.X - cellSpaceX / 2;
+  mapTop := cellPos.Y;
 
-  p1 := map[Length(map) - 1][Length(map[0]) - 1].img.LocalToAbsolute(temp);
-  p1.X := p1.X - cellSize;
-  p1.Y := p1.Y - cellSize;
+  cellPos := lastCell.img.LocalToAbsolute(PointF(cellSize, 0));
+  mapRight := cellPos.X + cellSpaceX / 2;
+  mapBottom := cellPos.Y;
 
-  if (p1.x < ScreenRect.Left) and (p1.Y < ScreenRect.Top) then
-    Result := meTopLeft
-  else if (p2.x > ScreenRect.Right) and (p1.Y < ScreenRect.Top) then
-    Result := meTopRight
-  else if (p1.x < ScreenRect.Left) and (p2.Y > ScreenRect.Bottom) then
-    Result := meBottomLeft
-  else if (p2.x > ScreenRect.Right) and (p2.Y > ScreenRect.Bottom) then
-    Result := meBottomRight
-  else if p1.x < ScreenRect.Left then
-    Result := meLeft
-  else if p2.x > ScreenRect.Right then
-    Result := meRight
-  else if p1.Y < ScreenRect.Top then
-    Result := meTop
-  else if p2.Y > ScreenRect.Bottom then
-    Result := meBottom;
+  // Вычисляем полный размер карты
+  mapWidth := mapRight - mapLeft;
+  mapHeight := mapBottom - mapTop;
+
+  // Проверяем, помещается ли карта на экране
+  if (mapWidth >= screenRight)then
+  begin
+    // Если карта не помещается - стандартная проверка границ
+    if (mapLeft > screenLeft) and (mapTop > screenTop) then
+      Result := meTopRight
+    else if (mapRight < screenRight) and (mapTop > screenTop) then
+      Result := meTopLeft
+    else if (mapLeft > screenLeft) and (mapBottom < screenBottom) then
+      Result := meBottomLeft
+    else if (mapRight < screenRight) and (mapBottom < screenBottom) then
+      Result := meBottomRight
+    else if mapLeft > screenLeft then
+      Result := meRight
+    else if mapRight < screenRight then
+      Result := meLeft
+    else if mapTop > screenTop then
+      Result := meTop
+    else if mapBottom < screenBottom then
+      Result := meBottom;
+  end
+  else
+  begin
+    // Если карта не помещается - стандартная проверка границ
+    if (mapLeft < screenLeft) and (mapTop > screenTop) then
+      Result := meTopLeft
+    else if (mapRight > screenRight) and (mapTop > screenTop) then
+      Result := meTopRight
+    else if (mapLeft < screenLeft) and (mapBottom < screenBottom) then
+      Result := meBottomLeft
+    else if (mapRight > screenRight) and (mapBottom < screenBottom) then
+      Result := meBottomRight
+    else if mapLeft < screenLeft then
+      Result := meLeft
+    else if mapRight > screenRight then
+      Result := meRight
+    else if mapTop > screenTop then
+      Result := meTop
+    else if mapBottom < screenBottom then
+      Result := meBottom;
+  end;
 end;
+
 
 procedure DeleteMap();
 begin

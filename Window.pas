@@ -285,6 +285,7 @@ procedure TForm2.CheckPressKey(Sender: TObject);
 var
   edge: TMapEdge;
 begin
+  // Движение карты (оставляем как было)
   if pressedW then
     Map.Position.Y := Map.Position.Y + mapMovingSpeed;
   if pressedS then
@@ -296,34 +297,31 @@ begin
 
   edge := CheckMapEdges();
 
+  // Коррекция позиции (инвертируем направление)
   case edge of
-    meLeft:
-      Map.Position.X := Map.Position.X + mapMovingSpeed;
-    meRight:
-      Map.Position.X := Map.Position.X - mapMovingSpeed;
-    meTop:
-     Map.Position.Y := Map.Position.Y + mapMovingSpeed;
-    meBottom:
-     Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+    meLeft: Map.Position.X := Map.Position.X + mapMovingSpeed;
+    meRight: Map.Position.X := Map.Position.X - mapMovingSpeed;
+    meTop: Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+    meBottom: Map.Position.Y := Map.Position.Y + mapMovingSpeed;
     meTopLeft:
       begin
         Map.Position.X := Map.Position.X + mapMovingSpeed;
-        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
       end;
     meTopRight:
       begin
         Map.Position.X := Map.Position.X - mapMovingSpeed;
-        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
       end;
     meBottomLeft:
       begin
         Map.Position.X := Map.Position.X + mapMovingSpeed;
-        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
       end;
     meBottomRight:
       begin
         Map.Position.X := Map.Position.X - mapMovingSpeed;
-        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
       end;
   end;
 end;
