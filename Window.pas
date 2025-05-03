@@ -164,7 +164,7 @@ uses CellManager, Winapi.Windows, CharacterDataVisualisator,
 {$R *.Windows.fmx MSWINDOWS}
 
 const
-  mapMovingSpeed = 2; // движение карты
+  mapMovingSpeed = 4; // движение карты
 
 var
   pressedA, pressedW, pressedD, pressedS: boolean;
@@ -282,6 +282,8 @@ begin
 end;
 
 procedure TForm2.CheckPressKey(Sender: TObject);
+var
+  edge: TMapEdge;
 begin
   if pressedW then
     Map.Position.Y := Map.Position.Y + mapMovingSpeed;
@@ -292,15 +294,38 @@ begin
   if pressedD then
     Map.Position.X := Map.Position.X - mapMovingSpeed;
 
-  if Map.Position.X > 0 then
-    Map.Position.X := 0;
-  if Map.Position.Y > 0 then
-    Map.Position.Y := 0;
+  edge := CheckMapEdges();
 
-  if Map.Position.X < minMapX then
-    Map.Position.X := minMapX;
-  if Map.Position.Y < minMapY then
-    Map.Position.Y := minMapY;
+  case edge of
+    meLeft:
+      Map.Position.X := Map.Position.X + mapMovingSpeed;
+    meRight:
+      Map.Position.X := Map.Position.X - mapMovingSpeed;
+    meTop:
+     Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+    meBottom:
+     Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+    meTopLeft:
+      begin
+        Map.Position.X := Map.Position.X + mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+      end;
+    meTopRight:
+      begin
+        Map.Position.X := Map.Position.X - mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+      end;
+    meBottomLeft:
+      begin
+        Map.Position.X := Map.Position.X + mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+      end;
+    meBottomRight:
+      begin
+        Map.Position.X := Map.Position.X - mapMovingSpeed;
+        Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+      end;
+  end;
 end;
 
 const

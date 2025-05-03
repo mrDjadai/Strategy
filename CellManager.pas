@@ -12,6 +12,9 @@ var
   dangerCellDamage: integer;
 
 type
+  TMapEdge = (meNone, meLeft, meRight, meTop, meBottom, meTopLeft, meTopRight,
+    meBottomLeft, meBottomRight);
+
   SelectionCondition = function(caster, target: TCellData): boolean of object;
   TCellList = Array of TCellData;
 
@@ -54,6 +57,8 @@ procedure UnselectMap();
 
 procedure SelectMap(cond: SelectionCondition; caster: TCellData);
 
+function CheckMapEdges(): TMapEdge;
+
 implementation
 
 uses Window, WinApi.Windows, System.IOUtils;
@@ -76,6 +81,48 @@ var
   map: Array of Array of TCellData;
   cells: Array of TCellInfo;
 
+function CheckMapEdges(): TMapEdge;
+var
+  temp, p1, p2: TPointF;
+  ScreenRect: TRectF;
+begin
+  Result := meNone;
+  if Length(map) = 0 then
+    exit;
+
+  ScreenRect := RectF(0, 0, Form2.ClientWidth, Form2.ClientHeight);
+
+  temp.x := 0;
+  temp.Y := cellSize;
+  p2 := map[0][0].img.LocalToAbsolute(temp);
+  p2.X := p2.X + cellSize;
+  p2.Y := p2.Y + cellSize;
+
+  temp.x := cellSize;
+  temp.Y := 0;
+
+  p1 := map[Length(map) - 1][Length(map[0]) - 1].img.LocalToAbsolute(temp);
+  p1.X := p1.X - cellSize;
+  p1.Y := p1.Y - cellSize;
+
+  if (p1.x < ScreenRect.Left) and (p1.Y < ScreenRect.Top) then
+    Result := meTopLeft
+  else if (p2.x > ScreenRect.Right) and (p1.Y < ScreenRect.Top) then
+    Result := meTopRight
+  else if (p1.x < ScreenRect.Left) and (p2.Y > ScreenRect.Bottom) then
+    Result := meBottomLeft
+  else if (p2.x > ScreenRect.Right) and (p2.Y > ScreenRect.Bottom) then
+    Result := meBottomRight
+  else if p1.x < ScreenRect.Left then
+    Result := meLeft
+  else if p2.x > ScreenRect.Right then
+    Result := meRight
+  else if p1.Y < ScreenRect.Top then
+    Result := meTop
+  else if p2.Y > ScreenRect.Bottom then
+    Result := meBottom;
+end;
+
 procedure DeleteMap();
 begin
   for var I := 0 to x do
@@ -93,9 +140,9 @@ end;
 function GetCell(pos: vector2): TCellData;
 begin
   if (pos.x < 0) or (pos.Y < 0) or (pos.x > x) or (pos.Y > Y) then
-    result := nil
+    Result := nil
   else
-    result := map[pos.Y, pos.x];
+    Result := map[pos.Y, pos.x];
 end;
 
 function GetCellTypeByName(name: string): TCellType;
@@ -105,14 +152,14 @@ begin
   for var I := 0 to Length(cells) - 1 do
     if cells[I].sprite = name then
       id := I;
-  result := TCellType(cells[id].tp);
+  Result := TCellType(cells[id].tp);
 end;
 
 function GetCellTypeById(id: char): TCellType;
 begin
   for var I := 0 to Length(cells) - 1 do
     if cells[I].literal = id then
-      result := TCellType(cells[I].tp);
+      Result := TCellType(cells[I].tp);
 end;
 
 function GetCellById(xpos, ypos: integer; id: char): TCellData;
@@ -124,17 +171,17 @@ begin
 
   if ypos mod 2 = 0 then
     x := cellSpaceX / 2 + x;
-  result := TCellData.Create(x, Y, cellSize);
+  Result := TCellData.Create(x, Y, cellSize);
 
   for var I := 0 to Length(cells) - 1 do
     if cells[I].literal = id then
     begin
-      result.sprite := cells[I].sprite;
-      result.cType := TCellType(cells[I].tp);
-      result.attackBlocker := cells[I].attackBlocker;
+      Result.sprite := cells[I].sprite;
+      Result.cType := TCellType(cells[I].tp);
+      Result.attackBlocker := cells[I].attackBlocker;
     end;
 
-  result.ReDraw();
+  Result.ReDraw();
 end;
 
 function LoadCells(): integer;
@@ -186,7 +233,7 @@ begin
       cells[Length(cells) - 1].attackBlocker := isBlocker;
     end;
   end;
-  result := Length(cells);
+  Result := Length(cells);
 end;
 
 procedure Init(mapName: string);
@@ -228,14 +275,14 @@ begin
 
   CloseFile(f);
 
-  form2.BuildingsOrigin.BringToFront();
-  form2.CharactersOrigin.BringToFront();
+  Form2.BuildingsOrigin.BringToFront();
+  Form2.CharactersOrigin.BringToFront();
 end;
 
 function GetMapScale(): vector2;
 begin
-  result.x := x;
-  result.Y := Y;
+  Result.x := x;
+  Result.Y := Y;
 end;
 
 procedure UnselectMap();
@@ -270,7 +317,7 @@ var
   len, j: integer;
   correct, found: boolean;
 begin
-  SetLength(result, 0);
+  SetLength(Result, 0);
   Files := TDirectory.GetFiles(ExtractFilePath(ParamStr(0)) +
     'Resourses\Maps\');
   for var FileName in Files do
@@ -312,7 +359,7 @@ begin
     end;
     if correct then
     begin
-      SetLength(result, Length(result) + 1);
+      SetLength(Result, Length(Result) + 1);
       var
         lastDir: integer;
       for var k := 1 to Length(FileName) do
@@ -320,7 +367,7 @@ begin
         if (FileName[k] = '/') or (FileName[k] = '\') then
           lastDir := k;
       end;
-      result[Length(result) - 1] := Copy(FileName, lastDir + 1,
+      Result[Length(Result) - 1] := Copy(FileName, lastDir + 1,
         Length(FileName) - lastDir - 4);
     end;
   end;
@@ -328,7 +375,7 @@ end;
 
 function GetCellBetween(a, b: TCellData): TCellList;
 begin
-  result := GetCellBetween(a.cubePos, b.cubePos);
+  Result := GetCellBetween(a.cubePos, b.cubePos);
 end;
 
 function GetCellBetween(a, b: Vector3): TCellList;
@@ -336,10 +383,10 @@ var
   n: integer;
 begin
   n := GetDistance(a, b);
-  SetLength(result, n + 1);
+  SetLength(Result, n + 1);
 
   for var I := 0 to n do
-    result[I] := GetCell(CubeToDecard(LerpCubePos(a, b, I * (1 / n))));
+    Result[I] := GetCell(CubeToDecard(LerpCubePos(a, b, I * (1 / n))));
 end;
 
 constructor TTransparentHitImage.Create(AOwner: TComponent);
@@ -393,21 +440,22 @@ var
   BitmapX, BitmapY: integer;
   PixelColor: TAlphaColor;
 begin
-  result := inherited PointInObject(x, Y);
+  Result := inherited PointInObject(x, Y);
 
-  if result and (Bitmap <> nil) and not Bitmap.IsEmpty then
+  if Result and (Bitmap <> nil) and not Bitmap.IsEmpty then
   begin
     LocalPoint := AbsoluteToLocal(TPointF.Create(x, Y));
 
     BitmapX := Trunc(LocalPoint.x * Bitmap.Width / Width);
     BitmapY := Trunc(LocalPoint.Y * Bitmap.Height / Height);
 
-    if (BitmapX >= 0) and (BitmapX < Bitmap.Width) and (BitmapY >= 0) and (BitmapY < Bitmap.Height) then
+    if (BitmapX >= 0) and (BitmapX < Bitmap.Width) and (BitmapY >= 0) and
+      (BitmapY < Bitmap.Height) then
     begin
-      result := not FTransparencyMap[BitmapX, BitmapY];
+      Result := not FTransparencyMap[BitmapX, BitmapY];
     end
     else
-      result := false;
+      Result := false;
   end;
 end;
 
