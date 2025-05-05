@@ -16,12 +16,40 @@ inherited Form2_Windows: TForm2_Windows
       end
     end
   end
+  inherited DownMenu: TLayout
+    inherited SkipRound: TButton [0]
+    end
+    inherited PlayerIndicator: TImage [1]
+    end
+    inherited RoundPrefix: TLabel [2]
+    end
+    inherited RoundText: TLabel [3]
+    end
+    inherited ActionsPrefix: TLabel [4]
+    end
+    inherited ActionsText: TLabel [5]
+    end
+    inherited MoneyPrefix: TLabel [6]
+    end
+    inherited MoneyText: TLabel [7]
+    end
+    inherited MenuExitButton: TButton [8]
+    end
+    inherited ExitBar: TProgressBar [9]
+    end
+    inherited DownBG: TImage [10]
+      MultiResBitmap.Height = 1080
+      MultiResBitmap.Width = 1920
+    end
+  end
   inherited MainMenu: TLayout
     inherited StartButton: TButton
       ImageIndex = 0
     end
     inherited GameExiter: TButton
       ImageIndex = 0
+      TextSettings.Font.Family = 'Renju'
+      TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
     inherited ErrorPanel: TPanel
       inherited ErrorHeader: TLabel

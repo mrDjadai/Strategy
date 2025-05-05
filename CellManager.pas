@@ -312,6 +312,9 @@ begin
 
   CloseFile(f);
 
+  Form2.Map.Position.X :=   cellSpaceX * Length(map[0]) / 4;
+  Form2.Map.Position.Y := - cellSpaceY * Length(map) / 4;
+
   Form2.BuildingsOrigin.BringToFront();
   Form2.CharactersOrigin.BringToFront();
 end;

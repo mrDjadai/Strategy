@@ -89,6 +89,7 @@ type
     BuyPanel: TImage;
     MapPanel: TImage;
     BG: TImage;
+    DownBG: TImage;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -140,6 +141,9 @@ type
     property Count: integer read _count write SetCount;
   end;
 
+const
+  ProjectFont = 'Renju';
+
 var
   Form2: TForm2;
   minMapX, minMapY: integer;
@@ -159,7 +163,7 @@ implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
   CharacterManager, PlayerManager, buildingManager, System.IOUtils,
-  SettingsManager;
+  SettingsManager, FMX.FontManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -170,12 +174,53 @@ var
   pressedA, pressedW, pressedD, pressedS: boolean;
   wantExit: boolean;
 
+procedure SetFont(TextCtrl: TPresentedTextControl);
+begin
+
+  TextCtrl.StyledSettings := TextCtrl.StyledSettings - [TStyledSetting.Family];
+  TextCtrl.Font.Family := ProjectFont;
+  TextCtrl.ApplyStyleLookup;
+end;
+
+procedure SetProjectFont(fontName: string);
+var
+  Stream: TResourceStream;
+  nFonts: DWORD;
+  FontHandle: THandle;
+  TextCtrl: TPresentedTextControl;
+begin
+
+  { Stream := TResourceStream.Create(HInstance, 'Renju', RT_RCDATA);
+    try
+    // Добавляем шрифт в память процесса
+    FontHandle := AddFontMemResourceEx(Stream.Memory, Stream.Size, nil, @nFonts);
+    if FontHandle = 0 then
+    RaiseLastOSError; // Проверка на ошибку
+
+    // Устанавливаем шрифт для контролов
+
+    finally
+    Stream.Free;
+    end;
+  }
+  for var i := 0 to Form2.ComponentCount - 1 do
+  begin
+
+    if Form2.Components[i] is TPresentedTextControl then
+    begin
+          TextCtrl := TPresentedTextControl(Form2.Components[i]);
+          SetFont(TextCtrl);
+    end;
+  end;
+end;
+
 procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   if MainMenu.Visible = false then
   begin
     ClearPlayerData();
-    DeleteMap();
+    if MapPanel.Visible = false then
+      DeleteMap();
   end;
 
   for var p in players do
@@ -299,10 +344,14 @@ begin
 
   // Коррекция позиции (инвертируем направление)
   case edge of
-    meLeft: Map.Position.X := Map.Position.X + mapMovingSpeed;
-    meRight: Map.Position.X := Map.Position.X - mapMovingSpeed;
-    meTop: Map.Position.Y := Map.Position.Y - mapMovingSpeed;
-    meBottom: Map.Position.Y := Map.Position.Y + mapMovingSpeed;
+    meLeft:
+      Map.Position.X := Map.Position.X + mapMovingSpeed;
+    meRight:
+      Map.Position.X := Map.Position.X - mapMovingSpeed;
+    meTop:
+      Map.Position.Y := Map.Position.Y - mapMovingSpeed;
+    meBottom:
+      Map.Position.Y := Map.Position.Y + mapMovingSpeed;
     meTopLeft:
       begin
         Map.Position.X := Map.Position.X + mapMovingSpeed;
@@ -359,6 +408,8 @@ begin
 
     b.Height := cButtonScaleY;
     b.Width := cButtonScaleX;
+
+    SetFont(b);
 
     AssignFile(f, c);
     Reset(f);
@@ -512,6 +563,8 @@ begin
       b.Text := line;
       CloseFile(f);
 
+      SetFont(b);
+
       b.Name := M;
       b.OnClick := Form2.OnChooseMap;
 
@@ -558,6 +611,9 @@ begin
 
     b.Height := buyButtonScaleY;
     b.Width := buyButtonScaleX;
+
+    SetFont(b);
+    SetFont(lb);
 
     AssignFile(f, c);
     Reset(f);
@@ -624,6 +680,9 @@ begin
       b.isBuilding := true;
       b.id := i;
 
+      SetFont(b);
+      SetFont(lb);
+
       b.Name := 'buildingPlacer' + IntToStr(b.id);
       b.OnClick := Form2.SelectToPlace;
 
@@ -688,6 +747,8 @@ begin
   wantExit := false;
 
   Randomize();
+
+  SetProjectFont(ProjectFont);
 
   if useConsole then
     AllocConsole();
