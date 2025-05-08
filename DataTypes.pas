@@ -189,6 +189,7 @@ Type
     procedure Init();
     procedure OnRoundStart();
     function CanPlace(): boolean;
+    class function CorrectHalf(caster, target: TCellData) : boolean;
   end;
 
 function decardToCube(pos: Vector2): Vector3;
@@ -204,6 +205,12 @@ implementation
 
 uses Drawer, CharacterManager, PlayerManager, CellManager,
   CharacterDataVisualisator, Window, BuildingManager;
+
+class function TPlayer.CorrectHalf(caster, target: TCellData) : boolean;
+begin
+      result := ((curPlayer = 0) and (target.decardPos.x <= (x - 1) div 2)) or
+      ((curPlayer = 1) and (target.decardPos.x > (x) div 2))
+end;
 
 Constructor TCellData.Create(x, y: extended; size: integer);
 begin

@@ -5,7 +5,7 @@
 --Sprite
 wall
 --Count
-0
+2
 --HP
 30
 --Cost
@@ -15,13 +15,13 @@ wall
 --Parametr2
 .
 --Name
-Медицинская палатка
+Палатка
 --Hint
 Лечит бойца на своей клетке
 --Sprite
 palatka
 --Count
-0
+1
 --HP
 10
 --Cost
@@ -37,7 +37,7 @@ palatka
 --Sprite
 fort
 --Count
-0
+1
 --HP
 40
 --Cost

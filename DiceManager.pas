@@ -35,7 +35,7 @@ const
     minValue: 1; maxValue: 6), (sprite: 'd8.png'; minValue: 1; maxValue: 8),
     (sprite: 'd20.png'; minValue: 1; maxValue: 20));
 
-  firstDiceX = 170;
+  firstDiceX = -20;
   firstDiceY = -50;
   deltaDicePos = -75;
   diceRowCount = 3;

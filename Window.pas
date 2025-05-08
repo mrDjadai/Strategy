@@ -142,7 +142,7 @@ type
   end;
 
 const
-  ProjectFont = 'Renju';
+  ProjectFont = 'South Park';
 
 var
   Form2: TForm2;
@@ -163,7 +163,7 @@ implementation
 
 uses CellManager, Winapi.Windows, CharacterDataVisualisator,
   CharacterManager, PlayerManager, buildingManager, System.IOUtils,
-  SettingsManager, FMX.FontManager;
+  SettingsManager;
 {$R *.fmx}
 {$R *.Windows.fmx MSWINDOWS}
 
@@ -176,7 +176,6 @@ var
 
 procedure SetFont(TextCtrl: TPresentedTextControl);
 begin
-
   TextCtrl.StyledSettings := TextCtrl.StyledSettings - [TStyledSetting.Family];
   TextCtrl.Font.Family := ProjectFont;
   TextCtrl.ApplyStyleLookup;
@@ -189,27 +188,13 @@ var
   FontHandle: THandle;
   TextCtrl: TPresentedTextControl;
 begin
-
-  { Stream := TResourceStream.Create(HInstance, 'Renju', RT_RCDATA);
-    try
-    // Добавляем шрифт в память процесса
-    FontHandle := AddFontMemResourceEx(Stream.Memory, Stream.Size, nil, @nFonts);
-    if FontHandle = 0 then
-    RaiseLastOSError; // Проверка на ошибку
-
-    // Устанавливаем шрифт для контролов
-
-    finally
-    Stream.Free;
-    end;
-  }
   for var i := 0 to Form2.ComponentCount - 1 do
   begin
 
     if Form2.Components[i] is TPresentedTextControl then
     begin
-          TextCtrl := TPresentedTextControl(Form2.Components[i]);
-          SetFont(TextCtrl);
+      TextCtrl := TPresentedTextControl(Form2.Components[i]);
+      SetFont(TextCtrl);
     end;
   end;
 end;
@@ -452,6 +437,7 @@ begin
     DownMenu.Visible := false;
     MainMenu.Visible := true;
     PrepairLayout.Visible := false;
+    CharacterPanel.Visible := false;
   end;
 
   for var item1 in buildPlacers do
@@ -614,6 +600,7 @@ begin
 
     SetFont(b);
     SetFont(lb);
+    lb.TextSettings.FontColor := TAlphaColors.White;
 
     AssignFile(f, c);
     Reset(f);
@@ -634,7 +621,6 @@ begin
     Readln(f, line);
     Readln(f, line);
     b.price := StrToInt(line);
-
     CloseFile(f);
 
     b.Name := 'charPlacer' + IntToStr(b.id);
@@ -682,6 +668,7 @@ begin
 
       SetFont(b);
       SetFont(lb);
+      lb.TextSettings.FontColor := TAlphaColors.White;
 
       b.Name := 'buildingPlacer' + IntToStr(b.id);
       b.OnClick := Form2.SelectToPlace;
@@ -996,6 +983,7 @@ begin
     Form2.PrepairLayout.Visible := false;
 
     ShowPlacersCount(players[0]);
+    SelectMap(TPlayer.CorrectHalf, nil);
   end;
 end;
 

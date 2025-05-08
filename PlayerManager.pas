@@ -40,7 +40,7 @@ procedure TryEndPrepare();
 
 implementation
 
-uses Window, System.SysUtils, Drawer, System.UITypes, CharacterManager;
+uses Window, System.SysUtils, Drawer, System.UITypes, CharacterManager, CellManager;
 
 const
   actionsPerRound = 3;
@@ -53,22 +53,20 @@ var
 
 procedure ClearPlayerData();
 var
-  cur: charList;
+  current, next: charList;
 begin
   for var p in players do
   begin
-    cur := p.characters;
+    current := p.characters;
 
-    while (p.characters^.next <> nil) and (p.characters^.next^.next <> nil) do
+    while current <> nil do
     begin
-      while cur^.next^.next <> nil do
-        cur := cur^.next;
-      Dispose(cur^.next);
-      cur^.next := nil;
+      next := current^.next;
+      Dispose(current);
+      current := next;
     end;
-    if cur^.next <> nil then
-      Dispose(cur^.next);
-    Dispose(cur);
+
+    p.characters := nil;
   end;
 end;
 
@@ -128,7 +126,9 @@ begin
   begin
     if curPlayer = 0 then
       StartNewRound();
-  end;
+  end
+  else
+    SelectMap(TPlayer.CorrectHalf, nil);
 
   currentPlayer := players[curPlayer];
   UnselectCharacter();
@@ -173,6 +173,7 @@ begin
     Form2.SkipRound.Enabled := true;
     curPlayer := 0;
     currentPlayer := players[0];
+    UnselectMap();
   end
   else
     ShowPlacersCount(currentPlayer);
