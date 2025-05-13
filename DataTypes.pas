@@ -391,6 +391,7 @@ begin
   healsBar.Parent := img;
   healsBar.position.x := position.x;
   healsBar.position.y := position.y;
+  healsBar.HitTest := false;
 
 
   healsBar.Bitmap.Width := scale.x;

@@ -16,7 +16,7 @@ bard
 ----Type
 0
 ----Name
-Болезненная мелодия
+Мелодия боли
 ----UseSound
 BadMelody
 ----ReloadTime
@@ -33,7 +33,7 @@ BadMelody
 ----Type
 2
 ----Name
-Целебная мелодия
+Исцеление
 ----UseSound
 Heal
 ----ReloadTime
@@ -50,7 +50,7 @@ Heal
 ----Type
 8
 ----Name
-Песнь проклятия
+Проклятие
 ----UseSound
 Curse
 ----ReloadTime

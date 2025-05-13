@@ -93,6 +93,23 @@ begin
   ReDraw();
 end;
 
+const
+  smallTextLength = 15;
+  bigTextMultiplier = 0.5;
+  skillButtonTextSize = 10;
+
+procedure InitSkillButton(b: TButton; s: TSkill);
+begin
+  b.Enabled := s.timeAfterUse >= s.reloadTime;
+  b.Text := s.name;
+  b.Hint := s.GetToolTip();
+
+  b.StyledSettings := b.StyledSettings - [TStyledSetting.Size];
+  b.TextSettings.Font.Size := skillButtonTextSize;
+  if Length(s.name) > smallTextLength then
+    b.TextSettings.Font.Size := b.TextSettings.Font.Size * bigTextMultiplier;
+end;
+
 procedure ReDraw();
 begin
   if curCharacter = nil then
@@ -115,17 +132,9 @@ begin
     DrawMoveIndicators();
     with form2, curCharacter do
     begin
-      attackButton.Enabled := atack.timeAfterUse >= atack.reloadTime;
-      skill1Button.Enabled := skill1.timeAfterUse >= skill1.reloadTime;
-      skill2Button.Enabled := skill2.timeAfterUse >= skill2.reloadTime;
-
-      attackButton.Text := atack.name;
-      skill1Button.Text := skill1.name;
-      skill2Button.Text := skill2.name;
-
-      attackButton.Hint := atack.GetToolTip();
-      skill1Button.Hint := skill1.GetToolTip();
-      skill2Button.Hint := skill2.GetToolTip();
+      InitSkillButton(attackButton, atack);
+      InitSkillButton(skill1Button, skill1);
+      InitSkillButton(skill2Button, skill2);
     end;
   end;
 end;

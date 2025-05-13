@@ -16,7 +16,7 @@ archer
 ----Type
 1
 ----Name
-Выстрел из лука
+Выстрел
 ----UseSound
 Arrow
 ----ReloadTime
@@ -50,7 +50,7 @@ HeavyArrow
 ----Type
 6
 ----Name
-Установить капкан
+Капкан
 ----UseSound
 Kapkan
 ----ReloadTime

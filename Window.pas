@@ -156,6 +156,7 @@ var
 
 procedure ShowPlacersCount(player: TPlayer);
 
+
 const
   useConsole = false;
 
@@ -600,6 +601,7 @@ begin
 
     SetFont(b);
     SetFont(lb);
+    lb.StyledSettings := lb.StyledSettings - [TStyledSetting.FontColor];
     lb.TextSettings.FontColor := TAlphaColors.White;
 
     AssignFile(f, c);
@@ -668,6 +670,7 @@ begin
 
       SetFont(b);
       SetFont(lb);
+      lb.StyledSettings := lb.StyledSettings - [TStyledSetting.FontColor];
       lb.TextSettings.FontColor := TAlphaColors.White;
 
       b.Name := 'buildingPlacer' + IntToStr(b.id);
