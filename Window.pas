@@ -90,6 +90,8 @@ type
     MapPanel: TImage;
     BG: TImage;
     DownBG: TImage;
+    Label1: TLabel;
+    GameExiter1: TButton;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -138,6 +140,7 @@ type
     isBuilding: boolean;
     id: integer;
     price: integer;
+    objectName: string;
     property Count: integer read _count write SetCount;
   end;
 
@@ -155,7 +158,7 @@ var
   mapPage: integer;
 
 procedure ShowPlacersCount(player: TPlayer);
-
+procedure SetFont(TextCtrl: TPresentedTextControl);
 
 const
   useConsole = false;
@@ -490,7 +493,7 @@ begin
 end;
 
 const
-  mapPageCount = 4;
+  mapPageCount = 7;
 
 procedure SetMapPage(num: integer);
 begin
@@ -519,6 +522,8 @@ end;
 
 const
   mapButtonHeight = 50;
+  firstMapButtonY = 100;
+  mapMargins = 10;
 
 function CreateMapList(): integer;
 var
@@ -543,6 +548,8 @@ begin
       b.Height := mapButtonHeight;
       b.Width := MapPanel.Width;
 
+      b.Margins.Left := mapMargins;
+      b.Margins.Right := mapMargins;
       AssignFile(f, ExtractFilePath(ParamStr(0)) + 'Resourses\Maps\' + M
         + '.txt');
       Reset(f);
@@ -555,7 +562,7 @@ begin
       b.Name := M;
       b.OnClick := Form2.OnChooseMap;
 
-      b.Position.Y := mapButtonHeight * (mapNum mod mapPageCount);
+      b.Position.Y := firstMapButtonY + mapButtonHeight * (mapNum mod mapPageCount);
       mapList[mapNum] := b;
       Inc(mapNum);
     end;
@@ -617,6 +624,7 @@ begin
 
     b.isBuilding := false;
     b.id := cNum;
+    b.objectName := b.Text;
 
     Readln(f, line);
     Readln(f, line);
@@ -667,6 +675,7 @@ begin
 
       b.isBuilding := true;
       b.id := i;
+      b.objectName := b.Text;
 
       SetFont(b);
       SetFont(lb);
@@ -789,6 +798,8 @@ begin
   end;
 
   InitAudio();
+  TryLoopAudio(nil);
+
   SettingsManager.Init();
   CharacterDataVisualisator.Init(OP, CharacterPanel);
 end;
@@ -861,6 +872,15 @@ begin
 
   BuyMoneyText.Text := IntToStr(currentPlayer.money);
   Form2.BuyRoundSkip.Enabled := false;
+
+  for var item in charPlacers do
+    item.txt.Text := item.objectName;
+  for var item1 in buildPlacers do
+    if item1 <> nil then
+    begin
+      item1.Visible := true;
+      item1.txt.Visible := true;
+    end;
 end;
 
 procedure TForm2.TryBuyCharacter(Sender: TObject);

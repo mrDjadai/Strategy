@@ -90,75 +90,75 @@ var
   mapWidth, mapHeight: Single;
 begin
   Result := meNone;
-  if Length(map) = 0 then
-    Exit;
 
-  // Получаем границы экрана
-  screenLeft := 0;
-  screenTop := 0;
-  screenRight := Form2.ClientWidth;
-  screenBottom := Form2.ClientHeight;
-
-  // Получаем первую и последнюю клетки карты
-  firstCell := map[0][0];
-  lastCell := map[Length(map)-1][Length(map[0])-1];
-
-  // Получаем абсолютные позиции клеток относительно формы
-  cellPos := firstCell.img.LocalToAbsolute(PointF(0, cellSize));
-  mapLeft := cellPos.X - cellSpaceX / 2;
-  mapTop := cellPos.Y;
-
-  cellPos := lastCell.img.LocalToAbsolute(PointF(cellSize, 0));
-  mapRight := cellPos.X + cellSpaceX / 2;
-  mapBottom := cellPos.Y;
-
-  // Вычисляем полный размер карты
-  mapWidth := mapRight - mapLeft;
-  mapHeight := mapBottom - mapTop;
-
-  // Проверяем, помещается ли карта на экране
-  if (mapWidth >= screenRight)then
+  if (Length(map) > 0) and (Form2.ClientWidth <= 1920) then
   begin
-    // Если карта не помещается - стандартная проверка границ
-    if (mapLeft > screenLeft) and (mapTop > screenTop) then
-      Result := meTopRight
-    else if (mapRight < screenRight) and (mapTop > screenTop) then
-      Result := meTopLeft
-    else if (mapLeft > screenLeft) and (mapBottom < screenBottom) then
-      Result := meBottomLeft
-    else if (mapRight < screenRight) and (mapBottom < screenBottom) then
-      Result := meBottomRight
-    else if mapLeft > screenLeft then
-      Result := meRight
-    else if mapRight < screenRight then
-      Result := meLeft
-    else if mapTop > screenTop then
-      Result := meTop
-    else if mapBottom < screenBottom then
-      Result := meBottom;
-  end
-  else
-  begin
-    // Если карта не помещается - стандартная проверка границ
-    if (mapLeft < screenLeft) and (mapTop > screenTop) then
-      Result := meTopLeft
-    else if (mapRight > screenRight) and (mapTop > screenTop) then
-      Result := meTopRight
-    else if (mapLeft < screenLeft) and (mapBottom < screenBottom) then
-      Result := meBottomLeft
-    else if (mapRight > screenRight) and (mapBottom < screenBottom) then
-      Result := meBottomRight
-    else if mapLeft < screenLeft then
-      Result := meLeft
-    else if mapRight > screenRight then
-      Result := meRight
-    else if mapTop > screenTop then
-      Result := meTop
-    else if mapBottom < screenBottom then
-      Result := meBottom;
+    // Получаем границы экрана
+    screenLeft := 0;
+    screenTop := 0;
+    screenRight := Form2.ClientWidth;
+    screenBottom := Form2.ClientHeight;
+
+    // Получаем первую и последнюю клетки карты
+    firstCell := map[0][0];
+    lastCell := map[Length(map) - 1][Length(map[0]) - 1];
+
+    // Получаем абсолютные позиции клеток относительно формы
+    cellPos := firstCell.img.LocalToAbsolute(PointF(0, cellSize));
+    mapLeft := cellPos.x - cellSpaceX / 2;
+    mapTop := cellPos.Y;
+
+    cellPos := lastCell.img.LocalToAbsolute(PointF(cellSize, 0));
+    mapRight := cellPos.x + cellSpaceX / 2;
+    mapBottom := cellPos.Y;
+
+    // Вычисляем полный размер карты
+    mapWidth := mapRight - mapLeft;
+    mapHeight := mapBottom - mapTop;
+
+    // Проверяем, помещается ли карта на экране
+    if (mapWidth >= screenRight) then
+    begin
+      // Если карта не помещается - стандартная проверка границ
+      if (mapLeft > screenLeft) and (mapTop > screenTop) then
+        Result := meTopRight
+      else if (mapRight < screenRight) and (mapTop > screenTop) then
+        Result := meTopLeft
+      else if (mapLeft > screenLeft) and (mapBottom < screenBottom) then
+        Result := meBottomLeft
+      else if (mapRight < screenRight) and (mapBottom < screenBottom) then
+        Result := meBottomRight
+      else if mapLeft > screenLeft then
+        Result := meRight
+      else if mapRight < screenRight then
+        Result := meLeft
+      else if mapTop > screenTop then
+        Result := meTop
+      else if mapBottom < screenBottom then
+        Result := meBottom;
+    end
+    else
+    begin
+      // Если карта не помещается - стандартная проверка границ
+      if (mapLeft < screenLeft) and (mapTop > screenTop) then
+        Result := meTopLeft
+      else if (mapRight > screenRight) and (mapTop > screenTop) then
+        Result := meTopRight
+      else if (mapLeft < screenLeft) and (mapBottom < screenBottom) then
+        Result := meBottomLeft
+      else if (mapRight > screenRight) and (mapBottom < screenBottom) then
+        Result := meBottomRight
+      else if mapLeft < screenLeft then
+        Result := meLeft
+      else if mapRight > screenRight then
+        Result := meRight
+      else if mapTop > screenTop then
+        Result := meTop
+      else if mapBottom < screenBottom then
+        Result := meBottom;
+    end;
   end;
 end;
-
 
 procedure DeleteMap();
 begin
@@ -312,8 +312,10 @@ begin
 
   CloseFile(f);
 
-  Form2.Map.Position.X :=   cellSpaceX * Length(map[0]) / 4;
-  Form2.Map.Position.Y := - cellSpaceY * Length(map) / 4;
+  // Form2.Map.Position.X :=   cellSpaceX * Length(map[0]) / 4;
+  // Form2.Map.Position.Y := - cellSpaceY * Length(map) / 4;
+  Form2.map.Position.x := 0;
+  Form2.map.Position.Y := -Form2.ClientHeight / 4;
 
   Form2.BuildingsOrigin.BringToFront();
   Form2.CharactersOrigin.BringToFront();

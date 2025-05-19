@@ -147,6 +147,9 @@ begin
   actions := c;
 
   Form2.ActionsText.Text := IntToStr(actions) + '/' + IntToStr(actionsPerRound);
+
+//  if actions = 0 then
+//      NextMove();
 end;
 
 procedure TryEndPrepare();

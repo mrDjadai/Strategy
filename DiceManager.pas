@@ -18,14 +18,12 @@ type
     text: TLabel;
   End;
 
-
-
 procedure ClearVisualisation();
 function DropDices(dices: DicesCount): integer;
 
 implementation
 
-uses CellManager, Window, Drawer;
+uses CellManager, Window, Drawer, System.UITypes;
 
 const
   DiceSize = 60;
@@ -82,6 +80,10 @@ begin
   MyText.TextSettings.VertAlign := TTextAlign.Center;
   MyText.Width := DiceSize;
   MyText.Height := DiceSize;
+
+  SetFont(MyText);
+  MyText.StyledSettings := MyText.StyledSettings - [TStyledSetting.FontColor];
+  MyText.TextSettings.FontColor := TAlphaColors.White;
 
   result.image := MyImage;
   result.text := MyText;

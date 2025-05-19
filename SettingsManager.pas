@@ -41,6 +41,9 @@ begin
     Write(f, currentSettings);
   end;
   CloseFile(f);
+
+  ChangeMusic(currentSettings.music);
+  ChangeSound(currentSettings.sound);
 end;
 
 procedure SaveSettings();

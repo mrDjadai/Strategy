@@ -359,7 +359,7 @@ begin
   if IsSelected then
     DrawOutline(img, TAlphaColors.Yellow, outlineWidth)
   else if curseRounds > 0 then
-    DrawOutline(img, TAlphaColors.Purple, outlineWidth);
+    DrawOutline(img, TAlphaColors.Fuchsia, outlineWidth);
 end;
 
 function decardToCube(pos: Vector2): Vector3;
@@ -662,6 +662,7 @@ begin
   GetCell(pos).character := nil;
   form2.DiePlayer.CurrentTime := 0;
   form2.DiePlayer.Play();
+  CharacterDataVisualisator.ReDraw();
   if curPlayer <> owner then
     currentPlayer.SetMoney(currentPlayer.Money + Round( addedMoneyMultiplier * cost));
   Self.Free;
@@ -725,7 +726,6 @@ end;
 
 procedure TSkill.PlaySound();
 begin
-  audioSource.Volume := 1;
   audioSource.CurrentTime := 0;
   audioSource.Play();
 end;
