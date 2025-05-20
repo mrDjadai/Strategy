@@ -32,8 +32,25 @@ inherited Form2_Windows: TForm2_Windows
       TextSettings.Font.StyleExt = {00070000000000000004000000}
     end
     inherited ErrorPanel: TPanel
-      inherited ErrorHeader: TLabel
+      inherited NoCharError: TLabel [0]
+      end
+      inherited NoMapsError: TLabel [1]
+      end
+      inherited ErrorHeader: TLabel [2]
         Position.X = 16.000000000000000000
+      end
+      inherited NoCellError: TLabel [3]
+      end
+      inherited NoParametrsError: TLabel [4]
+      end
+      inherited NoBuildingsError: TLabel [5]
+      end
+      inherited GameExiter1: TButton [6]
+      end
+      inherited ErrorBG: TImage [7]
+        MultiResBitmap.Height = 1080
+        MultiResBitmap.Width = 1920
+        Margins.Bottom = 5.000000000000000000
       end
     end
   end
@@ -47,6 +64,18 @@ inherited Form2_Windows: TForm2_Windows
       end
     end
     inherited MapPanel: TImage
+      MultiResBitmap.Height = 1080
+      MultiResBitmap.Width = 1920
+    end
+  end
+  inherited WinPanel: TPanel
+    inherited WinnerText: TLabel [0]
+    end
+    inherited WinnerIndicator: TImage [1]
+    end
+    inherited WinExit: TButton [2]
+    end
+    inherited WinBG: TImage [3]
       MultiResBitmap.Height = 1080
       MultiResBitmap.Width = 1920
     end

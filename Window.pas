@@ -92,6 +92,8 @@ type
     DownBG: TImage;
     Label1: TLabel;
     GameExiter1: TButton;
+    WinBG: TImage;
+    ErrorBG: TImage;
     procedure OpenGame(Sender: TObject);
     procedure FormKeyDown(Sender: TObject; var Key: Word; var KeyChar: WideChar;
       Shift: TShiftState);
@@ -916,6 +918,7 @@ procedure TForm2.TryLoopAudio(Sender: TObject);
 var
   Files: TStringDynArray;
   RandomIndex: integer;
+  oldVolume : single;
 begin
   if MusicPlayer.CurrentTime >= MusicPlayer.Duration then
   begin
@@ -923,7 +926,9 @@ begin
       'Resourses\Audio\Music\');
     RandomIndex := Random(Length(Files));
 
+    oldVolume := MusicPlayer.Volume;
     MusicPlayer.FileName := Files[RandomIndex];
+    musicPlayer.Volume := oldVolume;
     MusicPlayer.Play();
   end;
 
